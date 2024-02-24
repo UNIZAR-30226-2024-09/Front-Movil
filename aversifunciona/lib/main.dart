@@ -27,7 +27,7 @@ class MyHomePage extends StatelessWidget {
           children: [
             // Logo
             Image.asset(
-              'assets/logoMusify.jpg', // Reemplazar 'assets/logo.png' con la ruta del logo
+              'lib/logoMusify.JPG', // Reemplazar 'assets/logo.png' con la ruta del logo
               width: 150,
               height: 150,
             ),
@@ -49,7 +49,7 @@ class MyHomePage extends StatelessWidget {
             RoundedButton(
               text: 'Continuar con Google',
               backgroundColor: Colors.black,
-              textColor: Colors.white,
+              textColor: Colors.red,
               onPressed: () {
                 // Navegar a la pantalla de Google
                 Navigator.push(
@@ -98,7 +98,7 @@ class RoundedButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          primary: backgroundColor,
+
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20.0),
           ),
