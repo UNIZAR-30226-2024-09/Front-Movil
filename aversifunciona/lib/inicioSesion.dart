@@ -12,7 +12,7 @@ class InicioSesion extends StatelessWidget {
           children: [
             // Logo
             Image.asset(
-              'assets/logo.png', // Reemplazar 'assets/logo.png' con la ruta del logo
+              'lib/Musify.JPG', // Reemplazar 'assets/logo.png' con la ruta del logo
               width: 150,
               height: 150,
             ),
