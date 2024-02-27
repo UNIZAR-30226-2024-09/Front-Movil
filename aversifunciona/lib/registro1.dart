@@ -37,6 +37,7 @@ class Registro1 extends StatelessWidget {
 
             // Campo de Correo Electrónico
             InputField(
+
               hintText: 'Correo electrónico',
             ),
 
@@ -59,6 +60,7 @@ class Registro1 extends StatelessWidget {
     );
   }
 }
+
 
 class InputField extends StatelessWidget {
   final String hintText;
@@ -88,7 +90,7 @@ class InputField extends StatelessWidget {
               border: Border.all(color: Colors.white), // Borde blanco
             ),
             child: TextFormField(
-              style: TextStyle(color: Colors.black),
+              style: TextStyle(color: Colors.white),
               decoration: InputDecoration(
                 contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                 border: InputBorder.none,
@@ -100,6 +102,8 @@ class InputField extends StatelessWidget {
     );
   }
 }
+
+
 
 class RoundedButton extends StatelessWidget {
   final String text;

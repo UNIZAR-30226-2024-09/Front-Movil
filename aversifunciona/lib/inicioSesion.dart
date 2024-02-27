@@ -12,7 +12,7 @@ class InicioSesion extends StatelessWidget {
           children: [
             // Logo
             Image.asset(
-              'lib/Musify.JPG', // Reemplazar 'assets/logo.png' con la ruta del logo
+              'lib/logoMusify.JPG', // Reemplazar 'assets/logo.png' con la ruta del logo
               width: 150,
               height: 150,
             ),
@@ -119,7 +119,8 @@ class RoundedButton extends StatelessWidget {
         ),
         child: Text(
           text,
-          style: TextStyle(color: textColor),
+
+          style: TextStyle(color: Colors.black),
         ),
       ),
     );

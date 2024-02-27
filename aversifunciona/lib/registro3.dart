@@ -37,7 +37,7 @@ class Registro3 extends StatelessWidget {
 
             // Campo de Correo Electrónico
             InputField(
-              hintText: '¿Cuál es tu fecha de nacimietno?',
+              hintText: '¿Cuál es tu fecha de nacimiento?',
             ),
 
             SizedBox(height: 20),

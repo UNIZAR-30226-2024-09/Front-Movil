@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'registro_fin.dart';
+import 'registro3.dart';
 
-class Registro4 extends StatelessWidget {
+class Registro_fin extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,40 +33,58 @@ class Registro4 extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 20),
+            SizedBox(height: 10),
 
             // Campo de Género
+            InputField(
+              hintText: '¿Cómo te llamas?',
+            ),
+
             Text(
-              '¿Cuál es tu género?',
-              style: TextStyle(color: Colors.white),
+              'Esto se mostrará en tu perfil de Musify',
+              style: TextStyle(color: Colors.white)
+            ),
+            SizedBox(height: 5),
+            Text(
+                '______________________________________________________',
+                style: TextStyle(color: Colors.white)
+            ),
+            SizedBox(height: 10),
+            Text(
+                'Si pulsas "Crear cuenta, aceptas los terminos y condiciones de Musify"',
+                style: TextStyle(color: Colors.white, fontSize: 10)
             ),
 
             SizedBox(height: 20),
-
+            Text(
+                'Política de Privacidad',
+                style: TextStyle(color: Colors.blue)
+            ),
             // Opciones de género
             Column(
               children: [
-                genderOption('Mujer', context),
-                genderOption('Hombre', context),
-                genderOption('Otro', context),
-                genderOption('Prefiero no decirlo', context),
+                genderOption('Acepto Marianela', context),
+                genderOption('Permito que Musify utilice mi Marianela', context),
               ],
             ),
 
             SizedBox(height: 20),
 
-            RoundedButton(
-              text: 'Siguiente',
-              backgroundColor: Colors.white,
-              textColor: Colors.black,
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => Registro_fin()),
-                );
-              },
+            Align(
+              alignment: Alignment.center,
+              child: RoundedButton(
+
+                text: 'Crear cuenta',
+                backgroundColor: Colors.white,
+                textColor: Colors.black,
+                onPressed: () {
+                  // Puedes acceder al género seleccionado directamente en el onPressed
+                  // por ejemplo, genderOption('Mujer', context) devolverá 'Mujer'
+                },
+              ),
             ),
           ],
+
         ),
       ),
     );
@@ -84,41 +102,6 @@ class Registro4 extends StatelessWidget {
         // Puedes agregar lógica aquí si es necesario
       },
       activeColor: Colors.white,
-    );
-  }
-}
-
-class RoundedButton extends StatelessWidget {
-  final String text;
-  final Color backgroundColor;
-  final Color textColor;
-  final VoidCallback onPressed;
-
-  const RoundedButton({
-    Key? key,
-    required this.text,
-    required this.backgroundColor,
-    required this.textColor,
-    required this.onPressed,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 250,
-      child: ElevatedButton(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20.0),
-          ),
-        ),
-        child: Text(
-          text,
-          style: TextStyle(color: textColor),
-        ),
-      ),
     );
   }
 }
