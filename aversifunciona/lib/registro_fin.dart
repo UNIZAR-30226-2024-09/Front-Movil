@@ -1,3 +1,4 @@
+import 'package:aversifunciona/pantalla_principal.dart';
 import 'package:flutter/material.dart';
 import 'registro3.dart';
 
@@ -78,8 +79,10 @@ class Registro_fin extends StatelessWidget {
                 backgroundColor: Colors.white,
                 textColor: Colors.black,
                 onPressed: () {
-                  // Puedes acceder al género seleccionado directamente en el onPressed
-                  // por ejemplo, genderOption('Mujer', context) devolverá 'Mujer'
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => pantalla_principal()),
+                  );
                 },
               ),
             ),

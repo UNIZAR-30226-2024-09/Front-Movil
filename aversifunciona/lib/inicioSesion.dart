@@ -1,3 +1,4 @@
+import 'package:aversifunciona/pantalla_principal.dart';
 import 'package:flutter/material.dart';
 
 class InicioSesion extends StatelessWidget {
@@ -39,7 +40,10 @@ class InicioSesion extends StatelessWidget {
               backgroundColor: Colors.blue,
               textColor: Colors.white,
               onPressed: () {
-                // Lógica para iniciar sesión
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => pantalla_principal()),
+                );
               },
             ),
           ],
