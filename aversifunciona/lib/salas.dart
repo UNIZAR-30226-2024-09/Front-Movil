@@ -1,5 +1,9 @@
-import 'package:aversifunciona/crearSala.dart';
+import 'package:aversifunciona/pantalla_principal.dart';
 import 'package:flutter/material.dart';
+
+import 'biblioteca.dart';
+import 'buscar.dart';
+import 'chatDeSala.dart';
 
 class pantalla_salas extends StatelessWidget {
   @override
@@ -21,68 +25,22 @@ class pantalla_salas extends StatelessWidget {
       ),
       body: Column(
         children: [
-          ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => crearSala()),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              primary: Colors.grey, // Color del botón
-            ),
-            child: Text('+',
-              style: TextStyle(
-                color: Colors.white, // Color del texto
-                fontSize: 18, // Tamaño del texto
-              ),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              // Acción al presionar el primer botón
-              print('+');
-            },
-            style: ElevatedButton.styleFrom(
-              primary: Colors.blue, // Color del botón
-            ),
-            child: Text('SpainMusic',
-              style: TextStyle(
-                color: Colors.white, // Color del texto
-                fontSize: 18, // Tamaño del texto
-              ),
-            ), // Texto del botón
-          ),
-          ElevatedButton(
-            onPressed: () {
-              // Acción al presionar el primer botón
-              print('+');
-            },
-            style: ElevatedButton.styleFrom(
-              primary: Colors.blue, // Color del botón
-            ),
-            child: Text('SiaLovers',
-              style: TextStyle(
-                color: Colors.white, // Color del texto
-                fontSize: 18, // Tamaño del texto
-              ),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              // Acción al presionar el primer botón
-              print('+');
-            },
-            style: ElevatedButton.styleFrom(
-              primary: Colors.blue, // Color del botón
-            ),
-            child: Text('EminemGroup',
-              style: TextStyle(
-                color: Colors.white, // Color del texto
-                fontSize: 18, // Tamaño del texto
-              ),
-            ),
-          ),
+          buildButton('+', Colors.grey, 'Crear sala', () {
+            // Navegar a la pantalla de chat cuando se presiona el botón
+            Navigator.push(context, MaterialPageRoute(builder: (context) => ChatDeSala()));
+          }),
+          buildButton('SpainMusic', Colors.blue, 'Únete ahora', () {
+            // Navegar a la pantalla de chat cuando se presiona el botón
+            Navigator.push(context, MaterialPageRoute(builder: (context) => ChatDeSala()));
+          }),
+          buildButton('SiaLovers', Colors.blue, 'Únete ahora', () {
+            // Navegar a la pantalla de chat cuando se presiona el botón
+            Navigator.push(context, MaterialPageRoute(builder: (context) => ChatDeSala()));
+          }),
+          buildButton('EminemGroup', Colors.blue, 'Únete ahora', () {
+            // Navegar a la pantalla de chat cuando se presiona el botón
+            Navigator.push(context, MaterialPageRoute(builder: (context) => ChatDeSala()));
+          }),
           SizedBox(height: 20),
           Expanded(
             child: Container(
@@ -99,20 +57,91 @@ class pantalla_salas extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 // Opción 1
-                buildOption('Inicio'),
+                ElevatedButton(
+                  onPressed: () {
+                    // Navegar a la pantalla "Inicio"
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => pantalla_principal()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.transparent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                  child: Text(
+                    'Inicio',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
 
                 // Opción 2
-                buildOption('Buscar'),
+                ElevatedButton(
+                  onPressed: () {
+                    // Navegar a la pantalla "Buscar"
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => pantalla_buscar()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.transparent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                  child: Text(
+                    'Buscar',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
 
                 // Opción 3
-                buildOption('Biblioteca'),
+                ElevatedButton(
+                  onPressed: () {
+                    // Navegar a la pantalla "Biblioteca"
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => pantalla_biblioteca()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.transparent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                  child: Text(
+                    'Biblioteca',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
 
                 // Opción 4
-                buildOption('Salas'),
+                ElevatedButton(
+                  onPressed: () {
+                    // Navegar a la pantalla "Salas"
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => pantalla_salas()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.transparent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                  child: Text(
+                    'Salas',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
               ],
             ),
           ),
-
         ],
       ),
     );
@@ -122,7 +151,6 @@ class pantalla_salas extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // widget de imagen si es necesario
         Text(
           title,
           style: TextStyle(color: Colors.white, fontSize: 18),
@@ -131,28 +159,34 @@ class pantalla_salas extends StatelessWidget {
     );
   }
 
-  Widget buildButton(String label, Color color, IconData icon) {
+  Widget buildButton(String label, Color color, String buttonText, VoidCallback onPressed) {
     return Container(
-        width: double.infinity, // Ancho máximo
-        height: 100,
-      margin: EdgeInsets.all(8),
-      child: ElevatedButton.icon(
-        onPressed: () {
-          // Acción al presionar el botón (puedes personalizarlo según sea necesario)
-        },
+      width: 300, // Ancho fijo
+      height: 100,  // Alto fijo
+      margin: EdgeInsets.all(15),
+      child: ElevatedButton(
+        onPressed: onPressed, // Ahora el onPressed es dinámico
         style: ElevatedButton.styleFrom(
           primary: color,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
         ),
-        icon: Icon(icon),
-        label: Text(
-          label,
-          style: TextStyle(color: Colors.white),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              label,
+              style: TextStyle(color: Colors.white),
+            ),
+            SizedBox(height: 20),
+            Text(
+              buttonText,
+              style: TextStyle(color: Colors.black),
+            ),
+          ],
         ),
       ),
     );
   }
 }
-

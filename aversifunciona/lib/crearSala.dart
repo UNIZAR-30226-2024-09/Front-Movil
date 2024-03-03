@@ -1,4 +1,9 @@
+import 'package:aversifunciona/biblioteca.dart';
+import 'package:aversifunciona/pantalla_principal.dart';
+import 'package:aversifunciona/salas.dart';
 import 'package:flutter/material.dart';
+
+import 'buscar.dart';
 
 class crearSala extends StatelessWidget {
   @override
@@ -20,47 +25,38 @@ class crearSala extends StatelessWidget {
       ),
       body: Column(
         children: [
-          ElevatedButton(
-            onPressed: () {
-              // Acción al presionar el primer botón
-              print('+');
-            },
-            style: ElevatedButton.styleFrom(
-              primary: Colors.grey, // Color del botón
-            ),
-            child: Text('+'), // Texto del botón
-          ),
-          ElevatedButton(
-            onPressed: () {
-              // Acción al presionar el primer botón
-              print('+');
-            },
-            style: ElevatedButton.styleFrom(
-              primary: Colors.blue, // Color del botón
-            ),
-            child: Text('SpainMusic'), // Texto del botón
-          ),
-          ElevatedButton(
-            onPressed: () {
-              // Acción al presionar el primer botón
-              print('+');
-            },
-            style: ElevatedButton.styleFrom(
-              primary: Colors.blue, // Color del botón
-            ),
-            child: Text('SiaLovers'), // Texto del botón
-          ),
-          ElevatedButton(
-            onPressed: () {
-              // Acción al presionar el primer botón
-              print('+');
-            },
-            style: ElevatedButton.styleFrom(
-              primary: Colors.blue, // Color del botón
-            ),
-            child: Text('EminemGroup'), // Texto del botón
-          ),
+          buildButton('+', Colors.grey, 'Crear sala'), // Modificado aquí
+          buildButton('SpainMusic', Colors.blue, 'Únete ahora'),
+          buildButton('SiaLovers', Colors.blue, 'Únete ahora'),
+          buildButton('EminemGroup', Colors.blue, 'Únete ahora'),
           SizedBox(height: 20),
+          Center(
+            child: Container(
+              padding: EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Introduce el nombre de la sala',
+                    style: TextStyle(fontSize: 18),
+                  ),
+                  SizedBox(height: 10),
+                  Container(
+                    width: 200,
+                    child: TextField(
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
           Expanded(
             child: Container(
               // Contenido principal (puedes colocar aquí tu imagen o cualquier otro contenido)
@@ -76,20 +72,91 @@ class crearSala extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 // Opción 1
-                buildOption('Inicio'),
+                ElevatedButton(
+                  onPressed: () {
+                    // Navegar a la pantalla "Inicio"
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => pantalla_principal()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.transparent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                  child: Text(
+                    'Inicio',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
 
                 // Opción 2
-                buildOption('Buscar'),
+                ElevatedButton(
+                  onPressed: () {
+                    // Navegar a la pantalla "Buscar"
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => pantalla_buscar()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.transparent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                  child: Text(
+                    'Buscar',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
 
                 // Opción 3
-                buildOption('Biblioteca'),
+                ElevatedButton(
+                  onPressed: () {
+                    // Navegar a la pantalla "Biblioteca"
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => pantalla_biblioteca()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.transparent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                  child: Text(
+                    'Biblioteca',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
 
                 // Opción 4
-                buildOption('Salas'),
+                ElevatedButton(
+                  onPressed: () {
+                    // Navegar a la pantalla "Salas"
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => pantalla_salas()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.transparent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                  child: Text(
+                    'Salas',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
               ],
             ),
           ),
-
         ],
       ),
     );
@@ -99,7 +166,6 @@ class crearSala extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Aquí puedes agregar tu propio widget de imagen si es necesario
         Text(
           title,
           style: TextStyle(color: Colors.white, fontSize: 18),
@@ -108,10 +174,12 @@ class crearSala extends StatelessWidget {
     );
   }
 
-  Widget buildButton(String label, Color color, IconData icon) {
+  Widget buildButton(String label, Color color, String buttonText) {
     return Container(
-      margin: EdgeInsets.all(8),
-      child: ElevatedButton.icon(
+      width: 300, // Ancho fijo
+      height: 100,  // Alto fijo
+      margin: EdgeInsets.all(15),
+      child: ElevatedButton(
         onPressed: () {
           // Acción al presionar el botón (puedes personalizarlo según sea necesario)
         },
@@ -121,13 +189,21 @@ class crearSala extends StatelessWidget {
             borderRadius: BorderRadius.circular(10),
           ),
         ),
-        icon: Icon(icon),
-        label: Text(
-          label,
-          style: TextStyle(color: Colors.white),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              label,
+              style: TextStyle(color: Colors.white),
+            ),
+            SizedBox(height: 20),
+            Text(
+              buttonText,
+              style: TextStyle(color: Colors.black),
+            ),
+          ],
         ),
       ),
     );
   }
 }
-

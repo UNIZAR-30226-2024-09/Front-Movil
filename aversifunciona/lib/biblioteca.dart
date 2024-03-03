@@ -1,9 +1,9 @@
-import 'package:aversifunciona/biblioteca.dart';
 import 'package:aversifunciona/buscar.dart';
+import 'package:aversifunciona/pantalla_principal.dart';
 import 'package:aversifunciona/salas.dart';
 import 'package:flutter/material.dart';
 
-class pantalla_principal extends StatelessWidget {
+class pantalla_biblioteca extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -167,17 +167,5 @@ class pantalla_principal extends StatelessWidget {
   }
 }
 
-class SalasScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Salas'),
-      ),
-      body: Center(
-        child: Text('Contenido de la pantalla Salas'),
-      ),
-    );
-  }
-}
+
 
