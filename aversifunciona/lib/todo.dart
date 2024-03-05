@@ -1,5 +1,6 @@
 import 'package:aversifunciona/biblioteca.dart';
 import 'package:aversifunciona/buscar.dart';
+import 'package:aversifunciona/pantalla_principal.dart';
 import 'package:aversifunciona/podcast.dart';
 import 'package:aversifunciona/salas.dart';
 import 'package:aversifunciona/todo.dart';
@@ -7,7 +8,7 @@ import 'package:flutter/material.dart';
 
 import 'musica.dart';
 
-class pantalla_principal extends StatelessWidget {
+class pantalla_todo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

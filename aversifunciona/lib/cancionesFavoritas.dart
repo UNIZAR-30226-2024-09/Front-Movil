@@ -1,41 +1,72 @@
-import 'package:aversifunciona/biblioteca.dart';
-import 'package:aversifunciona/buscar.dart';
-import 'package:aversifunciona/podcast.dart';
-import 'package:aversifunciona/salas.dart';
-import 'package:aversifunciona/todo.dart';
+import 'package:aversifunciona/pantalla_principal.dart';
 import 'package:flutter/material.dart';
 
-import 'musica.dart';
+import 'ListaOCarpeta.dart';
+import 'biblioteca.dart';
+import 'buscar.dart';
+import 'chatDeSala.dart';
 
-class pantalla_principal extends StatelessWidget {
+class cancionesFavoritas extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,
-        title: Text(
-          'Título de la pantalla',
-          style: TextStyle(color: Colors.white),
-        ),
-        actions: [
-          Spacer(),
-          CircleAvatar(
-            backgroundImage: AssetImage('tu_ruta_de_imagen'),
-          ),
-          Spacer(),
-          // Botón Todo
-          buildTopButton(context, 'Todo', pantalla_todo()),
-
-          // Botón Música
-          buildTopButton(context, 'Música', pantalla_musica()),
-
-          // Botón Podcast
-          buildTopButton(context, 'Podcast', pantalla_podcast()),
-        ],
       ),
       body: Column(
         children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                CircleAvatar(
+                  radius: 20,
+                  backgroundImage: AssetImage('ruta_de_la_imagen'),
+                ),
+                SizedBox(width: 10),
+                Text(
+                  'Tu biblioteca',
+                  style: TextStyle(color: Colors.white, fontSize: 20),
+                ),
+              ],
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // Cuadrado con la imagen
+              Container(
+                width: 40, // Ajusta el tamaño según sea necesario
+                height: 40,
+                decoration: BoxDecoration(
+                  color: Colors.grey, // Puedes ajustar el color del cuadrado
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Image.asset('ruta_de_la_imagen_cuadrado'),
+              ),
+              // Botón a la derecha del cuadrado
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => cancionesFavoritas()),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.transparent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                child: Text(
+                  'Canciones que te gustan',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ],
+          ),
           Expanded(
             child: Container(
               // Contenido principal (puedes colocar aquí tu imagen o cualquier otro contenido)
@@ -56,7 +87,8 @@ class pantalla_principal extends StatelessWidget {
                     // Navegar a la pantalla "Inicio"
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => pantalla_principal()),
+                      MaterialPageRoute(
+                          builder: (context) => pantalla_principal()),
                     );
                   },
                   style: ElevatedButton.styleFrom(
@@ -70,14 +102,14 @@ class pantalla_principal extends StatelessWidget {
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
-
                 // Opción 2
                 ElevatedButton(
                   onPressed: () {
                     // Navegar a la pantalla "Buscar"
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => pantalla_buscar()),
+                      MaterialPageRoute(
+                          builder: (context) => pantalla_buscar()),
                     );
                   },
                   style: ElevatedButton.styleFrom(
@@ -91,14 +123,14 @@ class pantalla_principal extends StatelessWidget {
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
-
                 // Opción 3
                 ElevatedButton(
                   onPressed: () {
                     // Navegar a la pantalla "Biblioteca"
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => pantalla_biblioteca()),
+                      MaterialPageRoute(
+                          builder: (context) => pantalla_biblioteca()),
                     );
                   },
                   style: ElevatedButton.styleFrom(
@@ -112,7 +144,6 @@ class pantalla_principal extends StatelessWidget {
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
-
                 // Opción 4
                 ElevatedButton(
                   onPressed: () {
@@ -141,57 +172,4 @@ class pantalla_principal extends StatelessWidget {
     );
   }
 
-  Widget buildOption(String title) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // Aquí puedes agregar tu propio widget de imagen si es necesario
-        Text(
-          title,
-          style: TextStyle(color: Colors.white, fontSize: 18), // Ajusta el tamaño de la fuente según sea necesario
-        ),
-      ],
-    );
-  }
-
-  Widget buildTopButton(BuildContext context, String title, Widget screen) {
-    return Container(
-      margin: EdgeInsets.all(8),
-      child: ElevatedButton(
-        onPressed: () {
-          // Navegar a la pantalla correspondiente
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => screen),
-          );
-        },
-        style: ElevatedButton.styleFrom(
-          primary: Colors.grey,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-        ),
-        child: Text(
-          title,
-          style: TextStyle(color: Colors.white),
-        ),
-      ),
-    );
-  }
 }
-
-
-class SalasScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Salas'),
-      ),
-      body: Center(
-        child: Text('Contenido de la pantalla Salas'),
-      ),
-    );
-  }
-}
-

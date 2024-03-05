@@ -1,13 +1,10 @@
 import 'package:aversifunciona/biblioteca.dart';
 import 'package:aversifunciona/buscar.dart';
-import 'package:aversifunciona/podcast.dart';
+import 'package:aversifunciona/pantalla_principal.dart';
 import 'package:aversifunciona/salas.dart';
-import 'package:aversifunciona/todo.dart';
 import 'package:flutter/material.dart';
 
-import 'musica.dart';
-
-class pantalla_principal extends StatelessWidget {
+class pantalla_podcast extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,22 +22,71 @@ class pantalla_principal extends StatelessWidget {
           ),
           Spacer(),
           // Botón Todo
-          buildTopButton(context, 'Todo', pantalla_todo()),
+          buildTopButton('Todo'),
 
           // Botón Música
-          buildTopButton(context, 'Música', pantalla_musica()),
+          buildTopButton('Música'),
 
           // Botón Podcast
-          buildTopButton(context, 'Podcast', pantalla_podcast()),
+          buildTopButton('Podcast'),
         ],
       ),
       body: Column(
         children: [
-          Expanded(
+          // Botón con imagen 1
+          ElevatedButton(
+            onPressed: () {
+              // escuchar podcast
+            },
+            style: ElevatedButton.styleFrom(
+              primary: Colors.transparent,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+            ),
             child: Container(
-              // Contenido principal (puedes colocar aquí tu imagen o cualquier otro contenido)
+              height: 150,
+              width: 200,
+              child: Image.asset('imagen_podcast', fit: BoxFit.cover),
             ),
           ),
+          Spacer(),
+          // Botón con imagen 2
+          ElevatedButton(
+            onPressed: () {
+              // escuchar podcast
+            },
+            style: ElevatedButton.styleFrom(
+              primary: Colors.transparent,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+            ),
+            child: Container(
+              height: 150,
+              width: 200,
+              child: Image.asset('imagen_podcast', fit: BoxFit.cover),
+            ),
+          ),
+          Spacer(),
+          // Botón con imagen 3
+          ElevatedButton(
+            onPressed: () {
+              // escuchar podcast
+            },
+            style: ElevatedButton.styleFrom(
+              primary: Colors.transparent,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+            ),
+            child: Container(
+              height: 150,
+              width: 200,
+              child: Image.asset('imagen_podcast', fit: BoxFit.cover),
+            ),
+          ),
+          Spacer(),
           Container(
             decoration: BoxDecoration(
               border: Border(
@@ -154,16 +200,12 @@ class pantalla_principal extends StatelessWidget {
     );
   }
 
-  Widget buildTopButton(BuildContext context, String title, Widget screen) {
+  Widget buildTopButton(String title) {
     return Container(
       margin: EdgeInsets.all(8),
       child: ElevatedButton(
         onPressed: () {
-          // Navegar a la pantalla correspondiente
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => screen),
-          );
+          // Acción al presionar el botón (puedes personalizarlo según sea necesario)
         },
         style: ElevatedButton.styleFrom(
           primary: Colors.grey,
@@ -179,7 +221,6 @@ class pantalla_principal extends StatelessWidget {
     );
   }
 }
-
 
 class SalasScreen extends StatelessWidget {
   @override

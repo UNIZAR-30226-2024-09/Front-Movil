@@ -1,7 +1,10 @@
-import 'package:aversifunciona/buscar.dart';
+import 'package:aversifunciona/cancionesFavoritas.dart';
 import 'package:aversifunciona/pantalla_principal.dart';
-import 'package:aversifunciona/salas.dart';
 import 'package:flutter/material.dart';
+
+import 'ListaOCarpeta.dart';
+import 'buscar.dart';
+import 'chatDeSala.dart';
 
 class pantalla_biblioteca extends StatelessWidget {
   @override
@@ -10,23 +13,208 @@ class pantalla_biblioteca extends StatelessWidget {
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,
-        title: Text(
-          'Título de la pantalla',
-          style: TextStyle(color: Colors.white),
-        ),
-        actions: [
-          // Botón Todo
-          buildTopButton('Todo'),
-
-          // Botón Música
-          buildTopButton('Música'),
-
-          // Botón Podcast
-          buildTopButton('Podcast'),
-        ],
       ),
       body: Column(
         children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                CircleAvatar(
+                  radius: 20,
+                  backgroundImage: AssetImage('ruta_de_la_imagen'),
+                ),
+                SizedBox(width: 10),
+                Text(
+                  'Tu biblioteca',
+                  style: TextStyle(color: Colors.white, fontSize: 20),
+                ),
+                Spacer(),
+                GestureDetector(
+                  onTap: () {
+                    // Navegar a la pantalla "crearListaOCarpeta"
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => crearListaOCarpeta()),
+                    );
+                  },
+                  child: Text(
+                    '+',
+                    style: TextStyle(color: Colors.white, fontSize: 20),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Sección 1
+          Row(
+            children: [
+              // Botón con imagen y texto
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => cancionesFavoritas()),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.transparent,
+                  padding: EdgeInsets.all(0), // Sin relleno
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 40, // Ajusta el tamaño según sea necesario
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: Colors.grey, // Puedes ajustar el color del cuadrado
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Image.asset('ruta_de_la_imagen_cuadrado_1'),
+                    ),
+                    SizedBox(width: 5),
+                    Text(
+                      'Canciones que te gustan',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          // Sección 2
+          Row(
+            children: [
+              // Botón con imagen y texto
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => cancionesFavoritas()),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.transparent,
+                  padding: EdgeInsets.all(0), // Sin relleno
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 40, // Ajusta el tamaño según sea necesario
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: Colors.grey, // Puedes ajustar el color del cuadrado
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Image.asset('ruta_de_la_imagen_cuadrado_2'),
+                    ),
+                    SizedBox(width: 5),
+                    Text(
+                      'Playlist Nº1',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          // Sección 3
+          Row(
+            children: [
+              // Botón con imagen y texto
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => cancionesFavoritas()),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.transparent,
+                  padding: EdgeInsets.all(0), // Sin relleno
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 40, // Ajusta el tamaño según sea necesario
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: Colors.grey, // Puedes ajustar el color del cuadrado
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Image.asset('ruta_de_la_imagen_cuadrado_3'),
+                    ),
+                    SizedBox(width: 5),
+                    Text(
+                      'Playlist Nº2',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          // Sección 4
+          Row(
+            children: [
+              // Botón con imagen y texto
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => cancionesFavoritas()),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.transparent,
+                  padding: EdgeInsets.all(0), // Sin relleno
+                ),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 20,
+                      backgroundImage: AssetImage('ruta_de_la_imagen'),
+                    ),
+                    SizedBox(width: 5),
+                    Text(
+                      'Añadir artistas',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              // Botón con imagen y texto
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => cancionesFavoritas()),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.transparent,
+                  padding: EdgeInsets.all(0), // Sin relleno
+                ),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 20,
+                      backgroundImage: AssetImage('ruta_de_la_imagen'),
+                    ),
+                    SizedBox(width: 5),
+                    Text(
+                      'Añadir podcast',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
           Expanded(
             child: Container(
               // Contenido principal (puedes colocar aquí tu imagen o cualquier otro contenido)
@@ -61,7 +249,6 @@ class pantalla_biblioteca extends StatelessWidget {
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
-
                 // Opción 2
                 ElevatedButton(
                   onPressed: () {
@@ -82,7 +269,6 @@ class pantalla_biblioteca extends StatelessWidget {
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
-
                 // Opción 3
                 ElevatedButton(
                   onPressed: () {
@@ -103,7 +289,6 @@ class pantalla_biblioteca extends StatelessWidget {
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
-
                 // Opción 4
                 ElevatedButton(
                   onPressed: () {
@@ -139,7 +324,7 @@ class pantalla_biblioteca extends StatelessWidget {
         // Aquí puedes agregar tu propio widget de imagen si es necesario
         Text(
           title,
-          style: TextStyle(color: Colors.white, fontSize: 18), // Ajusta el tamaño de la fuente según sea necesario
+          style: TextStyle(color: Colors.white, fontSize: 18),
         ),
       ],
     );
@@ -166,6 +351,3 @@ class pantalla_biblioteca extends StatelessWidget {
     );
   }
 }
-
-
-

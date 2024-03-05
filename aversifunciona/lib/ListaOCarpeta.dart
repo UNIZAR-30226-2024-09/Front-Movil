@@ -1,41 +1,61 @@
-import 'package:aversifunciona/biblioteca.dart';
 import 'package:aversifunciona/buscar.dart';
-import 'package:aversifunciona/podcast.dart';
+import 'package:aversifunciona/pantalla_principal.dart';
 import 'package:aversifunciona/salas.dart';
-import 'package:aversifunciona/todo.dart';
 import 'package:flutter/material.dart';
 
-import 'musica.dart';
+import 'biblioteca.dart';
 
-class pantalla_principal extends StatelessWidget {
+class crearListaOCarpeta extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,
-        title: Text(
-          'Título de la pantalla',
-          style: TextStyle(color: Colors.white),
-        ),
-        actions: [
-          Spacer(),
-          CircleAvatar(
-            backgroundImage: AssetImage('tu_ruta_de_imagen'),
-          ),
-          Spacer(),
-          // Botón Todo
-          buildTopButton(context, 'Todo', pantalla_todo()),
-
-          // Botón Música
-          buildTopButton(context, 'Música', pantalla_musica()),
-
-          // Botón Podcast
-          buildTopButton(context, 'Podcast', pantalla_podcast()),
-        ],
       ),
       body: Column(
         children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Stack(
+              children: [
+              Row(
+              children: [
+                CircleAvatar(
+                  radius: 20,
+                  backgroundImage: AssetImage('ruta_de_la_imagen'),
+                ),
+                SizedBox(width: 10),
+                Text(
+                  'Tu biblioteca',
+                  style: TextStyle(color: Colors.white, fontSize: 20),
+                ),
+              ],
+            ),
+                Positioned(
+                  top: 0,
+                  right: 0,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: GestureDetector(
+                      onTap: () {
+                        // Navegar a la pantalla "crearListaOCarpeta"
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => crearListaOCarpeta()),
+                        );
+                      },
+                      child: Text(
+                        '+',
+                        style: TextStyle(color: Colors.white, fontSize: 20),
+                      ),
+                    ),
+                  ),
+                ),
+          ],
+            ),
+          ),
+
           Expanded(
             child: Container(
               // Contenido principal (puedes colocar aquí tu imagen o cualquier otro contenido)
@@ -154,16 +174,12 @@ class pantalla_principal extends StatelessWidget {
     );
   }
 
-  Widget buildTopButton(BuildContext context, String title, Widget screen) {
+  Widget buildTopButton(String title) {
     return Container(
       margin: EdgeInsets.all(8),
       child: ElevatedButton(
         onPressed: () {
-          // Navegar a la pantalla correspondiente
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => screen),
-          );
+          // Acción al presionar el botón (puedes personalizarlo según sea necesario)
         },
         style: ElevatedButton.styleFrom(
           primary: Colors.grey,
@@ -181,17 +197,4 @@ class pantalla_principal extends StatelessWidget {
 }
 
 
-class SalasScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Salas'),
-      ),
-      body: Center(
-        child: Text('Contenido de la pantalla Salas'),
-      ),
-    );
-  }
-}
 
