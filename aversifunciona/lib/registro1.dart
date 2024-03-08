@@ -6,6 +6,7 @@ class Registro1 extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black, // Fondo negro
+
       appBar: AppBar(
         backgroundColor: Colors.black,
         leading: IconButton(
@@ -28,10 +29,11 @@ class Registro1 extends StatelessWidget {
           ],
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      body: Center(
+
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+
           children: [
             SizedBox(height: 20),
 

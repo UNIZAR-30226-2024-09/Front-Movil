@@ -58,7 +58,7 @@ class pantalla_biblioteca extends StatelessWidget {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  primary: Colors.transparent,
+                  backgroundColor:Colors.transparent,
                   padding: EdgeInsets.all(0), // Sin relleno
                 ),
                 child: Row(
@@ -94,7 +94,7 @@ class pantalla_biblioteca extends StatelessWidget {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  primary: Colors.transparent,
+                  backgroundColor:Colors.transparent,
                   padding: EdgeInsets.all(0), // Sin relleno
                 ),
                 child: Row(
@@ -130,7 +130,7 @@ class pantalla_biblioteca extends StatelessWidget {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  primary: Colors.transparent,
+                  backgroundColor:Colors.transparent,
                   padding: EdgeInsets.all(0), // Sin relleno
                 ),
                 child: Row(
@@ -166,7 +166,7 @@ class pantalla_biblioteca extends StatelessWidget {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  primary: Colors.transparent,
+                  backgroundColor:Colors.transparent,
                   padding: EdgeInsets.all(0), // Sin relleno
                 ),
                 child: Row(
@@ -196,7 +196,7 @@ class pantalla_biblioteca extends StatelessWidget {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  primary: Colors.transparent,
+                  backgroundColor:Colors.transparent,
                   padding: EdgeInsets.all(0), // Sin relleno
                 ),
                 child: Row(
@@ -239,7 +239,7 @@ class pantalla_biblioteca extends StatelessWidget {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.transparent,
+                    backgroundColor:Colors.transparent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
@@ -259,7 +259,7 @@ class pantalla_biblioteca extends StatelessWidget {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.transparent,
+                    backgroundColor:Colors.transparent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
@@ -279,7 +279,7 @@ class pantalla_biblioteca extends StatelessWidget {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.transparent,
+                    backgroundColor:Colors.transparent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
@@ -299,7 +299,7 @@ class pantalla_biblioteca extends StatelessWidget {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.transparent,
+                    backgroundColor:Colors.transparent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
@@ -338,7 +338,7 @@ class pantalla_biblioteca extends StatelessWidget {
           // Acción al presionar el botón (puedes personalizarlo según sea necesario)
         },
         style: ElevatedButton.styleFrom(
-          primary: Colors.grey,
+          backgroundColor:Colors.grey,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),

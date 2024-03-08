@@ -85,7 +85,7 @@ class _ChatDeSalaState extends State<ChatDeSala> {
                     });
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.grey,
+                    backgroundColor:Colors.grey,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
@@ -111,7 +111,7 @@ class _ChatDeSalaState extends State<ChatDeSala> {
           // Acción al presionar el botón (puedes personalizarlo según sea necesario)
         },
         style: ElevatedButton.styleFrom(
-          primary: Colors.grey,
+          backgroundColor:Colors.grey,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
@@ -171,7 +171,7 @@ class pantalla_salas extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          primary: color,
+          backgroundColor:color,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),

@@ -80,7 +80,7 @@ class crearListaOCarpeta extends StatelessWidget {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.transparent,
+                    backgroundColor:Colors.transparent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
@@ -101,7 +101,7 @@ class crearListaOCarpeta extends StatelessWidget {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.transparent,
+                    backgroundColor:Colors.transparent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
@@ -122,7 +122,7 @@ class crearListaOCarpeta extends StatelessWidget {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.transparent,
+                    backgroundColor:Colors.transparent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
@@ -143,7 +143,7 @@ class crearListaOCarpeta extends StatelessWidget {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.transparent,
+                    backgroundColor:Colors.transparent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
@@ -182,7 +182,7 @@ class crearListaOCarpeta extends StatelessWidget {
           // Acción al presionar el botón (puedes personalizarlo según sea necesario)
         },
         style: ElevatedButton.styleFrom(
-          primary: Colors.grey,
+          backgroundColor:Colors.grey,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),

@@ -66,7 +66,7 @@ class pantalla_salas extends StatelessWidget {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.transparent,
+                    backgroundColor:Colors.transparent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
@@ -87,7 +87,7 @@ class pantalla_salas extends StatelessWidget {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.transparent,
+                    backgroundColor:Colors.transparent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
@@ -108,7 +108,7 @@ class pantalla_salas extends StatelessWidget {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.transparent,
+                    backgroundColor:Colors.transparent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
@@ -129,7 +129,7 @@ class pantalla_salas extends StatelessWidget {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.transparent,
+                    backgroundColor:Colors.transparent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
@@ -167,7 +167,7 @@ class pantalla_salas extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onPressed, // Ahora el onPressed es dinámico
         style: ElevatedButton.styleFrom(
-          primary: color,
+          backgroundColor:color,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),

@@ -39,7 +39,7 @@ class pantalla_podcast extends StatelessWidget {
               // escuchar podcast
             },
             style: ElevatedButton.styleFrom(
-              primary: Colors.transparent,
+              backgroundColor:Colors.transparent,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
               ),
@@ -57,7 +57,7 @@ class pantalla_podcast extends StatelessWidget {
               // escuchar podcast
             },
             style: ElevatedButton.styleFrom(
-              primary: Colors.transparent,
+              backgroundColor:Colors.transparent,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
               ),
@@ -75,7 +75,7 @@ class pantalla_podcast extends StatelessWidget {
               // escuchar podcast
             },
             style: ElevatedButton.styleFrom(
-              primary: Colors.transparent,
+              backgroundColor:Colors.transparent,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
               ),
@@ -106,7 +106,7 @@ class pantalla_podcast extends StatelessWidget {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.transparent,
+                    backgroundColor:Colors.transparent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
@@ -127,7 +127,7 @@ class pantalla_podcast extends StatelessWidget {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.transparent,
+                    backgroundColor:Colors.transparent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
@@ -148,7 +148,7 @@ class pantalla_podcast extends StatelessWidget {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.transparent,
+                    backgroundColor:Colors.transparent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
@@ -169,7 +169,7 @@ class pantalla_podcast extends StatelessWidget {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.transparent,
+                    backgroundColor:Colors.transparent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
@@ -208,7 +208,7 @@ class pantalla_podcast extends StatelessWidget {
           // Acción al presionar el botón (puedes personalizarlo según sea necesario)
         },
         style: ElevatedButton.styleFrom(
-          primary: Colors.grey,
+          backgroundColor:Colors.grey,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
