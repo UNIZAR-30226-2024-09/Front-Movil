@@ -16,7 +16,7 @@ class InicioSesion extends StatelessWidget {
               end: Alignment.bottomCenter,
               colors: [
                 Colors.black,
-                Colors.lightBlue.shade400,
+                Colors.cyan.shade800,
               ],
           )
         ),
@@ -154,10 +154,10 @@ class RoundedButton extends StatelessWidget {
         onPressed: onPressed,
 
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.blue.shade800,
+          backgroundColor: Colors.blue.shade400,
 
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20.0),
+            borderRadius: BorderRadius.circular(12.0),
           ),
         ),
         child: Text(

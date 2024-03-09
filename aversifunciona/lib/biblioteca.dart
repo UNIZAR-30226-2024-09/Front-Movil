@@ -20,16 +20,16 @@ class pantalla_biblioteca extends StatelessWidget {
             padding: const EdgeInsets.all(8.0),
             child: Row(
               children: [
-                CircleAvatar(
+                const CircleAvatar(
                   radius: 20,
                   backgroundImage: AssetImage('ruta_de_la_imagen'),
                 ),
-                SizedBox(width: 10),
-                Text(
+                const SizedBox(width: 10),
+                const Text(
                   'Tu biblioteca',
                   style: TextStyle(color: Colors.white, fontSize: 20),
                 ),
-                Spacer(),
+                const Spacer(),
                 GestureDetector(
                   onTap: () {
                     // Navegar a la pantalla "crearListaOCarpeta"
@@ -38,7 +38,7 @@ class pantalla_biblioteca extends StatelessWidget {
                       MaterialPageRoute(builder: (context) => crearListaOCarpeta()),
                     );
                   },
-                  child: Text(
+                  child: const Text(
                     '+',
                     style: TextStyle(color: Colors.white, fontSize: 20),
                   ),
@@ -72,8 +72,8 @@ class pantalla_biblioteca extends StatelessWidget {
                       ),
                       child: Image.asset('ruta_de_la_imagen_cuadrado_1'),
                     ),
-                    SizedBox(width: 5),
-                    Text(
+                    const SizedBox(width: 5),
+                    const Text(
                       'Canciones que te gustan',
                       style: TextStyle(color: Colors.white),
                     ),
@@ -108,8 +108,8 @@ class pantalla_biblioteca extends StatelessWidget {
                       ),
                       child: Image.asset('ruta_de_la_imagen_cuadrado_2'),
                     ),
-                    SizedBox(width: 5),
-                    Text(
+                    const SizedBox(width: 5),
+                    const Text(
                       'Playlist Nº1',
                       style: TextStyle(color: Colors.white),
                     ),
@@ -144,8 +144,8 @@ class pantalla_biblioteca extends StatelessWidget {
                       ),
                       child: Image.asset('ruta_de_la_imagen_cuadrado_3'),
                     ),
-                    SizedBox(width: 5),
-                    Text(
+                    const SizedBox(width: 5),
+                    const Text(
                       'Playlist Nº2',
                       style: TextStyle(color: Colors.white),
                     ),
@@ -169,7 +169,7 @@ class pantalla_biblioteca extends StatelessWidget {
                   backgroundColor:Colors.transparent,
                   padding: EdgeInsets.all(0), // Sin relleno
                 ),
-                child: Row(
+                child: const Row(
                   children: [
                     CircleAvatar(
                       radius: 20,
@@ -199,7 +199,7 @@ class pantalla_biblioteca extends StatelessWidget {
                   backgroundColor:Colors.transparent,
                   padding: EdgeInsets.all(0), // Sin relleno
                 ),
-                child: Row(
+                child: const Row(
                   children: [
                     CircleAvatar(
                       radius: 20,
@@ -221,7 +221,7 @@ class pantalla_biblioteca extends StatelessWidget {
             ),
           ),
           Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               border: Border(
                 top: BorderSide(width: 1.0, color: Colors.white),
               ),

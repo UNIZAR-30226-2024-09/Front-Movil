@@ -9,12 +9,12 @@ class Registro4 extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.black,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
-        title: Row(
+        title: const Row(
           children: [
             // Texto de Encabezado
             Text(
@@ -28,52 +28,74 @@ class Registro4 extends StatelessWidget {
           ],
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: 20),
 
-            // Campo de Género
-            Text(
-              '¿Cuál es tu género?',
-              style: TextStyle(color: Colors.white),
-            ),
-
-            SizedBox(height: 20),
-
-            // Opciones de género
-            Column(
+      body: Center(
+          child: Column(
               children: [
-                genderOption('Mujer', context),
-                genderOption('Hombre', context),
-                genderOption('Otro', context),
-                genderOption('Prefiero no decirlo', context),
-              ],
-            ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
 
-            SizedBox(height: 20),
+                  children: [
+                    const SizedBox(height: 20),
 
-            RoundedButton(
-              text: 'Siguiente',
-              backgroundColor: Colors.white,
-              textColor: Colors.black,
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => Registro_fin()),
-                );
-              },
-            ),
-          ],
-        ),
+                    // Campo de Género
+
+                  const Padding(
+                    padding: EdgeInsets.only(left: 20.0),
+                    child: Text(
+
+                      '¿Cuál es tu género?',
+                      style: TextStyle(color: Colors.white, fontSize: 18),
+                    ),
+                  ),
+
+                    const SizedBox(height: 20),
+
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        genderOption('Mujer', context),
+                        genderOption('Hombre', context),
+                        genderOption('Otro', context),
+                        genderOption('Prefiero no decirlo', context),
+                      ],
+                    ),
+
+                    const SizedBox(height: 20),
+                ]
+          ),
+                Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      RoundedButton(
+
+                        text: 'Siguiente',
+                        backgroundColor: Colors.white,
+                        textColor: Colors.black,
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => Registro_fin()),
+                          );
+                        },
+                      ),
+                    ]
+                )
+        ]
       ),
+    ),
     );
   }
 
+
+
   Widget genderOption(String gender, BuildContext context) {
     return RadioListTile(
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      visualDensity: const VisualDensity(
+        horizontal: VisualDensity.minimumDensity,
+        vertical: VisualDensity.minimumDensity,
+      ),
       title: Text(
         gender,
         style: TextStyle(color: Colors.white),

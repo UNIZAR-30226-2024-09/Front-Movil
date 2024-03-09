@@ -13,17 +13,18 @@ class pantalla_salas extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.black,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
-        title: Text(
+        title: const Text(
           'Salas',
           style: TextStyle(color: Colors.white),
         ),
       ),
       body: Column(
+
         children: [
           buildButton('+', Colors.grey, 'Crear sala', () {
             // Navegar a la pantalla de chat cuando se presiona el botón
@@ -48,7 +49,7 @@ class pantalla_salas extends StatelessWidget {
             ),
           ),
           Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               border: Border(
                 top: BorderSide(width: 1.0, color: Colors.white),
               ),
@@ -71,7 +72,7 @@ class pantalla_salas extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: Text(
+                  child: const Text(
                     'Inicio',
                     style: TextStyle(color: Colors.white),
                   ),
@@ -92,7 +93,7 @@ class pantalla_salas extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: Text(
+                  child: const Text(
                     'Buscar',
                     style: TextStyle(color: Colors.white),
                   ),
@@ -113,7 +114,7 @@ class pantalla_salas extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: Text(
+                  child: const Text(
                     'Biblioteca',
                     style: TextStyle(color: Colors.white),
                   ),
@@ -134,7 +135,7 @@ class pantalla_salas extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: Text(
+                  child: const Text(
                     'Salas',
                     style: TextStyle(color: Colors.white),
                   ),
@@ -153,7 +154,7 @@ class pantalla_salas extends StatelessWidget {
       children: [
         Text(
           title,
-          style: TextStyle(color: Colors.white, fontSize: 18),
+          style: const TextStyle(color: Colors.white, fontSize: 18),
         ),
       ],
     );
@@ -163,7 +164,7 @@ class pantalla_salas extends StatelessWidget {
     return Container(
       width: 300, // Ancho fijo
       height: 100,  // Alto fijo
-      margin: EdgeInsets.all(15),
+      margin: const EdgeInsets.all(15),
       child: ElevatedButton(
         onPressed: onPressed, // Ahora el onPressed es dinámico
         style: ElevatedButton.styleFrom(
@@ -177,12 +178,12 @@ class pantalla_salas extends StatelessWidget {
           children: [
             Text(
               label,
-              style: TextStyle(color: Colors.white),
+              style: const TextStyle(color: Colors.white),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Text(
               buttonText,
-              style: TextStyle(color: Colors.black),
+              style: const TextStyle(color: Colors.black),
             ),
           ],
         ),

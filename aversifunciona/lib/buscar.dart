@@ -14,8 +14,8 @@ class pantalla_buscar extends StatelessWidget {
       ),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
+          const Padding(
+            padding: EdgeInsets.all(8.0),
             child: Row(
               children: [
                 CircleAvatar(
@@ -33,10 +33,10 @@ class pantalla_buscar extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextField(
-              style: TextStyle(color: Colors.white),
+              style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
                 hintText: '¿Qué te apetece escuchar?',
-                hintStyle: TextStyle(color: Colors.white70),
+                hintStyle: const TextStyle(color: Colors.white70),
                 filled: true,
                 fillColor: Colors.grey[900],
                 border: OutlineInputBorder(
@@ -50,8 +50,8 @@ class pantalla_buscar extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
+                const Padding(
+                  padding: EdgeInsets.all(8.0),
                   child: Text(
                     'Explorar todo',
                     style: TextStyle(color: Colors.white, fontSize: 24),
@@ -62,8 +62,8 @@ class pantalla_buscar extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      buildTopButton('Rap'),
-                      buildTopButton('Clásico'),
+                      buildTopButton('Rap', Colors.blue.shade400),
+                      buildTopButton('Clásico', Colors.red.shade400),
                     ],
                   ),
                 ),
@@ -72,8 +72,8 @@ class pantalla_buscar extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      buildTopButton('Electro'),
-                      buildTopButton('Pop'),
+                      buildTopButton('Electro', Colors.green.shade400),
+                      buildTopButton('Pop', Colors.deepPurple.shade400),
                     ],
                   ),
                 ),
@@ -82,8 +82,8 @@ class pantalla_buscar extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      buildTopButton('Rock'),
-                      buildTopButton('Reggaeton'),
+                      buildTopButton('Rock', Colors.green.shade900),
+                      buildTopButton('Reggaeton', Colors.yellow.shade400),
                     ],
                   ),
                 ),
@@ -91,7 +91,7 @@ class pantalla_buscar extends StatelessWidget {
             ),
           ),
           Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               border: Border(
                 top: BorderSide(width: 1.0, color: Colors.white),
               ),
@@ -112,7 +112,7 @@ class pantalla_buscar extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: Text(
+                  child: const Text(
                     'Inicio',
                     style: TextStyle(color: Colors.white),
                   ),
@@ -130,7 +130,7 @@ class pantalla_buscar extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: Text(
+                  child: const Text(
                     'Buscar',
                     style: TextStyle(color: Colors.white),
                   ),
@@ -148,7 +148,7 @@ class pantalla_buscar extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: Text(
+                  child: const Text(
                     'Biblioteca',
                     style: TextStyle(color: Colors.white),
                   ),
@@ -166,7 +166,7 @@ class pantalla_buscar extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: Text(
+                  child: const Text(
                     'Salas',
                     style: TextStyle(color: Colors.white),
                   ),
@@ -179,24 +179,24 @@ class pantalla_buscar extends StatelessWidget {
     );
   }
 
-  Widget buildTopButton(String title) {
+  Widget buildTopButton(String title, Color color) {
     return Container(
       width: 150,
-      height: 60,
-      margin: EdgeInsets.all(8),
+      height: 100,
+      margin: const EdgeInsets.all(16),
       child: ElevatedButton(
         onPressed: () {
           // Acción al presionar el botón
         },
         style: ElevatedButton.styleFrom(
-          backgroundColor:Colors.grey,
-          shape: RoundedRectangleBorder(
+          backgroundColor: color,
+          shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.zero,
           ),
         ),
         child: Text(
           title,
-          style: TextStyle(color: Colors.white),
+          style: const TextStyle(color: Colors.white),
         ),
       ),
     );

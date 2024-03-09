@@ -13,15 +13,16 @@ class Google extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Center(
+            const Center(
               child: Text(
                 'Selecciona una cuenta',
                 style: TextStyle(fontSize: 18),
               ),
             ),
             SizedBox(height: 8), // Adjust as needed
-            Center(
+            const Center(
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
                     'para ir a ',

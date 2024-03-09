@@ -30,34 +30,46 @@ class Registro1 extends StatelessWidget {
         ),
       ),
       body: Center(
-
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
 
-          children: [
-            SizedBox(height: 20),
+                children: [
+                  SizedBox(height: 20),
 
-            // Campo de Correo Electrónico
-            InputField(
+                  // Campo de Correo Electrónico
+                  InputField(
 
-              hintText: 'Correo electrónico',
-            ),
+                    hintText: 'Correo electrónico',
+                  ),
 
-            SizedBox(height: 20),
+                  SizedBox(height: 20),
 
-            RoundedButton(
-              text: 'Siguiente',
-              backgroundColor: Colors.white,
-              textColor: Colors.black,
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => Registro2()),
-                );
-              },
-            ),
-          ],
-        ),
+
+
+                ],
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  RoundedButton(
+
+                  text: 'Siguiente',
+                  backgroundColor: Colors.white,
+                  textColor: Colors.black,
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => Registro2()),
+                    );
+                  },
+                ),
+                ]
+              )
+            ]
+        )
+
       ),
     );
   }
@@ -75,16 +87,16 @@ class InputField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 250,
-      padding: EdgeInsets.symmetric(horizontal: 16),
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             hintText,
-            style: TextStyle(color: Colors.white),
+            style: const TextStyle(color: Colors.white),
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           Container(
             decoration: BoxDecoration(
               color: Colors.black, // Color de fondo gris
@@ -125,10 +137,11 @@ class RoundedButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: 250,
+
       child: ElevatedButton(
         onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
 
+        style: ElevatedButton.styleFrom(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20.0),
           ),

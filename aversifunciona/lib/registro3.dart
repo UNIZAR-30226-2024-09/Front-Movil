@@ -9,12 +9,12 @@ class Registro3 extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.black,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
-        title: Row(
+        title: const Row(
           children: [
             // Texto de Encabezado
             Text(
@@ -28,33 +28,46 @@ class Registro3 extends StatelessWidget {
           ],
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: 20),
+      body: Center(
+          child: Column(
 
-            // Campo de Correo Electrónico
-            InputField(
-              hintText: '¿Cuál es tu fecha de nacimiento?',
-            ),
+              children: [
+                const Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
 
-            SizedBox(height: 20),
+                  children: [
+                    SizedBox(height: 20),
 
-            RoundedButton(
-              text: 'Siguiente',
-              backgroundColor: Colors.white,
-              textColor: Colors.black,
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => Registro4()),
-                );
-              },
-            ),
-          ],
-        ),
+                    // Campo de Correo Electrónico
+                    InputField(
+
+                      hintText: '¿Cual es tu fecha de nacimiento?',
+                    ),
+
+                    SizedBox(height: 20),
+
+                  ],
+                ),
+                Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      RoundedButton(
+
+                        text: 'Siguiente',
+                        backgroundColor: Colors.white,
+                        textColor: Colors.black,
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => Registro4()),
+                          );
+                        },
+                      ),
+                    ]
+                )
+              ]
+          )
+
       ),
     );
   }
@@ -71,7 +84,7 @@ class InputField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 250,
+      width: double.infinity,
       padding: EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

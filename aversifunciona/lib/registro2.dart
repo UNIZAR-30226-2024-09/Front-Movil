@@ -28,33 +28,47 @@ class Registro2 extends StatelessWidget {
           ],
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: 20),
+      body: Center(
+          child: Column(
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
 
-            // Campo de Correo Electrónico
-            InputField(
-              hintText: 'Crea una contraseña',
-            ),
+                  children: [
+                    SizedBox(height: 20),
 
-            SizedBox(height: 20),
+                    // Campo de Correo Electrónico
+                    InputField(
 
-            RoundedButton(
-              text: 'Siguiente',
-              backgroundColor: Colors.white,
-              textColor: Colors.black,
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => Registro3()),
-                );
-              },
-            ),
-          ],
-        ),
+                      hintText: 'Contraseña',
+                    ),
+
+                    SizedBox(height: 20),
+
+
+
+                  ],
+                ),
+                Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      RoundedButton(
+
+                        text: 'Siguiente',
+                        backgroundColor: Colors.white,
+                        textColor: Colors.black,
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => Registro3()),
+                          );
+                        },
+                      ),
+                    ]
+                )
+              ]
+          )
+
       ),
     );
   }
@@ -71,7 +85,7 @@ class InputField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 250,
+      width: double.infinity,
       padding: EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
