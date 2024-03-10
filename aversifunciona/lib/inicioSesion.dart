@@ -51,6 +51,8 @@ class InicioSesion extends StatelessWidget {
                 // Campo de Correo Electrónico o Nombre de Usuario
                 InputField(
                   hintText: 'Correo electrónico o nombre de usuario',
+                  hintTextInside: 'Correo o nombre de usuario',
+
                 ),
 
                 SizedBox(height: 10),
@@ -58,6 +60,7 @@ class InicioSesion extends StatelessWidget {
                 // Campo de Contraseña
                 InputField(
                   hintText: 'Contraseña',
+                  hintTextInside: 'Contraseña',
                   isPassword: true,
                 ),
 
@@ -91,11 +94,13 @@ class InicioSesion extends StatelessWidget {
 
 class InputField extends StatelessWidget {
   final String hintText;
+  final String hintTextInside;
   final bool isPassword;
 
   const InputField({
     Key? key,
     required this.hintText,
+    required this.hintTextInside,
     this.isPassword = false,
   }) : super(key: key);
 
@@ -103,25 +108,29 @@ class InputField extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: 250,
-      padding: EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             hintText,
-            style: TextStyle(color: Colors.white),
+            style: const TextStyle(color: Colors.white),
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           TextFormField(
             obscureText: isPassword,
-            style: TextStyle(color: Colors.white),
+            style: const TextStyle(color: Colors.white),
+
             decoration: InputDecoration(
-              contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+              contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+              hintText: hintTextInside,
               filled: true,
-              fillColor: Colors.grey[850],
+              fillColor: Colors.transparent,
+              hintStyle: const TextStyle(color: Colors.grey),
               border: OutlineInputBorder(
+
                 borderRadius: BorderRadius.circular(15),
-                borderSide: BorderSide.none,
+                borderSide: const BorderSide(color: Colors.white, width: 2.0),
               ),
             ),
           ),
@@ -163,7 +172,7 @@ class RoundedButton extends StatelessWidget {
         child: Text(
           text,
 
-          style: TextStyle(color: Colors.white),
+          style: const TextStyle(color: Colors.white),
         ),
       ),
     );

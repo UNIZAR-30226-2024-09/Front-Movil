@@ -22,7 +22,7 @@ class pantalla_biblioteca extends StatelessWidget {
               children: [
                 const CircleAvatar(
                   radius: 20,
-                  backgroundImage: AssetImage('ruta_de_la_imagen'),
+                  child: Icon(Icons.person, color: Colors.grey),
                 ),
                 const SizedBox(width: 10),
                 const Text(
@@ -70,7 +70,7 @@ class pantalla_biblioteca extends StatelessWidget {
                         color: Colors.grey, // Puedes ajustar el color del cuadrado
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: Image.asset('ruta_de_la_imagen_cuadrado_1'),
+                      child: Icon(Icons.heart_broken, color: Colors.white),
                     ),
                     const SizedBox(width: 5),
                     const Text(
@@ -106,7 +106,7 @@ class pantalla_biblioteca extends StatelessWidget {
                         color: Colors.grey, // Puedes ajustar el color del cuadrado
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: Image.asset('ruta_de_la_imagen_cuadrado_2'),
+                      child: Icon(Icons.music_note, color: Colors.grey.shade800),
                     ),
                     const SizedBox(width: 5),
                     const Text(
@@ -142,7 +142,7 @@ class pantalla_biblioteca extends StatelessWidget {
                         color: Colors.grey, // Puedes ajustar el color del cuadrado
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: Image.asset('ruta_de_la_imagen_cuadrado_3'),
+                      child: Icon(Icons.music_note, color: Colors.grey.shade800),
                     ),
                     const SizedBox(width: 5),
                     const Text(
@@ -244,7 +244,7 @@ class pantalla_biblioteca extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: Text(
+                  child: const Text(
                     'Inicio',
                     style: TextStyle(color: Colors.white),
                   ),
