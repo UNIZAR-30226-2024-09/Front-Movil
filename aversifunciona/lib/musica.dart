@@ -36,20 +36,26 @@ class pantalla_musica extends StatelessWidget {
       ),
       body: Column(
         children: [
-          Expanded(
-            child: Container(
-              // Contenido principal (puedes colocar aquí tu imagen o cualquier otro contenido)
-            ),
-          ),
+          Spacer(),
+          buildOptionsRow("Has escuchado recientemente", 4),
+          Spacer(),
+          buildOptionsRow("Hecho para user", 4),
+          Spacer(),
+          buildOptionsRow("Top Canciones", 4),
+          Spacer(),
+          buildOptionsRow("Top Podcasts", 4),
+          Spacer(),
           Container(
             decoration: BoxDecoration(
               border: Border(
                 top: BorderSide(width: 1.0, color: Colors.white),
               ),
             ),
+
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
+
                 // Opción 1
                 ElevatedButton(
                   onPressed: () {
@@ -140,17 +146,46 @@ class pantalla_musica extends StatelessWidget {
       ),
     );
   }
-
-  Widget buildOption(String title) {
+  Widget buildOptionsRow(String title, int numberOfOptions) {
     return Column(
-      mainAxisSize: MainAxisSize.min,
       children: [
-        // Aquí puedes agregar tu propio widget de imagen si es necesario
-        Text(
-          title,
-          style: TextStyle(color: Colors.white, fontSize: 18), // Ajusta el tamaño de la fuente según sea necesario
+        SizedBox(height: 10),
+        Padding(
+          padding: const EdgeInsets.only(left: 16.0),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              title,
+              style: TextStyle(color: Colors.white, fontSize: 18),
+            ),
+          ),
+        ),
+        SizedBox(height: 5),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: List.generate(
+            numberOfOptions,
+                (index) => buildOption(),
+          ),
         ),
       ],
+    );
+  }
+
+  Widget buildOption() {
+    return ElevatedButton(
+      onPressed: () {
+      },
+      style: ElevatedButton.styleFrom(
+        primary: Colors.blue,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(0),
+        ),
+      ),
+      child: Text(
+        "",
+        style: TextStyle(color: Colors.white),
+      ),
     );
   }
 
@@ -181,17 +216,4 @@ class pantalla_musica extends StatelessWidget {
 }
 
 
-class SalasScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Salas'),
-      ),
-      body: Center(
-        child: Text('Contenido de la pantalla Salas'),
-      ),
-    );
-  }
-}
 
