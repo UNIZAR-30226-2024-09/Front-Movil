@@ -16,24 +16,26 @@ class pantalla_principal extends StatelessWidget {
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,
+        leading: GestureDetector(
+          onTap: () {
+            // Navegar a la pantalla deseada al hacer clic en CircleAvatar
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => desplegable()),
+            );
+          },
+          child: CircleAvatar(
+            backgroundColor: Colors.white,
+            child: Icon(Icons.person, color: Colors.grey),
+          ),
+        ),
         title: Text(
           'Título de la pantalla',
           style: TextStyle(color: Colors.white),
         ),
         actions: [
           Spacer(),
-          GestureDetector(
-            onTap: () {
-              // Navegar a la pantalla deseada al hacer clic en CircleAvatar
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => desplegable()),
-              );
-            },
-            child: CircleAvatar(
-              backgroundImage: AssetImage('tu_ruta_de_imagen'),
-            ),
-          ),
+
           Spacer(),
           // Botón Todo
           buildTopButton(context, 'Todo', pantalla_todo()),
@@ -59,12 +61,11 @@ class pantalla_principal extends StatelessWidget {
               ),
             ),
             child: Row(
+
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                // Opción 1
                 ElevatedButton(
                   onPressed: () {
-                    // Navegar a la pantalla "Inicio"
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => pantalla_principal()),
@@ -76,16 +77,13 @@ class pantalla_principal extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: Text(
+                  child: const Text(
                     'Inicio',
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: Colors.white, fontSize: 12),
                   ),
                 ),
-
-                // Opción 2
                 ElevatedButton(
                   onPressed: () {
-                    // Navegar a la pantalla "Buscar"
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => pantalla_buscar()),
@@ -97,16 +95,13 @@ class pantalla_principal extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: Text(
+                  child: const Text(
                     'Buscar',
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: Colors.white, fontSize: 12),
                   ),
                 ),
-
-                // Opción 3
                 ElevatedButton(
                   onPressed: () {
-                    // Navegar a la pantalla "Biblioteca"
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => pantalla_biblioteca()),
@@ -118,16 +113,13 @@ class pantalla_principal extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: Text(
+                  child: const Text(
                     'Biblioteca',
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: Colors.white, fontSize: 12),
                   ),
                 ),
-
-                // Opción 4
                 ElevatedButton(
                   onPressed: () {
-                    // Navegar a la pantalla "Salas"
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => pantalla_salas()),
@@ -139,9 +131,9 @@ class pantalla_principal extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: Text(
+                  child: const Text(
                     'Salas',
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: Colors.white, fontSize: 12),
                   ),
                 ),
               ],
@@ -167,7 +159,7 @@ class pantalla_principal extends StatelessWidget {
 
   Widget buildTopButton(BuildContext context, String title, Widget screen) {
     return Container(
-      margin: EdgeInsets.all(8),
+      margin: EdgeInsets.all(4),
       child: ElevatedButton(
         onPressed: () {
           // Navegar a la pantalla correspondiente

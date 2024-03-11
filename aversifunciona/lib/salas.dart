@@ -27,28 +27,38 @@ class pantalla_salas extends StatelessWidget {
       body: Column(
 
         children: [
-          buildButton('+', Colors.grey, 'Crear sala', () {
-            // Navegar a la pantalla de chat cuando se presiona el botón
-            Navigator.push(context, MaterialPageRoute(builder: (context) => crearSala()));
-          }),
-          buildButton('SpainMusic', Colors.blue, 'Únete ahora', () {
-            // Navegar a la pantalla de chat cuando se presiona el botón
-            Navigator.push(context, MaterialPageRoute(builder: (context) => ChatDeSala()));
-          }),
-          buildButton('SiaLovers', Colors.blue, 'Únete ahora', () {
-            // Navegar a la pantalla de chat cuando se presiona el botón
-            Navigator.push(context, MaterialPageRoute(builder: (context) => ChatDeSala()));
-          }),
-          buildButton('EminemGroup', Colors.blue, 'Únete ahora', () {
-            // Navegar a la pantalla de chat cuando se presiona el botón
-            Navigator.push(context, MaterialPageRoute(builder: (context) => ChatDeSala()));
-          }),
-          SizedBox(height: 20),
-          Expanded(
-            child: Container(
-              // Contenido principal (puedes colocar aquí tu imagen o cualquier otro contenido)
-            ),
+          Container(
+            height: 500,
+            child: ListView(
+              shrinkWrap: true,
+              children: [
+                buildButton('+', Colors.grey, 'Crear sala', () {
+                  // Navegar a la pantalla de chat cuando se presiona el botón
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => crearSala()));
+                }),
+                buildButton('SpainMusic', Colors.blue, 'Únete ahora', () {
+                  // Navegar a la pantalla de chat cuando se presiona el botón
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => ChatDeSala()));
+                }),
+                buildButton('SiaLovers', Colors.blue, 'Únete ahora', () {
+                  // Navegar a la pantalla de chat cuando se presiona el botón
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => ChatDeSala()));
+                }),
+                buildButton('EminemGroup', Colors.blue, 'Únete ahora', () {
+                  // Navegar a la pantalla de chat cuando se presiona el botón
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => ChatDeSala()));
+                }),
+                SizedBox(height: 20),
+                Expanded(
+                  child: Container(
+                    // Contenido principal (puedes colocar aquí tu imagen o cualquier otro contenido)
+                  ),
+                ),
+              ],
+            )
           ),
+
+
           Container(
             decoration: const BoxDecoration(
               border: Border(
@@ -56,12 +66,11 @@ class pantalla_salas extends StatelessWidget {
               ),
             ),
             child: Row(
+
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                // Opción 1
                 ElevatedButton(
                   onPressed: () {
-                    // Navegar a la pantalla "Inicio"
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => pantalla_principal()),
@@ -75,14 +84,11 @@ class pantalla_salas extends StatelessWidget {
                   ),
                   child: const Text(
                     'Inicio',
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: Colors.white, fontSize: 12),
                   ),
                 ),
-
-                // Opción 2
                 ElevatedButton(
                   onPressed: () {
-                    // Navegar a la pantalla "Buscar"
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => pantalla_buscar()),
@@ -96,14 +102,11 @@ class pantalla_salas extends StatelessWidget {
                   ),
                   child: const Text(
                     'Buscar',
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: Colors.white, fontSize: 12),
                   ),
                 ),
-
-                // Opción 3
                 ElevatedButton(
                   onPressed: () {
-                    // Navegar a la pantalla "Biblioteca"
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => pantalla_biblioteca()),
@@ -117,14 +120,11 @@ class pantalla_salas extends StatelessWidget {
                   ),
                   child: const Text(
                     'Biblioteca',
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: Colors.white, fontSize: 12),
                   ),
                 ),
-
-                // Opción 4
                 ElevatedButton(
                   onPressed: () {
-                    // Navegar a la pantalla "Salas"
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => pantalla_salas()),
@@ -138,7 +138,7 @@ class pantalla_salas extends StatelessWidget {
                   ),
                   child: const Text(
                     'Salas',
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: Colors.white, fontSize: 12),
                   ),
                 ),
               ],
