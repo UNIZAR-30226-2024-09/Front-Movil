@@ -1,3 +1,4 @@
+import 'package:aversifunciona/crearSala.dart';
 import 'package:aversifunciona/pantalla_principal.dart';
 import 'package:flutter/material.dart';
 
@@ -28,7 +29,7 @@ class pantalla_salas extends StatelessWidget {
         children: [
           buildButton('+', Colors.grey, 'Crear sala', () {
             // Navegar a la pantalla de chat cuando se presiona el botón
-            Navigator.push(context, MaterialPageRoute(builder: (context) => ChatDeSala()));
+            Navigator.push(context, MaterialPageRoute(builder: (context) => crearSala()));
           }),
           buildButton('SpainMusic', Colors.blue, 'Únete ahora', () {
             // Navegar a la pantalla de chat cuando se presiona el botón

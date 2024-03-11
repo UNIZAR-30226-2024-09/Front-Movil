@@ -1,48 +1,29 @@
 import 'package:aversifunciona/biblioteca.dart';
 import 'package:aversifunciona/buscar.dart';
-import 'package:aversifunciona/configuracion.dart';
-import 'package:aversifunciona/desplegable.dart';
-import 'package:aversifunciona/podcast.dart';
-import 'package:aversifunciona/salas.dart';
-import 'package:aversifunciona/todo.dart';
+import 'package:aversifunciona/chatDeSala.dart';
+import 'package:aversifunciona/pantalla_principal.dart';
 import 'package:flutter/material.dart';
 
-import 'musica.dart';
-
-class pantalla_principal extends StatelessWidget {
+class historial extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            // Volver a la pantalla anterior
+            Navigator.pop(context);
+          },
+        ),
         title: Text(
-          'Título de la pantalla',
+          'Historial',
           style: TextStyle(color: Colors.white),
         ),
         actions: [
           Spacer(),
-          GestureDetector(
-            onTap: () {
-              // Navegar a la pantalla deseada al hacer clic en CircleAvatar
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => desplegable()),
-              );
-            },
-            child: CircleAvatar(
-              backgroundImage: AssetImage('tu_ruta_de_imagen'),
-            ),
-          ),
-          Spacer(),
-          // Botón Todo
-          buildTopButton(context, 'Todo', pantalla_todo()),
-
-          // Botón Música
-          buildTopButton(context, 'Música', pantalla_musica()),
-
-          // Botón Podcast
-          buildTopButton(context, 'Podcast', pantalla_podcast()),
         ],
       ),
       body: Column(
@@ -71,7 +52,7 @@ class pantalla_principal extends StatelessWidget {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:Colors.transparent,
+                    backgroundColor: Colors.transparent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
@@ -92,7 +73,7 @@ class pantalla_principal extends StatelessWidget {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:Colors.transparent,
+                    backgroundColor: Colors.transparent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
@@ -113,7 +94,7 @@ class pantalla_principal extends StatelessWidget {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:Colors.transparent,
+                    backgroundColor: Colors.transparent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
@@ -134,7 +115,7 @@ class pantalla_principal extends StatelessWidget {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:Colors.transparent,
+                    backgroundColor: Colors.transparent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
@@ -177,7 +158,7 @@ class pantalla_principal extends StatelessWidget {
           );
         },
         style: ElevatedButton.styleFrom(
-          backgroundColor:Colors.grey,
+          backgroundColor: Colors.grey,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
@@ -190,7 +171,3 @@ class pantalla_principal extends StatelessWidget {
     );
   }
 }
-
-
-
-

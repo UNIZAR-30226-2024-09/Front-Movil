@@ -1,38 +1,72 @@
-import 'package:aversifunciona/biblioteca.dart';
-import 'package:aversifunciona/buscar.dart';
-import 'package:aversifunciona/configuracion.dart';
-import 'package:aversifunciona/desplegable.dart';
+import 'package:aversifunciona/pantalla_principal.dart';
 import 'package:aversifunciona/podcast.dart';
-import 'package:aversifunciona/salas.dart';
 import 'package:aversifunciona/todo.dart';
+import 'package:aversifunciona/verPerfil.dart';
 import 'package:flutter/material.dart';
 
+import 'biblioteca.dart';
+import 'buscar.dart';
+import 'chatDeSala.dart';
+import 'configuracion.dart';
+import 'historial.dart';
 import 'musica.dart';
 
-class pantalla_principal extends StatelessWidget {
+class desplegable extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,
-        title: Text(
-          'Título de la pantalla',
-          style: TextStyle(color: Colors.white),
-        ),
         actions: [
-          Spacer(),
-          GestureDetector(
-            onTap: () {
-              // Navegar a la pantalla deseada al hacer clic en CircleAvatar
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => desplegable()),
-              );
-            },
-            child: CircleAvatar(
+          // Desplegable con foto de perfil, nombre y opciones
+          PopupMenuButton<String>(
+            icon: CircleAvatar(
               backgroundImage: AssetImage('tu_ruta_de_imagen'),
             ),
+            onSelected: (value) {
+              // Manejar la selección del desplegable
+              if (value == 'verPerfil') {
+                // Navegar a la pantalla "verPerfil"
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => verPerfil()),
+                );
+              } else if (value == 'historial') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => historial()),
+                );
+              } else if (value == 'configuracion') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => configuracion()),
+                );
+              }
+            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              const PopupMenuItem<String>(
+                value: 'verPerfil',
+                child: ListTile(
+                  leading: Icon(Icons.person),
+                  title: Text('Ver Perfil'),
+                ),
+              ),
+              const PopupMenuItem<String>(
+                value: 'historial',
+                child: ListTile(
+                  leading: Icon(Icons.history),
+                  title: Text('Historial'),
+                ),
+              ),
+              const PopupMenuItem<String>(
+                value: 'configuracion',
+                child: ListTile(
+                  leading: Icon(Icons.settings),
+                  title: Text('Configuración y Privacidad'),
+                ),
+              ),
+            ],
           ),
           Spacer(),
           // Botón Todo
@@ -71,7 +105,7 @@ class pantalla_principal extends StatelessWidget {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:Colors.transparent,
+                    backgroundColor: Colors.transparent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
@@ -81,7 +115,6 @@ class pantalla_principal extends StatelessWidget {
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
-
                 // Opción 2
                 ElevatedButton(
                   onPressed: () {
@@ -92,7 +125,7 @@ class pantalla_principal extends StatelessWidget {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:Colors.transparent,
+                    backgroundColor: Colors.transparent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
@@ -102,7 +135,6 @@ class pantalla_principal extends StatelessWidget {
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
-
                 // Opción 3
                 ElevatedButton(
                   onPressed: () {
@@ -113,7 +145,7 @@ class pantalla_principal extends StatelessWidget {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:Colors.transparent,
+                    backgroundColor: Colors.transparent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
@@ -123,7 +155,6 @@ class pantalla_principal extends StatelessWidget {
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
-
                 // Opción 4
                 ElevatedButton(
                   onPressed: () {
@@ -134,7 +165,7 @@ class pantalla_principal extends StatelessWidget {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:Colors.transparent,
+                    backgroundColor: Colors.transparent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
@@ -152,19 +183,6 @@ class pantalla_principal extends StatelessWidget {
     );
   }
 
-  Widget buildOption(String title) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // Aquí puedes agregar tu propio widget de imagen si es necesario
-        Text(
-          title,
-          style: TextStyle(color: Colors.white, fontSize: 18), // Ajusta el tamaño de la fuente según sea necesario
-        ),
-      ],
-    );
-  }
-
   Widget buildTopButton(BuildContext context, String title, Widget screen) {
     return Container(
       margin: EdgeInsets.all(8),
@@ -177,7 +195,7 @@ class pantalla_principal extends StatelessWidget {
           );
         },
         style: ElevatedButton.styleFrom(
-          backgroundColor:Colors.grey,
+          backgroundColor: Colors.grey,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
@@ -190,7 +208,4 @@ class pantalla_principal extends StatelessWidget {
     );
   }
 }
-
-
-
 
