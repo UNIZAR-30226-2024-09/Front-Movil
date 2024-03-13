@@ -48,34 +48,33 @@ class Registro_fin extends StatelessWidget {
               'Esto se mostrará en tu perfil de Musify',
               style: TextStyle(color: Colors.white)
             ),
-            const SizedBox(height: 5),
-            const Text(
-                '______________________________________________________',
-                style: TextStyle(color: Colors.white)
-            ),
+            const SizedBox(height: 10),
+            SizedBox(height: 1, width: double.infinity, child: Container(color: Colors.white,)),
+
             const SizedBox(height: 10),
             const Text(
                 'Si pulsas "Crear cuenta, aceptas los terminos y condiciones de Musify"',
                 style: TextStyle(color: Colors.white, fontSize: 10)
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 30),
             const Text(
                 'Política de Privacidad',
-                style: TextStyle(color: Colors.blue)
+                style: TextStyle(color: Colors.blue, fontSize: 14)
             ),
             // Opciones de género
+            const SizedBox(height: 10),
             Column(
               children: [
-                genderOption('Acepto Marianela', context),
-                genderOption('Permito que Musify utilice mi Marianela', context),
+                genderOption('Acepto la política de privacidad de Musify', context),
+                genderOption('Permito que Musify utilice mis datos personales para fines estadísticos y esas cosas que se dicen', context),
               ],
             ),
 
             const SizedBox(height: 20),
 
             Align(
-              alignment: Alignment.center,
+              alignment: Alignment.bottomCenter,
               child: RoundedButton(
 
                 text: 'Crear cuenta',

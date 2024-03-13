@@ -74,7 +74,7 @@ class _ChatDeSalaState extends State<ChatDeSala> {
                 ElevatedButton(
                   onPressed: () {
                     setState(() {
-                      _messages.add(_messageController.text);
+                      _messages.insert(0, _messageController.text);
                       _messageController.clear();
                     });
                   },

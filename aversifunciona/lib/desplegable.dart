@@ -11,6 +11,8 @@ import 'configuracion.dart';
 import 'historial.dart';
 import 'musica.dart';
 
+// PANTALLA LEGADA, ESTÁ INTEGRADA YA EN LA PANTALLA PRINCIPAL
+
 class desplegable extends StatelessWidget {
   @override
   Widget build(BuildContext context) {

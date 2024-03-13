@@ -1,5 +1,6 @@
+import 'package:aversifunciona/registro4.dart';
 import 'package:flutter/material.dart';
-import 'registro2.dart';
+import 'registro4.dart';
 
 class Registro1 extends StatelessWidget {
   @override
@@ -32,7 +33,7 @@ class Registro1 extends StatelessWidget {
       body: Center(
         child: Column(
             children: [
-              Column(
+              const Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
 
                 children: [
@@ -45,11 +46,56 @@ class Registro1 extends StatelessWidget {
                   ),
 
                   SizedBox(height: 20),
+      ]
+              ),
+                  const Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
 
+                    children: [
+                      SizedBox(height: 20),
 
+                      // Campo de Correo Electrónico
+                      InputField(
 
+                        hintText: 'Contraseña',
+                      ),
+
+                      SizedBox(height: 20),
                 ],
               ),
+
+              const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+
+                  children: [
+                    SizedBox(height: 20),
+
+                    // Campo de Correo Electrónico
+                    InputField(
+
+                      hintText: 'Fecha de nacimiento',
+                    ),
+
+                    SizedBox(height: 20),
+                  ]
+              ),
+
+              const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+
+                  children: [
+                    SizedBox(height: 20),
+
+                    // Campo de Correo Electrónico
+                    InputField(
+
+                      hintText: 'Pais de nacimiento',
+                    ),
+
+                    SizedBox(height: 20),
+                  ]
+              ),
+
               Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -61,15 +107,16 @@ class Registro1 extends StatelessWidget {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => Registro2()),
+                      MaterialPageRoute(builder: (context) => Registro4()),
                     );
                   },
+
                 ),
                 ]
-              )
-            ]
-        )
+              ),
 
+        ]
+      ),
       ),
     );
   }

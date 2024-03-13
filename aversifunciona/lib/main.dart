@@ -60,7 +60,7 @@ class MyHomePage extends StatelessWidget {
                   width: 150,
                   height: 150,
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
 
                 // Botones
                 RoundedButton(

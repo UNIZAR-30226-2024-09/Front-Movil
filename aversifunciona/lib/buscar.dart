@@ -1,7 +1,10 @@
 import 'package:aversifunciona/pantalla_principal.dart';
 import 'package:aversifunciona/salas.dart';
 import 'package:flutter/material.dart';
+import 'package:aversifunciona/verPerfil.dart';
 
+import 'configuracion.dart';
+import 'historial.dart';
 import 'biblioteca.dart';
 
 class pantalla_buscar extends StatelessWidget {
@@ -11,10 +14,53 @@ class pantalla_buscar extends StatelessWidget {
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,
-        leading: const CircleAvatar(
-          radius: 10,
-          backgroundColor: Colors.white,
-          child: Icon(Icons.person, color: Colors.grey,),
+        leading: PopupMenuButton<String>(
+          icon: CircleAvatar(
+            backgroundImage: AssetImage('tu_ruta_de_imagen'),
+          ),
+          onSelected: (value) {
+            // Manejar la selección del desplegable
+            if (value == 'verPerfil') {
+              // Navegar a la pantalla "verPerfil"
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => verPerfil()),
+              );
+            } else if (value == 'historial') {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => historial()),
+              );
+            } else if (value == 'configuracion') {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => configuracion()),
+              );
+            }
+          },
+          itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+            const PopupMenuItem<String>(
+              value: 'verPerfil',
+              child: ListTile(
+                leading: Icon(Icons.person),
+                title: Text('Ver Perfil'),
+              ),
+            ),
+            const PopupMenuItem<String>(
+              value: 'historial',
+              child: ListTile(
+                leading: Icon(Icons.history),
+                title: Text('Historial'),
+              ),
+            ),
+            const PopupMenuItem<String>(
+              value: 'configuracion',
+              child: ListTile(
+                leading: Icon(Icons.settings),
+                title: Text('Configuración y Privacidad'),
+              ),
+            ),
+          ],
         ),
         title: const Text(
           'Buscar',
@@ -23,77 +69,80 @@ class pantalla_buscar extends StatelessWidget {
       ),
       body: Column(
         children: [
-          Container(
-            height: 500,
-            child: ListView(
+          Expanded(
+            child: Container(
+              child: ListView(
 
                 shrinkWrap: true,
                 children: [
-            Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              style: const TextStyle(color: Colors.white),
-              decoration: InputDecoration(
-                hintText: '¿Qué te apetece escuchar?',
-                hintStyle: const TextStyle(color: Colors.white70),
-                filled: true,
-                fillColor: Colors.grey[900],
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(20),
-                  borderSide: BorderSide.none,
-                ),
-              ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextField(
+                      style: const TextStyle(color: Colors.white),
+                      decoration: InputDecoration(
+                        hintText: '¿Qué te apetece escuchar?',
+                        hintStyle: const TextStyle(color: Colors.white70),
+                        filled: true,
+                        fillColor: Colors.grey[900],
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text(
+                            'Explorar todo',
+                            style: TextStyle(color: Colors.white, fontSize: 24),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              buildTopButton('Rap', Colors.blue.shade400),
+                              buildTopButton('Clásico', Colors.red.shade400),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              buildTopButton('Electro', Colors.green.shade400),
+                              buildTopButton('Pop', Colors.deepPurple.shade400),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              buildTopButton('Rock', Colors.green.shade900),
+                              buildTopButton('Reggaeton', Colors.yellow.shade400),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ]
             ),
-          ),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text(
-                    'Explorar todo',
-                    style: TextStyle(color: Colors.white, fontSize: 24),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      buildTopButton('Rap', Colors.blue.shade400),
-                      buildTopButton('Clásico', Colors.red.shade400),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      buildTopButton('Electro', Colors.green.shade400),
-                      buildTopButton('Pop', Colors.deepPurple.shade400),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      buildTopButton('Rock', Colors.green.shade900),
-                      buildTopButton('Reggaeton', Colors.yellow.shade400),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-    ]
-    ),
 
           ),
+          ),
+
           Container(
+            height: 70,
             decoration: const BoxDecoration(
               border: Border(
                 top: BorderSide(width: 1.0, color: Colors.white),
@@ -103,11 +152,13 @@ class pantalla_buscar extends StatelessWidget {
 
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
+
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => pantalla_principal()),
+                      MaterialPageRoute(
+                          builder: (context) => pantalla_principal()),
                     );
                   },
                   style: ElevatedButton.styleFrom(
@@ -116,16 +167,26 @@ class pantalla_buscar extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: const Text(
-                    'Inicio',
-                    style: TextStyle(color: Colors.white, fontSize: 12),
+                  child: const Column(
+
+                      children: [
+                        SizedBox(height: 8),
+                        Icon(Icons.house_outlined, color: Colors.grey, size: 37.0),
+                        Text(
+                          'Inicio',
+                          style: TextStyle(color: Colors.white, fontSize: 12),
+                        ),
+                      ]
                   ),
                 ),
+
+
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => pantalla_buscar()),
+                      MaterialPageRoute(
+                          builder: (context) => pantalla_buscar()),
                     );
                   },
                   style: ElevatedButton.styleFrom(
@@ -134,16 +195,25 @@ class pantalla_buscar extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: const Text(
-                    'Buscar',
-                    style: TextStyle(color: Colors.white, fontSize: 12),
+                  child: const Column(
+
+                      children: [
+                        SizedBox(height: 8),
+                        Icon(Icons.question_mark_outlined, color: Colors.grey, size: 37.0),
+                        Text(
+                          'Buscar',
+                          style: TextStyle(color: Colors.white, fontSize: 12),
+                        ),
+                      ]
                   ),
                 ),
+
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => pantalla_biblioteca()),
+                      MaterialPageRoute(
+                          builder: (context) => pantalla_biblioteca()),
                     );
                   },
                   style: ElevatedButton.styleFrom(
@@ -152,16 +222,25 @@ class pantalla_buscar extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: const Text(
-                    'Biblioteca',
-                    style: TextStyle(color: Colors.white, fontSize: 12),
+                  child: const Column(
+
+                      children: [
+                        SizedBox(height: 8),
+                        Icon(Icons.library_books_rounded, color: Colors.grey, size: 37.0),
+                        Text(
+                          'Biblioteca',
+                          style: TextStyle(color: Colors.white, fontSize: 12),
+                        ),
+                      ]
                   ),
                 ),
+
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => pantalla_salas()),
+                      MaterialPageRoute(
+                          builder: (context) => pantalla_salas()),
                     );
                   },
                   style: ElevatedButton.styleFrom(
@@ -170,13 +249,21 @@ class pantalla_buscar extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: const Text(
-                    'Salas',
-                    style: TextStyle(color: Colors.white, fontSize: 12),
+                  child: const Column(
+
+                      children: [
+                        SizedBox(height: 8),
+                        Icon(Icons.chat_bubble_rounded, color: Colors.grey, size: 37.0),
+                        Text(
+                          'Salas',
+                          style: TextStyle(color: Colors.white, fontSize: 12),
+                        ),
+                      ]
                   ),
                 ),
               ],
             ),
+
           ),
         ],
       ),
