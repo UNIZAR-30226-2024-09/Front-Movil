@@ -94,15 +94,16 @@ class pantalla_podcast extends StatelessWidget {
               ),
             ),
             child: Row(
+
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                // Opción 1
+
                 ElevatedButton(
                   onPressed: () {
-                    // Navegar a la pantalla "Inicio"
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => pantalla_principal()),
+                      MaterialPageRoute(
+                          builder: (context) => pantalla_principal()),
                     );
                   },
                   style: ElevatedButton.styleFrom(
@@ -111,19 +112,26 @@ class pantalla_podcast extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: Text(
-                    'Inicio',
-                    style: TextStyle(color: Colors.white),
+                  child: const Column(
+
+                      children: [
+                        SizedBox(height: 8),
+                        Icon(Icons.house_outlined, color: Colors.grey, size: 37.0),
+                        Text(
+                          'Inicio',
+                          style: TextStyle(color: Colors.white, fontSize: 12),
+                        ),
+                      ]
                   ),
                 ),
 
-                // Opción 2
+
                 ElevatedButton(
                   onPressed: () {
-                    // Navegar a la pantalla "Buscar"
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => pantalla_buscar()),
+                      MaterialPageRoute(
+                          builder: (context) => pantalla_buscar()),
                     );
                   },
                   style: ElevatedButton.styleFrom(
@@ -132,19 +140,25 @@ class pantalla_podcast extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: Text(
-                    'Buscar',
-                    style: TextStyle(color: Colors.white),
+                  child: const Column(
+
+                      children: [
+                        SizedBox(height: 8),
+                        Icon(Icons.question_mark_outlined, color: Colors.grey, size: 37.0),
+                        Text(
+                          'Buscar',
+                          style: TextStyle(color: Colors.white, fontSize: 12),
+                        ),
+                      ]
                   ),
                 ),
 
-                // Opción 3
                 ElevatedButton(
                   onPressed: () {
-                    // Navegar a la pantalla "Biblioteca"
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => pantalla_biblioteca()),
+                      MaterialPageRoute(
+                          builder: (context) => pantalla_biblioteca()),
                     );
                   },
                   style: ElevatedButton.styleFrom(
@@ -153,19 +167,25 @@ class pantalla_podcast extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: Text(
-                    'Biblioteca',
-                    style: TextStyle(color: Colors.white),
+                  child: const Column(
+
+                      children: [
+                        SizedBox(height: 8),
+                        Icon(Icons.library_books_rounded, color: Colors.grey, size: 37.0),
+                        Text(
+                          'Biblioteca',
+                          style: TextStyle(color: Colors.white, fontSize: 12),
+                        ),
+                      ]
                   ),
                 ),
 
-                // Opción 4
                 ElevatedButton(
                   onPressed: () {
-                    // Navegar a la pantalla "Salas"
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => pantalla_salas()),
+                      MaterialPageRoute(
+                          builder: (context) => pantalla_salas()),
                     );
                   },
                   style: ElevatedButton.styleFrom(
@@ -174,9 +194,16 @@ class pantalla_podcast extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: Text(
-                    'Salas',
-                    style: TextStyle(color: Colors.white),
+                  child: const Column(
+
+                      children: [
+                        SizedBox(height: 8),
+                        Icon(Icons.chat_bubble_rounded, color: Colors.grey, size: 37.0),
+                        Text(
+                          'Salas',
+                          style: TextStyle(color: Colors.white, fontSize: 12),
+                        ),
+                      ]
                   ),
                 ),
               ],
