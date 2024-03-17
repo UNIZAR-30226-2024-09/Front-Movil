@@ -3,6 +3,7 @@ import 'package:aversifunciona/buscar.dart';
 import 'package:aversifunciona/configuracion.dart';
 import 'package:aversifunciona/desplegable.dart';
 import 'package:aversifunciona/podcast.dart';
+import 'package:aversifunciona/reproductor.dart';
 import 'package:aversifunciona/salas.dart';
 import 'package:aversifunciona/verPerfil.dart';
 import 'package:aversifunciona/todo.dart';
@@ -115,7 +116,13 @@ class pantalla_principal extends StatelessWidget {
                                   height: 75,
                                   width: 75,
                                   margin: const EdgeInsets.symmetric(horizontal: 16),
-                                  child: ElevatedButton(onPressed: (){},
+                                  child: ElevatedButton(onPressed: (){
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => reproductor()),
+                                    );
+                                  },
                                     style: ElevatedButton.styleFrom(backgroundColor: Colors.grey, shape: const RoundedRectangleBorder()),
                                     child: Text(''),
                                   )
@@ -125,7 +132,13 @@ class pantalla_principal extends StatelessWidget {
                                   height: 75,
                                   width: 75,
                                   margin: const EdgeInsets.symmetric(horizontal: 16),
-                                  child: ElevatedButton(onPressed: (){},
+                                  child: ElevatedButton(onPressed: (){
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => reproductor()),
+                                    );
+                                  },
                                     style: ElevatedButton.styleFrom(backgroundColor: Colors.grey, shape: const RoundedRectangleBorder()),
                                     child: Text(''),
                                   )
@@ -135,7 +148,13 @@ class pantalla_principal extends StatelessWidget {
                                   height: 75,
                                   width: 75,
                                   margin: const EdgeInsets.symmetric(horizontal: 16),
-                                  child: ElevatedButton(onPressed: (){},
+                                  child: ElevatedButton(onPressed: (){
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => reproductor()),
+                                    );
+                                  },
                                     style: ElevatedButton.styleFrom(backgroundColor: Colors.grey, shape: const RoundedRectangleBorder()),
                                     child: Text(''),
                                   )
@@ -145,7 +164,13 @@ class pantalla_principal extends StatelessWidget {
                                   height: 75,
                                   width: 75,
                                   margin: const EdgeInsets.symmetric(horizontal: 16),
-                                  child: ElevatedButton(onPressed: (){},
+                                  child: ElevatedButton(onPressed: (){
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => reproductor()),
+                                    );
+                                  },
                                     style: ElevatedButton.styleFrom(backgroundColor: Colors.grey, shape: const RoundedRectangleBorder()),
                                     child: Text(''),
                                   )
@@ -181,7 +206,13 @@ class pantalla_principal extends StatelessWidget {
                                   height: 75,
                                   width: 75,
                                   margin: const EdgeInsets.symmetric(horizontal: 16),
-                                  child: ElevatedButton(onPressed: (){},
+                                  child: ElevatedButton(onPressed: (){
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => reproductor()),
+                                    );
+                                  },
                                     style: ElevatedButton.styleFrom(backgroundColor: Colors.grey, shape: const RoundedRectangleBorder()),
                                     child: Text(''),
                                   )
@@ -191,7 +222,13 @@ class pantalla_principal extends StatelessWidget {
                                   height: 75,
                                   width: 75,
                                   margin: const EdgeInsets.symmetric(horizontal: 16),
-                                  child: ElevatedButton(onPressed: (){},
+                                  child: ElevatedButton(onPressed: (){
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => reproductor()),
+                                    );
+                                  },
                                     style: ElevatedButton.styleFrom(backgroundColor: Colors.grey, shape: const RoundedRectangleBorder()),
                                     child: Text(''),
                                   )
@@ -201,7 +238,13 @@ class pantalla_principal extends StatelessWidget {
                                   height: 75,
                                   width: 75,
                                   margin: const EdgeInsets.symmetric(horizontal: 16),
-                                  child: ElevatedButton(onPressed: (){},
+                                  child: ElevatedButton(onPressed: (){
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => reproductor()),
+                                    );
+                                  },
                                     style: ElevatedButton.styleFrom(backgroundColor: Colors.grey, shape: const RoundedRectangleBorder()),
                                     child: Text(''),
                                   )
@@ -211,7 +254,13 @@ class pantalla_principal extends StatelessWidget {
                                   height: 75,
                                   width: 75,
                                   margin: const EdgeInsets.symmetric(horizontal: 16),
-                                  child: ElevatedButton(onPressed: (){},
+                                  child: ElevatedButton(onPressed: (){
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => reproductor()),
+                                    );
+                                  },
                                     style: ElevatedButton.styleFrom(backgroundColor: Colors.grey, shape: const RoundedRectangleBorder()),
                                     child: Text(''),
                                   )
@@ -249,7 +298,13 @@ class pantalla_principal extends StatelessWidget {
                                   height: 75,
                                   width: 75,
                                   margin: const EdgeInsets.symmetric(horizontal: 16),
-                                  child: ElevatedButton(onPressed: (){},
+                                  child: ElevatedButton(onPressed: (){
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => reproductor()),
+                                    );
+                                  },
                                     style: ElevatedButton.styleFrom(backgroundColor: Colors.grey, shape: const RoundedRectangleBorder()),
                                     child: Text(''),
                                   )
@@ -259,7 +314,13 @@ class pantalla_principal extends StatelessWidget {
                                   height: 75,
                                   width: 75,
                                   margin: const EdgeInsets.symmetric(horizontal: 16),
-                                  child: ElevatedButton(onPressed: (){},
+                                  child: ElevatedButton(onPressed: (){
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => reproductor()),
+                                    );
+                                  },
                                     style: ElevatedButton.styleFrom(backgroundColor: Colors.grey, shape: const RoundedRectangleBorder()),
                                     child: Text(''),
                                   )
@@ -269,7 +330,13 @@ class pantalla_principal extends StatelessWidget {
                                   height: 75,
                                   width: 75,
                                   margin: const EdgeInsets.symmetric(horizontal: 16),
-                                  child: ElevatedButton(onPressed: (){},
+                                  child: ElevatedButton(onPressed: (){
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => reproductor()),
+                                    );
+                                  },
                                     style: ElevatedButton.styleFrom(backgroundColor: Colors.grey, shape: const RoundedRectangleBorder()),
                                     child: Text(''),
                                   )
@@ -279,7 +346,13 @@ class pantalla_principal extends StatelessWidget {
                                   height: 75,
                                   width: 75,
                                   margin: const EdgeInsets.symmetric(horizontal: 16),
-                                  child: ElevatedButton(onPressed: (){},
+                                  child: ElevatedButton(onPressed: (){
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => reproductor()),
+                                    );
+                                  },
                                     style: ElevatedButton.styleFrom(backgroundColor: Colors.grey, shape: const RoundedRectangleBorder()),
                                     child: const Text(''),
                                   )
@@ -316,7 +389,13 @@ class pantalla_principal extends StatelessWidget {
                                   height: 75,
                                   width: 75,
                                   margin: const EdgeInsets.symmetric(horizontal: 16),
-                                  child: ElevatedButton(onPressed: (){},
+                                  child: ElevatedButton(onPressed: (){
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => reproductor()),
+                                    );
+                                  },
                                     style: ElevatedButton.styleFrom(backgroundColor: Colors.grey, shape: const RoundedRectangleBorder()),
                                     child: Text(''),
                                   )
@@ -326,7 +405,13 @@ class pantalla_principal extends StatelessWidget {
                                   height: 75,
                                   width: 75,
                                   margin: const EdgeInsets.symmetric(horizontal: 16),
-                                  child: ElevatedButton(onPressed: (){},
+                                  child: ElevatedButton(onPressed: (){
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => reproductor()),
+                                    );
+                                  },
                                     style: ElevatedButton.styleFrom(backgroundColor: Colors.grey, shape: const RoundedRectangleBorder()),
                                     child: Text(''),
                                   )
@@ -336,7 +421,13 @@ class pantalla_principal extends StatelessWidget {
                                   height: 75,
                                   width: 75,
                                   margin: const EdgeInsets.symmetric(horizontal: 16),
-                                  child: ElevatedButton(onPressed: (){},
+                                  child: ElevatedButton(onPressed: (){
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => reproductor()),
+                                    );
+                                  },
                                     style: ElevatedButton.styleFrom(backgroundColor: Colors.grey, shape: const RoundedRectangleBorder()),
                                     child: Text(''),
                                   )
@@ -346,7 +437,13 @@ class pantalla_principal extends StatelessWidget {
                                   height: 75,
                                   width: 75,
                                   margin: const EdgeInsets.symmetric(horizontal: 16),
-                                  child: ElevatedButton(onPressed: (){},
+                                  child: ElevatedButton(onPressed: (){
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => reproductor()),
+                                    );
+                                  },
                                     style: ElevatedButton.styleFrom(backgroundColor: Colors.grey, shape: const RoundedRectangleBorder()),
                                     child: Text(''),
                                   )
@@ -525,7 +622,7 @@ class pantalla_principal extends StatelessWidget {
           // Navegar a la pantalla correspondiente
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => screen),
+            MaterialPageRoute(builder: (context) => reproductor()),
           );
         },
         style: ElevatedButton.styleFrom(
