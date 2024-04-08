@@ -1,6 +1,5 @@
 import 'package:aversifunciona/registro4.dart';
 import 'package:flutter/material.dart';
-import 'registro4.dart';
 
 class Registro1 extends StatelessWidget {
   @override

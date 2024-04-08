@@ -1,5 +1,6 @@
 import 'package:aversifunciona/cancionesFavoritas.dart';
 import 'package:aversifunciona/pantalla_principal.dart';
+import 'package:aversifunciona/salas.dart';
 import 'package:flutter/material.dart';
 import 'package:aversifunciona/verPerfil.dart';
 
@@ -7,7 +8,6 @@ import 'configuracion.dart';
 import 'historial.dart';
 import 'ListaOCarpeta.dart';
 import 'buscar.dart';
-import 'chatDeSala.dart';
 
 class pantalla_biblioteca extends StatelessWidget {
   @override
@@ -88,7 +88,7 @@ class pantalla_biblioteca extends StatelessWidget {
                     );
                   },
                   child: lo de abajo*/
-          Text(
+          const Text(
             '+  ',
             style: const TextStyle(color: Colors.white, fontSize: 20),
           ),
@@ -115,7 +115,7 @@ class pantalla_biblioteca extends StatelessWidget {
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor:Colors.transparent,
-                        padding: EdgeInsets.all(0), // Sin relleno
+                        padding: const EdgeInsets.all(0), // Sin relleno
                       ),
                       child: Row(
                         children: [
@@ -126,7 +126,7 @@ class pantalla_biblioteca extends StatelessWidget {
                               color: Colors.grey, // Puedes ajustar el color del cuadrado
                               borderRadius: BorderRadius.circular(8),
                             ),
-                            child: Icon(Icons.heart_broken, color: Colors.white),
+                            child: const Icon(Icons.heart_broken, color: Colors.white),
                           ),
                           const SizedBox(width: 5),
                           const Text(

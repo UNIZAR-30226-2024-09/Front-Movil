@@ -15,7 +15,8 @@ class verPerfil extends StatelessWidget {
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,
-        title: Text('Editar Perfil'),
+        title: const Text('Editar Perfil', style: TextStyle(color: Colors.white))
+        ,
       ),
       body: Column(
         children: [
