@@ -1,5 +1,7 @@
 import 'package:aversifunciona/pantalla_principal.dart';
 import 'package:flutter/material.dart';
+import '../models/userPassword.dart';
+import 'package:http/http.dart' as http;
 
 class InicioSesion extends StatelessWidget {
   @override
@@ -46,25 +48,26 @@ class InicioSesion extends StatelessWidget {
                   width: 150,
                   height: 150,
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
 
                 // Campo de Correo Electrónico o Nombre de Usuario
-                InputField(
+                const InputField(
                   hintText: 'Correo electrónico o nombre de usuario',
                   hintTextInside: 'Correo o nombre de usuario',
 
                 ),
 
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
 
                 // Campo de Contraseña
-                InputField(
+                const InputField(
                   hintText: 'Contraseña',
                   hintTextInside: 'Contraseña',
                   isPassword: true,
                 ),
 
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
+
 
                 // Botón de Iniciar Sesión
                 RoundedButton(
