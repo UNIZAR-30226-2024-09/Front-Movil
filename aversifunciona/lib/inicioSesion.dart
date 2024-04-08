@@ -1,6 +1,6 @@
 import 'package:aversifunciona/pantalla_principal.dart';
+import 'userPassword.dart';
 import 'package:flutter/material.dart';
-import '../models/userPassword.dart';
 import 'package:http/http.dart' as http;
 
 class InicioSesion extends StatelessWidget {
