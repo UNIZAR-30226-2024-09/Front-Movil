@@ -31,7 +31,6 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
       isPlaying = !isPlaying;
       // Simulamos el progreso de la canción
       if (isPlaying) {
-        progress = 0.0;
         startPlaying();
       } else {
         stopPlaying();
