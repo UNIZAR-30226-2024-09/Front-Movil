@@ -15,28 +15,33 @@ class InicioSesion extends StatelessWidget {
 
 
   Future<bool> loginValido(String correo, String contrasegna) async {
-    final response = await
+    try{
+      final response = await http.post(
+        Uri.parse("${Env.URL_PREFIX}/iniciarSesion/"),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8'
+        },
 
-    http.post(
-      Uri.parse("${Env.URL_PREFIX}/iniciarSesion/"),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8'
-      },
+        body: jsonEncode(<String, String>{
+            'correo': correo,
+            'contrasegna': contrasegna,
+        }),
+      );
 
-      body: jsonEncode(<String, String>{
-          'correo': correo,
-          'contrasegna': contrasegna,
-      }),
-    );
+      if (response.statusCode == 200) {
+        debugPrint("Paula");
+        // Si la solicitud es exitosa, retornar verdadero
+        return true;
+      } else {
+        // Si la solicitud no es exitosa, retornar falso
+        return false;
+      }
+    } catch (e) {
+      // Si ocurre algún error, retornar falso
+      print("Error al realizar la solicitud HTTP: $e");
+      return false;
+      }
 
-    final items = json.decode(response.body).cast<Map<String, dynamic>>();
-    List<UserPassword> userPassword = items.map<UserPassword>((json) {
-      return UserPassword.fromJson(json);
-    }).toList();
-
-    final respuesta = await http.get(Uri.parse("${Env.URL_PREFIX}/iniciarSesion/"));
-
-    return jsonDecode(respuesta.body);
   }
 
   @override
@@ -117,7 +122,6 @@ class InicioSesion extends StatelessWidget {
                         borderSide: BorderSide(color: Colors.white, width: 2.0),
                       ),
                     ),
-                    obscureText: true,
                   ),
                 ),
 
@@ -165,13 +169,13 @@ class InicioSesion extends StatelessWidget {
                   text: 'Iniciar Sesión',
                   backgroundColor: Colors.blue.shade400,
                   textColor: Colors.white,
-                  onPressed: () {
-                    //if (_contrasegna.text == lo que queramos){
+                  onPressed: () async{
+                    if (await loginValido(_correo.text, _contrasegna.text)){
                       Navigator.push(
                           context,
                           MaterialPageRoute(builder: (context) => pantalla_principal())
                       );
-                    //}
+                    }
 
                   },
                 ),
