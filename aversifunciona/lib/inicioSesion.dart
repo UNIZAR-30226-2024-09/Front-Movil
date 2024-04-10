@@ -1,17 +1,56 @@
+import 'dart:convert';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/widgets.dart';
+
+import 'env.dart';
+
 import 'package:aversifunciona/pantalla_principal.dart';
 import 'userPassword.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class InicioSesion extends StatelessWidget {
+  var _contrasegna = TextEditingController();
+  var _correo = TextEditingController();
+
+
+  Future<bool> loginValido(String correo, String contrasegna) async {
+    final response = await
+
+    http.post(
+      Uri.parse("${Env.URL_PREFIX}/iniciarSesion/"),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8'
+      },
+
+      body: jsonEncode(<String, String>{
+          'correo': correo,
+          'contrasegna': contrasegna,
+      }),
+    );
+
+    final items = json.decode(response.body).cast<Map<String, dynamic>>();
+    List<UserPassword> userPassword = items.map<UserPassword>((json) {
+      return UserPassword.fromJson(json);
+    }).toList();
+
+    final respuesta = await http.get(Uri.parse("${Env.URL_PREFIX}/iniciarSesion/"));
+
+    return jsonDecode(respuesta.body);
+  }
+
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       backgroundColor: Colors.black,  // Ajuste del fondo a negro
 
       body: Center(
+
+        child: SingleChildScrollView(
         child: Container(
           width: 400,
+          height: 640,
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
@@ -23,12 +62,16 @@ class InicioSesion extends StatelessWidget {
           )
         ),
 
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
 
-          children: [
+            child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.max,
+
+            children: [
             // Logo
-            Container(
+
+
+              Container(
               alignment: Alignment.center,
               width: 270,
               height: 530,
@@ -50,24 +93,72 @@ class InicioSesion extends StatelessWidget {
                 ),
                 const SizedBox(height: 20),
 
-                // Campo de Correo Electrónico o Nombre de Usuario
-                const InputField(
-                  hintText: 'Correo electrónico o nombre de usuario',
-                  hintTextInside: 'Correo o nombre de usuario',
 
+                const Text("Correo electrónico", style: TextStyle(color: Colors.white), textAlign: TextAlign.left,),
+                const SizedBox(height: 10),
+
+                // Campo de Correo Electrónico o Nombre de Usuario
+                Container(
+                  width: 250,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: TextFormField(
+                    controller: _correo,
+                    style: TextStyle(color: Colors.white),
+                    decoration: InputDecoration(
+
+                      contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                      hintText: 'Correo electrónico',
+                      filled: true,
+                      fillColor: Colors.transparent,
+                      hintStyle: TextStyle(color: Colors.grey),
+                      border: OutlineInputBorder(
+
+                        borderRadius: BorderRadius.all(Radius.circular(15)),
+                        borderSide: BorderSide(color: Colors.white, width: 2.0),
+                      ),
+                    ),
+                    obscureText: true,
+                  ),
                 ),
 
                 const SizedBox(height: 10),
-
+                const Text("Contraseña", style: TextStyle(color: Colors.white), textAlign: TextAlign.left,),
+                const SizedBox(height: 10),
                 // Campo de Contraseña
+                /*
                 const InputField(
                   hintText: 'Contraseña',
                   hintTextInside: 'Contraseña',
                   isPassword: true,
                 ),
+                */
+
+                // Tendremos que modificar todos los InputField por TextField y cambiar más cosillas
+                Container(
+                  width: 250,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: TextFormField(
+                    controller: _contrasegna,
+                    style: TextStyle(color: Colors.white),
+                    decoration: InputDecoration(
+
+                      contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                      hintText: 'Contraseña',
+                      filled: true,
+                      fillColor: Colors.transparent,
+                      hintStyle: TextStyle(color: Colors.grey),
+                      border: OutlineInputBorder(
+
+                        borderRadius: BorderRadius.all(Radius.circular(15)),
+                        borderSide: BorderSide(color: Colors.white, width: 2.0),
+                      ),
+                    ),
+                    obscureText: true,
+                  ),
+                ),
+
 
                 const SizedBox(height: 20),
-
 
                 // Botón de Iniciar Sesión
                 RoundedButton(
@@ -75,17 +166,21 @@ class InicioSesion extends StatelessWidget {
                   backgroundColor: Colors.blue.shade400,
                   textColor: Colors.white,
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => pantalla_principal()),
-                    );
+                    //if (_contrasegna.text == lo que queramos){
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => pantalla_principal())
+                      );
+                    //}
+
                   },
                 ),
               ],
             ),
             ),
+            ],
+            ),
 
-          ],
         ),
         ),
 

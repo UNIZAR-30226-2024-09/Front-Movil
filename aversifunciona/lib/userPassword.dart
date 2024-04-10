@@ -4,7 +4,7 @@ class UserPassword {
 
     UserPassword({required this.correo, required this.contrasegna});
 
-    factory UserPassword.fromJSon(Map <String, dynamic> json){
+    factory UserPassword.fromJson(Map <String, dynamic> json){
       return UserPassword(
         correo: json['correo'],
         contrasegna: json['contrasegna'],
@@ -12,7 +12,7 @@ class UserPassword {
     }
 
     Map<String, dynamic> toJson() => {
-      'usuario' : correo,
+      'correo' : correo,
       'contrasegna': contrasegna,
     };
 }
