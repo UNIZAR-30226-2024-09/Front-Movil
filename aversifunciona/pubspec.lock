@@ -91,6 +91,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.2"
+  intl:
+    dependency: transitive
+    description:
+      name: intl
+      sha256: "3bc132a9dbce73a7e4a21a17d06e1878839ffbf975568bc875c60537824b0c4d"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.18.1"
   leak_tracker:
     dependency: transitive
     description:
@@ -147,6 +155,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.11.0"
+  number_editing_controller:
+    dependency: "direct main"
+    description:
+      name: number_editing_controller
+      sha256: e2ae1bd23022ebdc7bf8f4726803df5800d0a047ac0a99cfadc1bb94125fbc75
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.2.1"
   path:
     dependency: transitive
     description:
@@ -242,3 +258,4 @@ packages:
     version: "0.5.1"
 sdks:
   dart: ">=3.3.0 <4.0.0"
+  flutter: ">=1.17.0"

@@ -2,6 +2,26 @@ import 'package:aversifunciona/registro4.dart';
 import 'package:flutter/material.dart';
 
 class Registro1 extends StatelessWidget {
+  final _correo = TextEditingController();
+  final _contrasegna = TextEditingController();
+  final _fecha = TextEditingController();
+  final _pais = TextEditingController();
+  bool visible = false;
+
+  void mostrar(){
+    debugPrint('Marianela');
+    Container(
+      alignment: Alignment.bottomCenter,
+      child: const Text(
+        '¡Completa todos los campos antes de continuar!',
+        textAlign: TextAlign.center,
+
+        style: TextStyle(
+            color: Colors.red,
+            fontWeight: FontWeight.bold
+        )));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -10,12 +30,12 @@ class Registro1 extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.black,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
-        title: Row(
+        title: const Row(
           children: [
             // Texto de Encabezado
             Text(
@@ -30,104 +50,137 @@ class Registro1 extends StatelessWidget {
         ),
       ),
       body: Center(
+      child: SingleChildScrollView(
         child: Column(
             children: [
-              const Column(
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
 
                 children: [
-                  SizedBox(height: 20),
 
                   // Campo de Correo Electrónico
                   InputField(
-
+                    controller: _correo,
                     hintText: 'Correo electrónico',
                   ),
 
-                  SizedBox(height: 20),
+                  const SizedBox(height: 10),
       ]
               ),
-                  const Column(
+                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
 
                     children: [
-                      SizedBox(height: 20),
+                      const SizedBox(height: 10),
 
                       // Campo de Correo Electrónico
                       InputField(
-
+                        controller: _contrasegna,
                         hintText: 'Contraseña',
                       ),
 
-                      SizedBox(height: 20),
+                      const SizedBox(height: 10),
                 ],
               ),
 
-              const Column(
+              Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
 
                   children: [
-                    SizedBox(height: 20),
+                    const SizedBox(height: 10),
 
                     // Campo de Correo Electrónico
                     InputField(
-
+                      controller: _fecha,
                       hintText: 'Fecha de nacimiento',
                     ),
 
-                    SizedBox(height: 20),
+                    const SizedBox(height: 10),
                   ]
               ),
 
-              const Column(
+              Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
 
                   children: [
-                    SizedBox(height: 20),
+                    const SizedBox(height: 10),
 
                     // Campo de Correo Electrónico
                     InputField(
-
+                      controller: _pais,
                       hintText: 'Pais de nacimiento',
                     ),
 
-                    SizedBox(height: 20),
+                    const SizedBox(height: 40),
                   ]
               ),
 
               Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+
                   RoundedButton(
 
                   text: 'Siguiente',
                   backgroundColor: Colors.white,
                   textColor: Colors.black,
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => Registro4()),
-                    );
+
+                    if (_correo.text == '' || _contrasegna.text == '' || _fecha.text == '' || _pais.text == '') {
+                      showDialog(context: context, builder: (BuildContext context) {
+                        return const AlertDialog(
+                          backgroundColor: Colors.white,
+                          content: Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child:  Text(
+                                            '¡Completa todos los campos antes de continuar!',
+                                            textAlign: TextAlign.center,
+
+                                            style: TextStyle(
+                                                color: Colors.red,
+                                                fontWeight: FontWeight.bold
+                                            )),
+
+                                    ),);
+                      });
+
+                    }
+                    else {
+                      const Text(
+                          '',
+                          textAlign: TextAlign.center,
+
+                      );
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => Registro4()),
+                      );
+                    }
                   },
 
                 ),
                 ]
               ),
 
+
+
+
         ]
       ),
       ),
-    );
+    ));
   }
 }
 
 
 class InputField extends StatelessWidget {
   final String hintText;
+  final controller;
 
   const InputField({
     Key? key,
     required this.hintText,
+    required this.controller
   }) : super(key: key);
 
   @override
@@ -150,20 +203,32 @@ class InputField extends StatelessWidget {
               border: Border.all(color: Colors.white), // Borde blanco
             ),
             child: TextFormField(
-              style: TextStyle(color: Colors.white),
-              decoration: InputDecoration(
+              style: const TextStyle(color: Colors.white),
+                controller: controller,
+                decoration: const InputDecoration(
+
+
                 contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                border: InputBorder.none,
-              ),
+                hintText: '',
+                filled: true,
+                fillColor: Colors.transparent,
+                hintStyle: TextStyle(color: Colors.grey),
+                border: OutlineInputBorder(
+
+                  borderRadius: BorderRadius.all(Radius.circular(15)),
+                  borderSide: BorderSide(color: Colors.white, width: 2.0),
+
+
+            ),
+          ),
             ),
           ),
         ],
       ),
     );
+
   }
 }
-
-
 
 class RoundedButton extends StatelessWidget {
   final String text;
