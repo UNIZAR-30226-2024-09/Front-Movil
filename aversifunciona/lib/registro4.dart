@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'registro_fin.dart';
 
-class Registro4 extends StatelessWidget {
+class Registro4 extends StatefulWidget {
+  @override
+  _Registro4State createState() => _Registro4State();
+}
+class _Registro4State extends State<Registro4> {
+  String _genero = '';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,10 +59,10 @@ class Registro4 extends StatelessWidget {
                     Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        genderOption('Mujer', context),
-                        genderOption('Hombre', context),
-                        genderOption('Otro', context),
-                        genderOption('Prefiero no decirlo', context),
+                        genderOption('Mujer'),
+                        genderOption('Hombre'),
+                        genderOption('Otro'),
+                        genderOption('Prefiero no decirlo'),
                       ],
                     ),
 
@@ -89,7 +94,7 @@ class Registro4 extends StatelessWidget {
 
 
 
-  Widget genderOption(String gender, BuildContext context) {
+  Widget genderOption(String gender) {
     return RadioListTile(
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
       visualDensity: const VisualDensity(
@@ -101,9 +106,11 @@ class Registro4 extends StatelessWidget {
         style: TextStyle(color: Colors.white),
       ),
       value: gender,
-      groupValue: null, // No es necesario el groupValue si no se almacena internamente
+      groupValue: _genero, // Establecer el valor del grupo al género seleccionado
       onChanged: (value) {
-        // Puedes agregar lógica aquí si es necesario
+        setState(() {
+          _genero = value.toString(); // Actualizar el género seleccionado
+        });
       },
       activeColor: Colors.white,
     );

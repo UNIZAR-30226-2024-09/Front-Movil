@@ -7,6 +7,22 @@ class Registro1 extends StatelessWidget {
   final _fecha = TextEditingController();
   final _pais = TextEditingController();
   bool visible = false;
+  
+  String obtenerCorreoDesdeRegistro1() {
+    return _correo.text;
+  }
+
+  String obtenerContrasenaDesdeRegistro1() {
+    return _contrasegna.text;
+  }
+
+  String obtenerFechaDesdeRegistro1() {
+    return _fecha.text;
+  }
+
+  String obtenerPaisDesdeRegistro1() {
+    return _pais.text;
+  }
 
   void mostrar(){
     debugPrint('Marianela');

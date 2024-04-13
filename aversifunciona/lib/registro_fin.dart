@@ -1,8 +1,33 @@
-import 'package:aversifunciona/pantalla_principal.dart';
-import 'package:flutter/material.dart';
-import 'registro4.dart';
+import 'dart:convert';
 
-class Registro_fin extends StatelessWidget {
+import 'package:aversifunciona/pantalla_principal.dart';
+import 'package:aversifunciona/registroValido.dart';
+import 'package:flutter/material.dart';
+import 'env.dart';
+import 'registro4.dart';
+import 'registro1.dart';
+import 'package:http/http.dart' as http;
+
+class Registro_fin extends StatefulWidget {
+  @override
+  _Registro_finState createState() => _Registro_finState();
+}
+
+class _Registro_finState extends State<Registro_fin> {
+  final TextEditingController _nombre = TextEditingController();
+  final TextEditingController _correo = TextEditingController();
+  final TextEditingController _contrasena = TextEditingController();
+  final TextEditingController _fecha = TextEditingController();
+  final TextEditingController _pais = TextEditingController();
+  bool _politicaPrivacidadAceptada = false;
+  void obtenerDatosRegistro() {
+    // Supongamos que aquí obtienes los datos de Registro1 y los asignas a los controladores de texto
+    _nombre.text = obtenerNombreDesdeRegistro1();
+    _correo.text = obtenerCorreoDesdeRegistro1();
+    _contrasena.text = obtenerContrasenaDesdeRegistro1();
+    _fecha.text = obtenerFechaDesdeRegistro1();
+    _pais.text = obtenerPaisDesdeRegistro1();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,9 +62,10 @@ class Registro_fin extends StatelessWidget {
             const SizedBox(height: 10),
 
             // Campo de Género
-            const InputField(
+            InputField(
 
               hintText: '¿Cómo te llamas?',
+              controller: _nombre,
             ),
 
             const SizedBox(height: 10),
@@ -66,8 +92,8 @@ class Registro_fin extends StatelessWidget {
             const SizedBox(height: 10),
             Column(
               children: [
-                genderOption('Acepto la política de privacidad de Musify', context),
-                genderOption('Permito que Musify utilice mis datos personales para fines estadísticos y esas cosas que se dicen', context),
+                genderOption('Acepto la política de privacidad de Musify'),
+                genderOption('Permito que Musify utilice mis datos personales para fines estadísticos y esas cosas que se dicen'),
               ],
             ),
 
@@ -81,10 +107,38 @@ class Registro_fin extends StatelessWidget {
                 backgroundColor: Colors.white,
                 textColor: Colors.black,
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => pantalla_principal()),
-                  );
+                  String nombre = _nombre.text;
+                  // Verificar si se ha aceptado la política de privacidad
+                  Future<bool> registroExitoso = registroValido(nombre, correo, contrasegna, fecha, pais, _politicaPrivacidadAceptada);
+
+                      if (registroExitoso == true) {
+                      // Si el registro es exitoso, puedes navegar a la siguiente pantalla
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => pantalla_principal()),
+                          );
+                      }else {
+                        // Si el registro no es exitoso, puedes mostrar un mensaje de error o manejarlo de otra manera
+                        // Por ejemplo, mostrando un diálogo de error
+                        showDialog(
+                          context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                              title: Text('Error'),
+                              content: Text('El registro no se pudo completar. Por favor, inténtalo de nuevo.'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.pop(context); // Cerrar el diálogo
+                                    },
+                                    child: Text('OK'),
+                                  ),
+                                ],
+                              );
+                          },
+                        );
+                      }
+
                 },
               ),
             ),
@@ -95,7 +149,7 @@ class Registro_fin extends StatelessWidget {
     );
   }
 
-  Widget genderOption(String gender, BuildContext context) {
+  Widget genderOption(String gender) {
     return RadioListTile(
       title: Text(
         gender,
@@ -104,7 +158,9 @@ class Registro_fin extends StatelessWidget {
       value: gender,
       groupValue: null, // No es necesario el groupValue si no se almacena internamente
       onChanged: (value) {
-        // Puedes agregar lógica aquí si es necesario
+        setState(() {
+          _politicaPrivacidadAceptada = true; // Actualizar el género seleccionado
+        });
       },
       activeColor: Colors.white,
     );
@@ -113,10 +169,12 @@ class Registro_fin extends StatelessWidget {
 
 class InputField extends StatelessWidget {
   final String hintText;
+  final TextEditingController controller;
 
   const InputField({
     Key? key,
     required this.hintText,
+    required this.controller,
   }) : super(key: key);
 
   @override
@@ -139,6 +197,7 @@ class InputField extends StatelessWidget {
             ),
             child: TextFormField(
               style: const TextStyle(color: Colors.black),
+              controller: controller,
               decoration: const InputDecoration(
                 contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                 border: InputBorder.none,
@@ -149,4 +208,5 @@ class InputField extends StatelessWidget {
       ),
     );
   }
+
 }
