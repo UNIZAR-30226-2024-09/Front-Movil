@@ -1,6 +1,10 @@
 import 'package:aversifunciona/verPerfil.dart';
 import 'package:flutter/material.dart';
 
+import 'env.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
 class EditarNombreUsuario extends StatefulWidget {
   @override
   _EditarNombreUsuarioState createState() => _EditarNombreUsuarioState();
@@ -8,6 +12,33 @@ class EditarNombreUsuario extends StatefulWidget {
 
 class _EditarNombreUsuarioState extends State<EditarNombreUsuario> {
   TextEditingController _nuevoNombreUsuarioController = TextEditingController();
+
+
+  Future<bool> actualizarNombreUsuario(String nuevoNombreUsuario) async {
+    try {
+      final response = await http.put(
+        Uri.parse("${Env.URL_PREFIX}/actualizarNombreUsuario/"),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8'
+        },
+        body: jsonEncode(<String, dynamic>{
+          'nuevoNombreUsuario': nuevoNombreUsuario,
+        }),
+      );
+
+      if (response.statusCode == 200) { // si no hay un usuario que se llame así
+        // Si la solicitud es exitosa, retornar verdadero
+        return true;
+      } else {
+        // Si la solicitud no es exitosa, retornar falso
+        return false;
+      }
+    } catch (e) {
+      // Si ocurre algún error, retornar falso
+      print("Error al realizar la solicitud HTTP: $e");
+      return false;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

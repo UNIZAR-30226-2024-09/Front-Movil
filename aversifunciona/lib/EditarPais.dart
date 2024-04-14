@@ -1,6 +1,9 @@
 import 'package:aversifunciona/verPerfil.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
+import 'env.dart';
 class EditarPais extends StatefulWidget {
   @override
   _EditarPaisState createState() => _EditarPaisState();
@@ -8,6 +11,32 @@ class EditarPais extends StatefulWidget {
 
 class _EditarPaisState extends State<EditarPais> {
   TextEditingController _nuevoPaisController = TextEditingController();
+
+  Future<bool> actualizarPais(String nuevoPais) async {
+    try {
+      final response = await http.put(
+        Uri.parse("${Env.URL_PREFIX}/actualizarPais/"),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8'
+        },
+        body: jsonEncode(<String, dynamic>{
+          'nuevoPais': nuevoPais,
+        }),
+      );
+
+      if (response.statusCode == 200) { //si es un país valido
+        // Si la solicitud es exitosa, retornar verdadero
+        return true;
+      } else {
+        // Si la solicitud no es exitosa, retornar falso
+        return false;
+      }
+    } catch (e) {
+      // Si ocurre algún error, retornar falso
+      print("Error al realizar la solicitud HTTP: $e");
+      return false;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

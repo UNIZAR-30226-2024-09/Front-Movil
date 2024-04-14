@@ -21,12 +21,11 @@ class _Registro_finState extends State<Registro_fin> {
   final TextEditingController _pais = TextEditingController();
   bool _politicaPrivacidadAceptada = false;
   void obtenerDatosRegistro() {
-    // Supongamos que aquí obtienes los datos de Registro1 y los asignas a los controladores de texto
-    _nombre.text = obtenerNombreDesdeRegistro1();
-    _correo.text = obtenerCorreoDesdeRegistro1();
-    _contrasena.text = obtenerContrasenaDesdeRegistro1();
-    _fecha.text = obtenerFechaDesdeRegistro1();
-    _pais.text = obtenerPaisDesdeRegistro1();
+    _nombre.text = registro1Key.currentState.obtenerNombreDesdeRegistro1();
+    _correo.text = registro1Key.currentState.obtenerCorreoDesdeRegistro1();
+    _contrasena.text = registro1Key.currentState.obtenerContrasenaDesdeRegistro1();
+    _fecha.text = registro1Key.currentState.obtenerFechaDesdeRegistro1();
+    _pais.text = registro1Key.currentState.obtenerPaisDesdeRegistro1();
   }
   @override
   Widget build(BuildContext context) {
