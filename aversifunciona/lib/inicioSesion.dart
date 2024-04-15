@@ -176,6 +176,24 @@ class InicioSesion extends StatelessWidget {
                           MaterialPageRoute(builder: (context) => pantalla_principal())
                       );
                     }
+                    else{
+                      showDialog(context: context, builder: (BuildContext context) {
+                        return const AlertDialog(
+                          backgroundColor: Colors.white,
+                          content: Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child:  Text(
+                                'Correo y/o contraseña incorrecto(s)',
+                                textAlign: TextAlign.center,
+
+                                style: TextStyle(
+                                    color: Colors.red,
+                                    fontWeight: FontWeight.bold
+                                )),
+
+                          ),);
+                      });
+                    }
 
                   },
                 ),
