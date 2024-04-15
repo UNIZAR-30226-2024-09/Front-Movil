@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'registro4.dart';
 
+// PANTALLA LEGADA, ELIMINAR CUANDO SEA POSIBLE
+
 class Registro3 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {

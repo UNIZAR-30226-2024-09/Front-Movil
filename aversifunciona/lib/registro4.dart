@@ -3,10 +3,25 @@ import 'registro_fin.dart';
 
 class Registro4 extends StatefulWidget {
   @override
-  _Registro4State createState() => _Registro4State();
+  _Registro4State createState() => _Registro4State(correo: correo, contrasegna: contrasegna, fecha: fecha, pais: pais);
+
+  const Registro4({required this.correo, required this.contrasegna, required this.fecha, required this.pais});
+
+  final String correo;
+  final String contrasegna;
+  final String fecha;
+  final String pais;
 }
 class _Registro4State extends State<Registro4> {
   String _genero = '';
+
+  _Registro4State({required this.correo, required this.contrasegna, required this.fecha, required this.pais});
+
+  final String correo;
+  final String contrasegna;
+  final String fecha;
+  final String pais;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -80,7 +95,7 @@ class _Registro4State extends State<Registro4> {
                         onPressed: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => Registro_fin()),
+                            MaterialPageRoute(builder: (context) => Registro_fin(correo: correo, contrasegna: contrasegna, fecha: fecha, pais: pais, genero: _genero)),
                           );
                         },
                       ),

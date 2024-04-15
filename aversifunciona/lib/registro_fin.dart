@@ -10,23 +10,34 @@ import 'package:http/http.dart' as http;
 
 class Registro_fin extends StatefulWidget {
   @override
-  _Registro_finState createState() => _Registro_finState();
+  _Registro_finState createState() => _Registro_finState(correo: correo, contrasegna: contrasegna, fecha: fecha, pais: pais, genero: genero);
+
+  const Registro_fin({required this.correo, required this.contrasegna, required this.fecha, required this.pais, required this.genero});
+
+  final String correo;
+  final String contrasegna;
+  final String fecha;
+  final String pais;
+  final String genero;
 }
 
 class _Registro_finState extends State<Registro_fin> {
+
+  _Registro_finState({required this.correo, required this.contrasegna, required this.fecha, required this.pais, required this.genero});
+
+  final String correo;
+  final String contrasegna;
+  final String fecha;
+  final String pais;
+  final String genero;
+
   final TextEditingController _nombre = TextEditingController();
   final TextEditingController _correo = TextEditingController();
   final TextEditingController _contrasena = TextEditingController();
   final TextEditingController _fecha = TextEditingController();
   final TextEditingController _pais = TextEditingController();
   bool _politicaPrivacidadAceptada = false;
-  void obtenerDatosRegistro() {
-    _nombre.text = registro1Key.currentState.obtenerNombreDesdeRegistro1();
-    _correo.text = registro1Key.currentState.obtenerCorreoDesdeRegistro1();
-    _contrasena.text = registro1Key.currentState.obtenerContrasenaDesdeRegistro1();
-    _fecha.text = registro1Key.currentState.obtenerFechaDesdeRegistro1();
-    _pais.text = registro1Key.currentState.obtenerPaisDesdeRegistro1();
-  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -108,7 +119,7 @@ class _Registro_finState extends State<Registro_fin> {
                 onPressed: () {
                   String nombre = _nombre.text;
                   // Verificar si se ha aceptado la política de privacidad
-                  Future<bool> registroExitoso = registroValido(nombre, correo, contrasegna, fecha, pais, _politicaPrivacidadAceptada);
+                  Future<bool> registroExitoso = registroValido(nombre, correo, contrasegna, fecha, pais, genero, _politicaPrivacidadAceptada);
 
                       if (registroExitoso == true) {
                       // Si el registro es exitoso, puedes navegar a la siguiente pantalla
@@ -165,6 +176,43 @@ class _Registro_finState extends State<Registro_fin> {
     );
   }
 }
+
+class RoundedButton extends StatelessWidget {
+  final String text;
+  final Color backgroundColor;
+  final Color textColor;
+  final VoidCallback onPressed;
+
+  const RoundedButton({
+    Key? key,
+    required this.text,
+    required this.backgroundColor,
+    required this.textColor,
+    required this.onPressed,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 250,
+
+      child: ElevatedButton(
+        onPressed: onPressed,
+
+        style: ElevatedButton.styleFrom(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+        ),
+        child: Text(
+          text,
+          style: TextStyle(color: textColor),
+        ),
+      ),
+    );
+  }
+}
+
 
 class InputField extends StatelessWidget {
   final String hintText;

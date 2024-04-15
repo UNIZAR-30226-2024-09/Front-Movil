@@ -23,21 +23,6 @@ class Registro1 extends StatelessWidget {
   String obtenerPaisDesdeRegistro1() {
     return _pais.text;
   }
-
-  void mostrar(){
-    debugPrint('Marianela');
-    Container(
-      alignment: Alignment.bottomCenter,
-      child: const Text(
-        '¡Completa todos los campos antes de continuar!',
-        textAlign: TextAlign.center,
-
-        style: TextStyle(
-            color: Colors.red,
-            fontWeight: FontWeight.bold
-        )));
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -169,7 +154,7 @@ class Registro1 extends StatelessWidget {
                       );
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => Registro4()),
+                        MaterialPageRoute(builder: (context) => Registro4(correo: _correo.text, contrasegna: _contrasegna.text, fecha: _fecha.text, pais: _pais.text)),
                       );
                     }
                   },
