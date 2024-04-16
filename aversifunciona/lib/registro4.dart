@@ -93,10 +93,32 @@ class _Registro4State extends State<Registro4> {
                         backgroundColor: Colors.white,
                         textColor: Colors.black,
                         onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => Registro_fin(correo: correo, contrasegna: contrasegna, fecha: fecha, pais: pais, genero: _genero)),
-                          );
+                          if (_genero == ''){
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text('Error'),
+                                  content: Text('Selecciona un género para continuar'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context); // Cerrar el diálogo
+                                      },
+                                      child: Text('OK'),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          }
+                          else{
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => Registro_fin(correo: correo, contrasegna: contrasegna, fecha: fecha, pais: pais, genero: _genero)),
+                            );
+                          }
+
                         },
                       ),
                     ]

@@ -128,22 +128,23 @@ class Registro1 extends StatelessWidget {
                   onPressed: () {
 
                     if (_correo.text == '' || _contrasegna.text == '' || _fecha.text == '' || _pais.text == '') {
-                      showDialog(context: context, builder: (BuildContext context) {
-                        return const AlertDialog(
-                          backgroundColor: Colors.white,
-                          content: Padding(
-                                    padding: EdgeInsets.all(8.0),
-                                    child:  Text(
-                                            '¡Completa todos los campos antes de continuar!',
-                                            textAlign: TextAlign.center,
-
-                                            style: TextStyle(
-                                                color: Colors.red,
-                                                fontWeight: FontWeight.bold
-                                            )),
-
-                                    ),);
-                      });
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text('Error'),
+                            content: Text('Rellena todos los campos para continuar'),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context); // Cerrar el diálogo
+                                },
+                                child: Text('OK'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
 
                     }
                     else {

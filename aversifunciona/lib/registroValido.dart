@@ -16,6 +16,7 @@ Future<bool> registroValido(String nombre, String correo, String contrasegna, St
         'contrasegna': contrasegna,
         'fecha': fecha,
         'pais': pais,
+        'genero': genero
       }),
     );
 

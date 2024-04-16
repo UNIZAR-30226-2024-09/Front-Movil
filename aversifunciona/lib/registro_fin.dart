@@ -64,7 +64,8 @@ class _Registro_finState extends State<Registro_fin> {
           ],
         ),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
+        child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -117,37 +118,77 @@ class _Registro_finState extends State<Registro_fin> {
                 backgroundColor: Colors.white,
                 textColor: Colors.black,
                 onPressed: () {
-                  String nombre = _nombre.text;
-                  // Verificar si se ha aceptado la política de privacidad
-                  Future<bool> registroExitoso = registroValido(nombre, correo, contrasegna, fecha, pais, genero, _politicaPrivacidadAceptada);
-
-                      if (registroExitoso == true) {
-                      // Si el registro es exitoso, puedes navegar a la siguiente pantalla
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => pantalla_principal()),
-                          );
-                      }else {
-                        // Si el registro no es exitoso, puedes mostrar un mensaje de error o manejarlo de otra manera
-                        // Por ejemplo, mostrando un diálogo de error
-                        showDialog(
-                          context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                              title: Text('Error'),
-                              content: Text('El registro no se pudo completar. Por favor, inténtalo de nuevo.'),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.pop(context); // Cerrar el diálogo
-                                    },
-                                    child: Text('OK'),
-                                  ),
-                                ],
-                              );
-                          },
+                  if (_nombre.text == ''){
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text('Error'),
+                          content: Text('Introduzca un nombre de usuario'),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context); // Cerrar el diálogo
+                              },
+                              child: Text('OK'),
+                            ),
+                          ],
                         );
-                      }
+                      },
+                    );
+                  }
+                  else if (!_politicaPrivacidadAceptada){
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text('Error'),
+                          content: Text('Debes aceptar la política de privacidad para poder continuar'),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context); // Cerrar el diálogo
+                              },
+                              child: Text('OK'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  }
+                  else{
+                    String nombre = _nombre.text;
+                    // Verificar si se ha aceptado la política de privacidad
+                    Future<bool> registroExitoso = registroValido(nombre, correo, contrasegna, fecha, pais, genero, _politicaPrivacidadAceptada);
+
+                    if (registroExitoso == true) {
+                      // Si el registro es exitoso, puedes navegar a la siguiente pantalla
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => pantalla_principal()),
+                      );
+                    }else {
+                      // Si el registro no es exitoso, puedes mostrar un mensaje de error o manejarlo de otra manera
+                      // Por ejemplo, mostrando un diálogo de error
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text('Error'),
+                            content: Text('El registro no se pudo completar. Por favor, inténtalo de nuevo.'),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context); // Cerrar el diálogo
+                                },
+                                child: Text('OK'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    }
+                  }
 
                 },
               ),
@@ -156,14 +197,20 @@ class _Registro_finState extends State<Registro_fin> {
 
         ),
       ),
+      )
     );
   }
 
   Widget genderOption(String gender) {
     return RadioListTile(
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      visualDensity: const VisualDensity(
+        horizontal: VisualDensity.minimumDensity,
+        vertical: VisualDensity.minimumDensity,
+      ),
       title: Text(
         gender,
-        style: const TextStyle(color: Colors.white),
+        style: TextStyle(color: Colors.white),
       ),
       value: gender,
       groupValue: null, // No es necesario el groupValue si no se almacena internamente
@@ -243,7 +290,7 @@ class InputField extends StatelessWidget {
               border: Border.all(color: Colors.white), // Borde blanco
             ),
             child: TextFormField(
-              style: const TextStyle(color: Colors.black),
+              style: const TextStyle(color: Colors.white),
               controller: controller,
               decoration: const InputDecoration(
                 contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
