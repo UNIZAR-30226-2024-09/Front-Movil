@@ -85,15 +85,15 @@ class pantalla_salas extends StatelessWidget {
                       }),
                       buildButton('SpainMusic', Colors.blue, 'Únete ahora', () {
                         // Navegar a la pantalla de chat cuando se presiona el botón
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => ChatDeSala()));
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => crearSala()));
                       }),
                       buildButton('SiaLovers', Colors.blue, 'Únete ahora', () {
                         // Navegar a la pantalla de chat cuando se presiona el botón
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => ChatDeSala()));
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => crearSala()));
                       }),
                       buildButton('EminemGroup', Colors.blue, 'Únete ahora', () {
                         // Navegar a la pantalla de chat cuando se presiona el botón
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => ChatDeSala()));
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => crearSala()));
                       }),
                       const SizedBox(height: 20),
 

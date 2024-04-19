@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import 'env.dart';
-class ChatDeSala extends StatefulWidget {
+class chatSalaDisponible extends StatefulWidget {
   @override
-  _chatDeSalaState createState() => _chatDeSalaState();
+  _chatSalaDisponibleState createState() => _chatSalaDisponibleState();
 }
 
-class _chatDeSalaState extends State<ChatDeSala> {
+class _chatSalaDisponibleState extends State<chatSalaDisponible> {
   TextEditingController _messageController = TextEditingController();
   List<String> _messages = [];
 
