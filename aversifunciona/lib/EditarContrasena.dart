@@ -1,5 +1,8 @@
 import 'package:aversifunciona/verPerfil.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'env.dart';
 
 class EditarContrasena extends StatefulWidget {
   @override
@@ -10,6 +13,31 @@ class _EditarContrasenaState extends State<EditarContrasena> {
   TextEditingController _nuevaContrasenaController = TextEditingController();
   TextEditingController _repetirContrasenaController = TextEditingController();
 
+  Future<bool> actualizarContrasena(String nuevaContrasena) async {
+    try {
+      final response = await http.put(
+        Uri.parse("${Env.URL_PREFIX}/actualizarContrasena/"), // Ajusta la URL según tu API
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8'
+        },
+        body: jsonEncode(<String, dynamic>{
+          'nuevaContrasena': nuevaContrasena,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        // Si la solicitud es exitosa, retornar verdadero
+        return true;
+      } else {
+        // Si la solicitud no es exitosa, retornar falso
+        return false;
+      }
+    } catch (e) {
+      // Si ocurre algún error, retornar falso
+      print("Error al realizar la solicitud HTTP: $e");
+      return false;
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
