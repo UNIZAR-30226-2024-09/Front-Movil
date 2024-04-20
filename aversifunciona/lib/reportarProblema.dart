@@ -104,7 +104,7 @@ class reportarProblema extends StatelessWidget {
                   ),
                 );
               },
-              child: Text('Enviar Reporte', style: TextStyle(color: Colors.white)),
+              child: Text('Enviar', style: TextStyle(color: Colors.white)),
             ),
           ],
         ),
