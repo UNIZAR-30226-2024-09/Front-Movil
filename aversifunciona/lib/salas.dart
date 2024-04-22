@@ -1,6 +1,5 @@
-import 'package:aversifunciona/crearSala.dart';
-import 'package:aversifunciona/pantalla_principal.dart';
 import 'package:flutter/material.dart';
+import 'package:aversifunciona/pantalla_principal.dart';
 import 'package:aversifunciona/verPerfil.dart';
 
 import 'configuracion.dart';
@@ -9,8 +8,15 @@ import 'biblioteca.dart';
 import 'buscar.dart';
 import 'chatDeSala.dart';
 
-class pantalla_salas extends StatelessWidget {
+class pantalla_salas extends StatefulWidget {
+  @override
+  _PantallaSalasState createState() => _PantallaSalasState();
+}
+
+class _PantallaSalasState extends State<pantalla_salas> {
+  List<String> _listaSalas = ['SpainMusic', 'SiaLovers', 'EminemGroup']; // Lista de nombres de salas
   TextEditingController salaController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -71,42 +77,32 @@ class pantalla_salas extends StatelessWidget {
         ),
       ),
       body: Column(
-
         children: [
-
-                Expanded(
-                  child: Container(
-
-                      child: ListView(
-                          shrinkWrap: true,
-                          children: [
-                          buildButton('+', Colors.grey, 'Crear sala', () {
-                            _showCreateRoomDialog(context);
-                      }),
-                      buildButton('SpainMusic', Colors.blue, 'Únete ahora', () {
-                        // Navegar a la pantalla de chat cuando se presiona el botón
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => ChatDeSala(roomName: 'SiaLovers')));
-                      }),
-                      buildButton('SiaLovers', Colors.blue, 'Únete ahora', () {
-                        // Navegar a la pantalla de chat cuando se presiona el botón
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => ChatDeSala(roomName: 'SiaLovers')));
-                      }),
-                      buildButton('EminemGroup', Colors.blue, 'Únete ahora', () {
-                        // Navegar a la pantalla de chat cuando se presiona el botón
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => ChatDeSala(roomName: 'SiaLovers')));
-                      }),
-                      const SizedBox(height: 20),
-
-                          ],
-                ),
-
-
-              ),
+          Expanded(
+            child: ListView(
+              shrinkWrap: true,
+              children: [
+                buildButton('+', Colors.grey, 'Crear sala', () {
+                  _showCreateRoomDialog(context);
+                }),
+                for (String sala in _listaSalas)
+                  buildButton(
+                    sala,
+                    Colors.blue,
+                    'Únete ahora',
+                        () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ChatDeSala(roomName: sala),
+                        ),
+                      );
+                    },
+                  ),
+                const SizedBox(height: 20),
+              ],
             ),
-
-
-
-
+          ),
           Container(
             height: 70,
             decoration: const BoxDecoration(
@@ -115,150 +111,129 @@ class pantalla_salas extends StatelessWidget {
               ),
             ),
             child: Row(
-
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => pantalla_principal()),
+                        builder: (context) => pantalla_principal(),
+                      ),
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:Colors.transparent,
+                    backgroundColor: Colors.transparent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
                   child: const Column(
-
-                      children: [
-                        SizedBox(height: 8),
-                        Icon(Icons.house_outlined, color: Colors.grey, size: 37.0),
-                        Text(
-                          'Inicio',
-                          style: TextStyle(color: Colors.white, fontSize: 12),
-                        ),
-                      ]
+                    children: [
+                      SizedBox(height: 8),
+                      Icon(Icons.house_outlined, color: Colors.grey, size: 37.0),
+                      Text(
+                        'Inicio',
+                        style: TextStyle(color: Colors.white, fontSize: 12),
+                      ),
+                    ],
                   ),
                 ),
-
-
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => pantalla_buscar()),
+                        builder: (context) => pantalla_buscar(),
+                      ),
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:Colors.transparent,
+                    backgroundColor: Colors.transparent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
                   child: const Column(
-
-                      children: [
-                        SizedBox(height: 8),
-                        Icon(Icons.question_mark_outlined, color: Colors.grey, size: 37.0),
-                        Text(
-                          'Buscar',
-                          style: TextStyle(color: Colors.white, fontSize: 12),
-                        ),
-                      ]
+                    children: [
+                      SizedBox(height: 8),
+                      Icon(Icons.question_mark_outlined, color: Colors.grey, size: 37.0),
+                      Text(
+                        'Buscar',
+                        style: TextStyle(color: Colors.white, fontSize: 12),
+                      ),
+                    ],
                   ),
                 ),
-
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => pantalla_biblioteca()),
+                        builder: (context) => pantalla_biblioteca(),
+                      ),
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:Colors.transparent,
+                    backgroundColor: Colors.transparent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
                   child: const Column(
-
-                      children: [
-                        SizedBox(height: 8),
-                        Icon(Icons.library_books_rounded, color: Colors.grey, size: 37.0),
-                        Text(
-                          'Biblioteca',
-                          style: TextStyle(color: Colors.white, fontSize: 12),
-                        ),
-                      ]
+                    children: [
+                      SizedBox(height: 8),
+                      Icon(Icons.library_books_rounded, color: Colors.grey, size: 37.0),
+                      Text(
+                        'Biblioteca',
+                        style: TextStyle(color: Colors.white, fontSize: 12),
+                      ),
+                    ],
                   ),
                 ),
-
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => pantalla_salas()),
+                        builder: (context) => pantalla_salas(),
+                      ),
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:Colors.transparent,
+                    backgroundColor: Colors.transparent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
                   child: const Column(
-
-                      children: [
-                        SizedBox(height: 8),
-                        Icon(Icons.chat_bubble_rounded, color: Colors.grey, size: 37.0),
-                        Text(
-                          'Salas',
-                          style: TextStyle(color: Colors.white, fontSize: 12),
-                        ),
-                      ]
+                    children: [
+                      SizedBox(height: 8),
+                      Icon(Icons.chat_bubble_rounded, color: Colors.grey, size: 37.0),
+                      Text(
+                        'Salas',
+                        style: TextStyle(color: Colors.white, fontSize: 12),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
-
           ),
         ],
       ),
-
-    );
-
-  }
-
-  Widget buildOption(String title) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          title,
-          style: const TextStyle(color: Colors.white, fontSize: 18),
-        ),
-      ],
     );
   }
 
   Widget buildButton(String label, Color color, String buttonText, VoidCallback onPressed) {
     return Container(
       width: 300, // Ancho fijo
-      height: 100,  // Alto fijo
+      height: 100, // Alto fijo
       margin: const EdgeInsets.all(15),
       child: ElevatedButton(
         onPressed: onPressed, // Ahora el onPressed es dinámico
         style: ElevatedButton.styleFrom(
-          backgroundColor:color,
+          backgroundColor: color,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
@@ -280,6 +255,7 @@ class pantalla_salas extends StatelessWidget {
       ),
     );
   }
+
   void _showCreateRoomDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -318,6 +294,10 @@ class pantalla_salas extends StatelessWidget {
                     // Puedes acceder al nombre de la sala usando salaController.text
                     // Agrega aquí la lógica para crear la sala con el nombre proporcionado
                     String roomName = salaController.text;
+                    // Agregar la nueva sala a la lista
+                    setState(() {
+                      _listaSalas.add(roomName);
+                    });
                     // Lógica para crear la sala
                     Navigator.pop(context); // Cerrar el diálogo
                     Navigator.push(context, MaterialPageRoute(builder: (context) => ChatDeSala(roomName: roomName)));
@@ -331,4 +311,5 @@ class pantalla_salas extends StatelessWidget {
       },
     );
   }
+
 }
