@@ -1,16 +1,145 @@
 import 'package:aversifunciona/biblioteca.dart';
 import 'package:aversifunciona/buscar.dart';
 import 'package:aversifunciona/configuracion.dart';
-import 'package:aversifunciona/desplegable.dart';
+import 'package:aversifunciona/lista_canciones.dart';
 import 'package:aversifunciona/podcast.dart';
 import 'package:aversifunciona/reproductor.dart';
 import 'package:aversifunciona/salas.dart';
 import 'package:aversifunciona/verPerfil.dart';
 import 'package:aversifunciona/todo.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 import 'musica.dart';
 import 'historial.dart';
+import 'env.dart';
+import 'cancion.dart';
+import 'lista_canciones.dart';
+
+
+Future<Lista_Canciones> listar_canciones() async {
+  Lista_Canciones lista = new Lista_Canciones(canciones: []);
+  try {
+    final response = await http.get(
+      Uri.parse("${Env.URL_PREFIX}/listarCanciones/"), // Ajusta la URL según tu API
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8'
+      },
+
+    );
+
+    Lista_Canciones lista = Lista_Canciones.fromJson(jsonDecode(response.toString()));
+    if (response.statusCode == 200) {
+      // Si la solicitud es exitosa, retornar verdadero
+
+      return lista;
+    } else {
+      debugPrint(response.statusCode.toString());
+      // Si la solicitud no es exitosa, retornar falso
+      return lista;
+    }
+  } catch (e) {
+    // Si ocurre algún error, retornar falso
+    print("Error al realizar la solicitud HTTP: $e");
+    return lista;
+  }
+}
+
+Future<Lista_Canciones> canciones = listar_canciones();
+
+Route _createRoute() {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => pantalla_opciones(),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      const begin = Offset(-1.0, 0.0);
+      const end = Offset.zero;
+      const curve = Curves.ease;
+
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
+}
+
+class pantalla_opciones extends StatelessWidget{
+  @override
+  Widget build(BuildContext context){
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        leading: Row(
+            children: [
+              IconButton(
+              icon: Icon(Icons.arrow_back, color: Colors.white),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ]
+        ),
+
+        backgroundColor: Colors.black
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: Container(
+              child: ListView(
+                children: [
+                  Container(
+                    height: 125,
+                    child: TextButton(
+                      child: Text('Ver perfil', style: TextStyle(color: Colors.white, fontSize: 24, ), textAlign: TextAlign.center,),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => verPerfil()),
+                        );
+                      }
+                    ),
+                  ),
+                  Container(
+                    height: 125,
+                    child: TextButton(
+                        child: Text('Historial', style: TextStyle(color: Colors.white, fontSize: 24), textAlign: TextAlign.center),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => historial()),
+                          );
+                        }
+                    ),
+                  ),
+                  Container(
+                    height: 125,
+                    child: TextButton(
+                        child: Text('Configuración y privacidad', style: TextStyle(color: Colors.white, fontSize: 24), textAlign: TextAlign.center),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => configuracion()),
+                          );
+                        }
+                    ),
+                  )
+                ],
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}
 
 class pantalla_principal extends StatelessWidget {
   @override
@@ -19,13 +148,15 @@ class pantalla_principal extends StatelessWidget {
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,
-        leading: PopupMenuButton<String>(
-          icon: CircleAvatar(
+        leading: TextButton(
+          child: CircleAvatar(
             backgroundImage: AssetImage('tu_ruta_de_imagen'),
           ),
-          onSelected: (value) {
+          onPressed: () {
+            Navigator.of(context).push(_createRoute());
+          }
             // Manejar la selección del desplegable
-            if (value == 'verPerfil') {
+            /*if (value == 'verPerfil') {
               // Navegar a la pantalla "verPerfil"
               Navigator.push(
                 context,
@@ -66,6 +197,7 @@ class pantalla_principal extends StatelessWidget {
               ),
             ),
           ],
+        ),*/
         ),
         title: const Text(
           'Título de la pantalla',
@@ -86,14 +218,15 @@ class pantalla_principal extends StatelessWidget {
         ],
       ),
       body: Column(
+
          children: [
-           SizedBox(height: 20),
+           const SizedBox(height: 20),
           Expanded(
             child: Container(
               child: ListView(
 
                 children: [
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   const Text(
 
                     '    Has escuchado recientemente',
@@ -106,7 +239,7 @@ class pantalla_principal extends StatelessWidget {
 
                     child: SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
-                      child:
+                    child:
                       Expanded(
                           child:
                           Row(
@@ -124,7 +257,7 @@ class pantalla_principal extends StatelessWidget {
                                     );
                                   },
                                     style: ElevatedButton.styleFrom(backgroundColor: Colors.grey, shape: const RoundedRectangleBorder()),
-                                    child: Text(''),
+                                    child: const Text(''),
                                   )
                               ),
 
@@ -140,7 +273,7 @@ class pantalla_principal extends StatelessWidget {
                                     );
                                   },
                                     style: ElevatedButton.styleFrom(backgroundColor: Colors.grey, shape: const RoundedRectangleBorder()),
-                                    child: Text(''),
+                                    child: const Text(''),
                                   )
                               ),
 
@@ -156,7 +289,7 @@ class pantalla_principal extends StatelessWidget {
                                     );
                                   },
                                     style: ElevatedButton.styleFrom(backgroundColor: Colors.grey, shape: const RoundedRectangleBorder()),
-                                    child: Text(''),
+                                    child: const Text(''),
                                   )
                               ),
 
@@ -172,10 +305,9 @@ class pantalla_principal extends StatelessWidget {
                                     );
                                   },
                                     style: ElevatedButton.styleFrom(backgroundColor: Colors.grey, shape: const RoundedRectangleBorder()),
-                                    child: Text(''),
+                                    child: const Text(''),
                                   )
                               ),
-
 
                             ],
                           )
@@ -185,10 +317,12 @@ class pantalla_principal extends StatelessWidget {
 
                     ),
                   ),
-                  Text(
+
+                  const Text(
                     '    Hecho para el usuario',
                     style: TextStyle(color: Colors.white),
                   ),
+
                   Container(
 
                     height: 125,

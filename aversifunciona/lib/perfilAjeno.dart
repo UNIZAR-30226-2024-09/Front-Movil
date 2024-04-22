@@ -98,7 +98,7 @@ class _ProfileScreenState extends State<PerfilAjeno> {
                     ? ElevatedButton(
                   onPressed: toggleFollow,
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.blue,
+                    backgroundColor: Colors.blue,
                   ),
                   child: Text(
                     'Siguiendo',
@@ -152,8 +152,8 @@ class _ProfileScreenState extends State<PerfilAjeno> {
                     // Lógica para ver todas las listas
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.black,
-                    onPrimary: Colors.white,
+                    backgroundColor: Colors.black,
+                    foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                       side: BorderSide(color: Colors.white),

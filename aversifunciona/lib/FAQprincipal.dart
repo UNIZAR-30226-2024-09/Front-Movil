@@ -99,8 +99,8 @@ class MainScreen extends StatelessWidget {
                     },
                     child: Text('Preguntas FAQ'),
                     style: ElevatedButton.styleFrom(
-                      primary: Colors.transparent,
-                      onPrimary: Colors.white,
+                      backgroundColor: Colors.transparent,
+                      foregroundColor: Colors.white,
                       side: BorderSide.none,
                     ),
                   ),
