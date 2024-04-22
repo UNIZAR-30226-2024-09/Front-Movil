@@ -6,7 +6,6 @@ import 'package:aversifunciona/verPerfil.dart';
 
 import 'configuracion.dart';
 import 'historial.dart';
-import 'ListaOCarpeta.dart';
 import 'buscar.dart';
 
 class pantalla_biblioteca extends StatelessWidget {

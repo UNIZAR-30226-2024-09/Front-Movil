@@ -1,13 +1,12 @@
 import 'package:aversifunciona/pantalla_principal.dart';
 import 'package:aversifunciona/podcast.dart';
+import 'package:aversifunciona/salas.dart';
 import 'package:aversifunciona/todo.dart';
 import 'package:aversifunciona/verPerfil.dart';
 import 'package:flutter/material.dart';
 
 import 'biblioteca.dart';
 import 'buscar.dart';
-import 'chatDeSala.dart';
-import 'chatSalaDisponible.dart';
 import 'historial.dart';
 import 'musica.dart';
 

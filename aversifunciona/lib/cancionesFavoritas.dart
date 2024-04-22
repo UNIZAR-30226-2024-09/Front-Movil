@@ -1,11 +1,11 @@
 import 'package:aversifunciona/pantalla_principal.dart';
+import 'package:aversifunciona/salas.dart';
 import 'package:flutter/material.dart';
 
 import 'ListaOCarpeta.dart';
 import 'biblioteca.dart';
 import 'buscar.dart';
 import 'chatDeSala.dart';
-import 'chatSalaDisponible.dart';
 
 class cancionesFavoritas extends StatelessWidget {
   @override

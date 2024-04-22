@@ -2,9 +2,9 @@ import 'package:aversifunciona/biblioteca.dart';
 import 'package:aversifunciona/buscar.dart';
 import 'package:aversifunciona/chatDeSala.dart';
 import 'package:aversifunciona/pantalla_principal.dart';
+import 'package:aversifunciona/salas.dart';
 import 'package:flutter/material.dart';
 
-import 'chatSalaDisponible.dart';
 
 class historial extends StatelessWidget {
   @override
