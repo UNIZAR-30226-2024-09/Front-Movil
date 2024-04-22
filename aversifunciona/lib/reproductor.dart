@@ -5,7 +5,7 @@ class reproductor extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Music Player',
+      title: 'Reproductor de Música',
       theme: ThemeData(
         scaffoldBackgroundColor: Colors.black,
         primaryColor: Colors.white,
@@ -60,6 +60,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
   void stopPlaying() {
     // Detener el temporizador si existe
     timer?.cancel();
+    isPlaying = false;
   }
 
   void nextSong() {
@@ -88,61 +89,86 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'Now Playing',
-              style: TextStyle(fontSize: 24.0),
-            ),
-            SizedBox(height: 20.0),
-            // Agregar aquí la imagen de la canción
-            SizedBox(height: 20.0),
-            Text(
-              'Song Name', // Nombre de la canción actual
-              style: TextStyle(fontSize: 20.0),
-            ),
-            SizedBox(height: 20.0),
-            Slider(
-              value: progress,
-              onChanged: (newValue) {
-                setState(() {
-                  progress = newValue;
-                });
-              },
-            ),
-            SizedBox(height: 20.0),
-            Row(
+      body: Stack(
+        children: [
+          Center(
+            child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                IconButton(
-                  icon: Icon(Icons.skip_previous, color: Colors.white), // Icono blanco
-                  iconSize: 64.0,
-                  onPressed: previousSong,
+                Text(
+                  'Now Playing',
+                  style: TextStyle(fontSize: 24.0),
                 ),
-                IconButton(
-                  icon: isPlaying ? Icon(Icons.pause, color: Colors.white) : Icon(Icons.play_arrow, color: Colors.white), // Iconos blancos
-                  iconSize: 64.0,
-                  onPressed: togglePlay,
+                SizedBox(height: 20.0),
+                // Agregar aquí la imagen de la canción
+                SizedBox(height: 20.0),
+                Text(
+                  'Song Name', // Nombre de la canción actual
+                  style: TextStyle(fontSize: 20.0),
                 ),
-                IconButton(
-                  icon: Icon(Icons.skip_next, color: Colors.white), // Icono blanco
-                  iconSize: 64.0,
-                  onPressed: nextSong,
+                SizedBox(height: 20.0),
+                Slider(
+                  value: progress,
+                  onChanged: (newValue) {
+                    setState(() {
+                      progress = newValue;
+                    });
+                  },
                 ),
-                IconButton(
-                  icon: Icon(Icons.replay, color: Colors.white), // Icono blanco
-                  iconSize: 64.0,
-                  onPressed: replaySong,
+                SizedBox(height: 20.0),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    IconButton(
+                      icon: Icon(Icons.skip_previous, color: Colors.white), // Icono blanco
+                      iconSize: 64.0,
+                      onPressed: previousSong,
+                    ),
+                    IconButton(
+                      icon: isPlaying ? Icon(Icons.pause, color: Colors.white) : Icon(Icons.play_arrow, color: Colors.white), // Iconos blancos
+                      iconSize: 64.0,
+                      onPressed: togglePlay,
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.skip_next, color: Colors.white), // Icono blanco
+                      iconSize: 64.0,
+                      onPressed: nextSong,
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.replay, color: Colors.white), // Icono blanco
+                      iconSize: 64.0,
+                      onPressed: replaySong,
+                    ),
+                  ],
                 ),
               ],
             ),
-          ],
-        ),
+          ),
+          Positioned(
+            left: 10,
+            top: 10,
+            child: Row(
+              children: [
+                IconButton(
+                  icon: Icon(Icons.keyboard_arrow_down, color: Colors.white),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+                SizedBox(width: 10),
+                Text(
+                  'Nombre de la Playlist',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
-
+void main() {
+  runApp(reproductor());
+}

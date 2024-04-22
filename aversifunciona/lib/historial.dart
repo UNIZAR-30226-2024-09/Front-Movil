@@ -1,10 +1,17 @@
 import 'package:aversifunciona/biblioteca.dart';
 import 'package:aversifunciona/buscar.dart';
-import 'package:aversifunciona/chatDeSala.dart';
+import 'package:aversifunciona/configuracion.dart';
+import 'package:aversifunciona/desplegable.dart';
 import 'package:aversifunciona/pantalla_principal.dart';
+import 'package:aversifunciona/podcast.dart';
+import 'package:aversifunciona/reproductor.dart';
 import 'package:aversifunciona/salas.dart';
+import 'package:aversifunciona/verPerfil.dart';
+import 'package:aversifunciona/todo.dart';
 import 'package:flutter/material.dart';
 
+import 'musica.dart';
+import 'historial.dart';
 
 class historial extends StatelessWidget {
   @override
@@ -13,124 +20,207 @@ class historial extends StatelessWidget {
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            // Volver a la pantalla anterior
-            Navigator.pop(context);
+        leading: PopupMenuButton<String>(
+          icon: CircleAvatar(
+            backgroundImage: AssetImage('tu_ruta_de_imagen'),
+          ),
+          onSelected: (value) {
+            // Manejar la selección del desplegable
+            if (value == 'verPerfil') {
+              // Navegar a la pantalla "verPerfil"
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => verPerfil()),
+              );
+            } else if (value == 'historial') {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => historial()),
+              );
+            } else if (value == 'configuracion') {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => configuracion()),
+              );
+            }
           },
+          itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+            const PopupMenuItem<String>(
+              value: 'verPerfil',
+              child: ListTile(
+                leading: Icon(Icons.person),
+                title: Text('Ver Perfil'),
+              ),
+            ),
+            const PopupMenuItem<String>(
+              value: 'historial',
+              child: ListTile(
+                leading: Icon(Icons.history),
+                title: Text('Historial'),
+              ),
+            ),
+            const PopupMenuItem<String>(
+              value: 'configuracion',
+              child: ListTile(
+                leading: Icon(Icons.settings),
+                title: Text('Configuración y Privacidad'),
+              ),
+            ),
+          ],
         ),
-        title: Text(
-          'Historial',
+        title: const Text(
+          'Título de la pantalla',
           style: TextStyle(color: Colors.white),
         ),
         actions: [
-          Spacer(),
+          const Spacer(),
+
+          const Spacer(),
+          // Botón Todo
+          buildTopButton(context, 'Todo', pantalla_todo()),
+
+          // Botón Música
+          buildTopButton(context, 'Música', pantalla_musica()),
+
+          // Botón Podcast
+          buildTopButton(context, 'Podcast', pantalla_podcast()),
         ],
       ),
       body: Column(
-        children: [
-          Expanded(
-            child: Container(
-              // Contenido principal (puedes colocar aquí tu imagen o cualquier otro contenido)
-            ),
-          ),
-          Container(
-            decoration: BoxDecoration(
-              border: Border(
-                top: BorderSide(width: 1.0, color: Colors.white),
+          children: [
+            SizedBox(height: 20),
+            Expanded(
+              child: Container(
+
+
               ),
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                // Opción 1
-                ElevatedButton(
-                  onPressed: () {
-                    // Navegar a la pantalla "Inicio"
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => pantalla_principal()),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.transparent,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                  ),
-                  child: Text(
-                    'Inicio',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
 
-                // Opción 2
-                ElevatedButton(
-                  onPressed: () {
-                    // Navegar a la pantalla "Buscar"
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => pantalla_buscar()),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.transparent,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                  ),
-                  child: Text(
-                    'Buscar',
-                    style: TextStyle(color: Colors.white),
-                  ),
+            Container(
+              height: 70,
+              decoration: const BoxDecoration(
+                border: Border(
+                  top: BorderSide(width: 1.0, color: Colors.white),
                 ),
+              ),
+              child: Row(
 
-                // Opción 3
-                ElevatedButton(
-                  onPressed: () {
-                    // Navegar a la pantalla "Biblioteca"
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => pantalla_biblioteca()),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.transparent,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                  ),
-                  child: Text(
-                    'Biblioteca',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
 
-                // Opción 4
-                ElevatedButton(
-                  onPressed: () {
-                    // Navegar a la pantalla "Salas"
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => pantalla_salas()),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.transparent,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => pantalla_principal()),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:Colors.transparent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                    child: const Column(
+
+                        children: [
+                          SizedBox(height: 8),
+                          Icon(Icons.house_outlined, color: Colors.grey, size: 37.0),
+                          Text(
+                            'Inicio',
+                            style: TextStyle(color: Colors.white, fontSize: 12),
+                          ),
+                        ]
                     ),
                   ),
-                  child: Text(
-                    'Salas',
-                    style: TextStyle(color: Colors.white),
+
+
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => pantalla_buscar()),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:Colors.transparent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                    child: const Column(
+
+                        children: [
+                          SizedBox(height: 8),
+                          Icon(Icons.question_mark_outlined, color: Colors.grey, size: 37.0),
+                          Text(
+                            'Buscar',
+                            style: TextStyle(color: Colors.white, fontSize: 12),
+                          ),
+                        ]
+                    ),
                   ),
-                ),
-              ],
+
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => pantalla_biblioteca()),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:Colors.transparent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                    child: const Column(
+
+                        children: [
+                          SizedBox(height: 8),
+                          Icon(Icons.library_books_rounded, color: Colors.grey, size: 37.0),
+                          Text(
+                            'Biblioteca',
+                            style: TextStyle(color: Colors.white, fontSize: 12),
+                          ),
+                        ]
+                    ),
+                  ),
+
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => pantalla_salas()),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:Colors.transparent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                    child: const Column(
+
+                        children: [
+                          SizedBox(height: 8),
+                          Icon(Icons.chat_bubble_rounded, color: Colors.grey, size: 37.0),
+                          Text(
+                            'Salas',
+                            style: TextStyle(color: Colors.white, fontSize: 12),
+                          ),
+                        ]
+                    ),
+                  ),
+                ],
+              ),
+
             ),
-          ),
-        ],
+          ]
       ),
     );
   }
@@ -150,17 +240,17 @@ class historial extends StatelessWidget {
 
   Widget buildTopButton(BuildContext context, String title, Widget screen) {
     return Container(
-      margin: EdgeInsets.all(8),
+      margin: EdgeInsets.all(4),
       child: ElevatedButton(
         onPressed: () {
           // Navegar a la pantalla correspondiente
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => screen),
+            MaterialPageRoute(builder: (context) => reproductor()),
           );
         },
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.grey,
+          backgroundColor:Colors.grey,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
@@ -173,3 +263,7 @@ class historial extends StatelessWidget {
     );
   }
 }
+
+
+
+
