@@ -4,6 +4,8 @@ import 'package:aversifunciona/chatDeSala.dart';
 import 'package:aversifunciona/pantalla_principal.dart';
 import 'package:flutter/material.dart';
 
+import 'chatSalaDisponible.dart';
+
 class historial extends StatelessWidget {
   @override
   Widget build(BuildContext context) {

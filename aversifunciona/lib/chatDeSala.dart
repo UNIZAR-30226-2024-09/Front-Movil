@@ -1,35 +1,36 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import 'env.dart';
+
 class ChatDeSala extends StatefulWidget {
+  final String roomName;
+
+  ChatDeSala({required this.roomName});
+
   @override
-  _chatDeSalaState createState() => _chatDeSalaState();
+  _ChatDeSalaState createState() => _ChatDeSalaState();
 }
 
-class _chatDeSalaState extends State<ChatDeSala> {
+class _ChatDeSalaState extends State<ChatDeSala> {
   TextEditingController _messageController = TextEditingController();
   List<String> _messages = [];
 
   Future<bool> verificarSala(String salaId) async {
     try {
       final response = await http.get(
-        Uri.parse("${Env.URL_PREFIX}/verificarSala/$salaId"), // Ajusta la URL según tu API
+        Uri.parse("${Env.URL_PREFIX}/verificarSala/$salaId"),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8'
         },
       );
 
       if (response.statusCode == 200) {
-        // Si la solicitud es exitosa, retornar verdadero
         return true;
       } else {
-        // Si la solicitud no es exitosa, retornar falso
         return false;
       }
     } catch (e) {
-      // Si ocurre algún error, retornar falso
       print("Error al realizar la solicitud HTTP: $e");
       return false;
     }
@@ -39,6 +40,27 @@ class _chatDeSalaState extends State<ChatDeSala> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.grey,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.close, color: Colors.white),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+        ],
+        title: Text(
+          widget.roomName,
+          style: TextStyle(color: Colors.white),
+        ),
+      ),
       body: Column(
         children: [
           Expanded(
@@ -122,35 +144,4 @@ class _chatDeSalaState extends State<ChatDeSala> {
       ),
     );
   }
-}
-
-class pantalla_salas extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(
-        backgroundColor: Colors.grey,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.close, color: Colors.white), // Puedes cambiar el icono según tus necesidades
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-        ],
-        title: Text(
-          'Salas',
-          style: TextStyle(color: Colors.white),
-        ),
-      ),
-    );
-  }
-
 }

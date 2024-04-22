@@ -10,6 +10,7 @@ import 'buscar.dart';
 import 'chatDeSala.dart';
 
 class pantalla_salas extends StatelessWidget {
+  TextEditingController salaController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -80,20 +81,19 @@ class pantalla_salas extends StatelessWidget {
                           shrinkWrap: true,
                           children: [
                           buildButton('+', Colors.grey, 'Crear sala', () {
-                        // Navegar a la pantalla de chat cuando se presiona el botón
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => crearSala()));
+                            _showCreateRoomDialog(context);
                       }),
                       buildButton('SpainMusic', Colors.blue, 'Únete ahora', () {
                         // Navegar a la pantalla de chat cuando se presiona el botón
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => crearSala()));
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => ChatDeSala(roomName: 'SiaLovers')));
                       }),
                       buildButton('SiaLovers', Colors.blue, 'Únete ahora', () {
                         // Navegar a la pantalla de chat cuando se presiona el botón
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => crearSala()));
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => ChatDeSala(roomName: 'SiaLovers')));
                       }),
                       buildButton('EminemGroup', Colors.blue, 'Únete ahora', () {
                         // Navegar a la pantalla de chat cuando se presiona el botón
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => crearSala()));
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => ChatDeSala(roomName: 'SiaLovers')));
                       }),
                       const SizedBox(height: 20),
 
@@ -233,7 +233,9 @@ class pantalla_salas extends StatelessWidget {
           ),
         ],
       ),
+
     );
+
   }
 
   Widget buildOption(String title) {
@@ -276,6 +278,57 @@ class pantalla_salas extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+  void _showCreateRoomDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          contentPadding: EdgeInsets.zero,
+          content: Container(
+            width: 300,
+            padding: EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.grey,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Nombre de la Sala',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 10),
+                TextField(
+                  controller: salaController,
+                  decoration: InputDecoration(
+                    hintText: 'Ingrese el nombre de la sala',
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: () {
+                    // Puedes acceder al nombre de la sala usando salaController.text
+                    // Agrega aquí la lógica para crear la sala con el nombre proporcionado
+                    String roomName = salaController.text;
+                    // Lógica para crear la sala
+                    Navigator.pop(context); // Cerrar el diálogo
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => ChatDeSala(roomName: roomName)));
+                  },
+                  child: Text('Aceptar'),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

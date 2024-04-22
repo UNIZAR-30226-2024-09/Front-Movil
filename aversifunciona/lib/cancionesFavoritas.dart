@@ -5,6 +5,7 @@ import 'ListaOCarpeta.dart';
 import 'biblioteca.dart';
 import 'buscar.dart';
 import 'chatDeSala.dart';
+import 'chatSalaDisponible.dart';
 
 class cancionesFavoritas extends StatelessWidget {
   @override

@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'biblioteca.dart';
 import 'buscar.dart';
 import 'chatDeSala.dart';
+import 'chatSalaDisponible.dart';
 import 'configuracion.dart';
 import 'historial.dart';
 import 'musica.dart';

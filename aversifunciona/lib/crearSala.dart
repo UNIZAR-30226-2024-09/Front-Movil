@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'chatDeSala.dart';
 
 class crearSala extends StatelessWidget {
@@ -31,13 +30,13 @@ class crearSala extends StatelessWidget {
                 _showCreateRoomDialog(context);
               }),
               buildButton('SpainMusic', Colors.blue, 'Únete ahora', () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => ChatDeSala()));
+                Navigator.push(context, MaterialPageRoute(builder: (context) => ChatDeSala(roomName: 'SpainMusic')));
               }),
               buildButton('SiaLovers', Colors.blue, 'Únete ahora', () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => ChatDeSala()));
+                Navigator.push(context, MaterialPageRoute(builder: (context) => ChatDeSala(roomName: 'SiaLovers')));
               }),
               buildButton('EminemGroup', Colors.blue, 'Únete ahora', () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => ChatDeSala()));
+                Navigator.push(context, MaterialPageRoute(builder: (context) => ChatDeSala(roomName: 'EminemGroup')));
               }),
               SizedBox(height: 20),
               Expanded(
@@ -46,50 +45,6 @@ class crearSala extends StatelessWidget {
                 ),
               ),
             ],
-          ),
-          Positioned.fill(
-            child: Container(
-              color: Colors.transparent,
-              alignment: Alignment.center,
-              child: AlertDialog(
-                contentPadding: EdgeInsets.zero,
-                content: Container(
-                  width: 300,
-                  padding: EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white10,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        'Introduce el nombre de la sala',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(height: 10),
-                      TextField(
-                        controller: salaController,
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: Colors.grey,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(0),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 10),
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => ChatDeSala()));
-                        },
-                        child: Text('Aceptar'),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
           ),
         ],
       ),
@@ -164,7 +119,10 @@ class crearSala extends StatelessWidget {
                   onPressed: () {
                     // Puedes acceder al nombre de la sala usando salaController.text
                     // Agrega aquí la lógica para crear la sala con el nombre proporcionado
-                    Navigator.pop(context);
+                    String roomName = salaController.text;
+                    // Lógica para crear la sala
+                    Navigator.pop(context); // Cerrar el diálogo
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => ChatDeSala(roomName: roomName)));
                   },
                   child: Text('Aceptar'),
                 ),

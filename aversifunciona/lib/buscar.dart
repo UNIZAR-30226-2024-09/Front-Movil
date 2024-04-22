@@ -7,7 +7,45 @@ import 'configuracion.dart';
 import 'historial.dart';
 import 'biblioteca.dart';
 
-class pantalla_buscar extends StatelessWidget {
+class HistorialItem {
+  final String term;
+  final DateTime timestamp;
+
+  HistorialItem(this.term, this.timestamp);
+}
+
+class pantalla_buscar extends StatefulWidget {
+  @override
+  _pantalla_buscarState createState() => _pantalla_buscarState();
+}
+
+class _pantalla_buscarState extends State<pantalla_buscar> {
+  List<HistorialItem> elHistorial = [];
+  TextEditingController _searchController = TextEditingController();
+  @override
+  void initState() {
+    super.initState();
+    _searchController.addListener(_onSearchSubmitted);
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _onSearchSubmitted() {
+    String searchTerm = _searchController.text;
+    if (searchTerm.isNotEmpty) {
+      _agregarAlHistorial(searchTerm);
+      _searchController.clear(); // Limpiar el TextField después de agregar al historial
+    }
+  }
+  void _agregarAlHistorial(String term) {
+    setState(() {
+      elHistorial.add(HistorialItem(term, DateTime.now()));
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -78,6 +116,7 @@ class pantalla_buscar extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: TextField(
+                      controller: _searchController,
                       style: const TextStyle(color: Colors.white),
                       decoration: InputDecoration(
                         hintText: '¿Qué te apetece escuchar?',
@@ -90,6 +129,7 @@ class pantalla_buscar extends StatelessWidget {
                         ),
                       ),
                     ),
+
                   ),
                   Expanded(
                     child: Column(
