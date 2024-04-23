@@ -14,7 +14,7 @@ class FAQprincipal extends StatelessWidget {
         scaffoldBackgroundColor: Colors.black,
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            primary: Colors.blue,
+            backgroundColor: Colors.blue,
             padding: EdgeInsets.symmetric(vertical: 15),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
@@ -113,8 +113,8 @@ class MainScreen extends StatelessWidget {
                     },
                     child: Text('Reportar Problema'),
                     style: ElevatedButton.styleFrom(
-                      primary: Colors.transparent,
-                      onPrimary: Colors.white,
+                      backgroundColor: Colors.transparent,
+                      foregroundColor: Colors.white,
                       side: BorderSide.none,
                     ),
                   ),

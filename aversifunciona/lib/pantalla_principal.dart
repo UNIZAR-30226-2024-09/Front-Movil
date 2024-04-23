@@ -1,62 +1,67 @@
-import 'package:aversifunciona/biblioteca.dart';
-import 'package:aversifunciona/buscar.dart';
-import 'package:aversifunciona/configuracion.dart';
-import 'package:aversifunciona/lista_canciones.dart';
-import 'package:aversifunciona/podcast.dart';
-import 'package:aversifunciona/reproductor.dart';
-import 'package:aversifunciona/salas.dart';
-import 'package:aversifunciona/verPerfil.dart';
-import 'package:aversifunciona/todo.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'salas.dart';
 import 'musica.dart';
+import 'todo.dart';
+import 'podcast.dart';
+import 'biblioteca.dart';
+import 'buscar.dart';
 import 'historial.dart';
-import 'env.dart';
+import 'verPerfil.dart';
+import 'configuracion.dart';
 import 'cancion.dart';
-import 'lista_canciones.dart';
+import 'env.dart';
+import 'reproductor.dart';
 
-
-Future<Lista_Canciones> listar_canciones() async {
-  Lista_Canciones lista = new Lista_Canciones(canciones: []);
+Future<List<Cancion>> conseguir_canciones() async {
   try {
     final response = await http.get(
-      Uri.parse("${Env.URL_PREFIX}/listarCanciones/"), // Ajusta la URL según tu API
+      Uri.parse("${Env.URL_PREFIX}/listarCanciones/"),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8'
       },
-
     );
 
-    Lista_Canciones lista = Lista_Canciones.fromJson(jsonDecode(response.toString()));
+    var lista = jsonDecode(response.body);
+    List<Cancion> canciones = [];
+
+    for (var indice in lista) {
+      Cancion cancion = Cancion(
+        nombre: indice["nombre"],
+        miAlbum: indice["miAlbum"],
+        puntuacion: indice["puntuacion"],
+        numPuntuaciones: indice["numPuntuaciones"],
+        archivo_mp3: indice["archivo_mp3"],
+        foto: indice["foto"],
+      );
+      canciones.add(cancion);
+    }
+
     if (response.statusCode == 200) {
       // Si la solicitud es exitosa, retornar verdadero
-
-      return lista;
+      return canciones;
     } else {
-      debugPrint(response.statusCode.toString());
+      print("Error" + (response.statusCode).toString());
       // Si la solicitud no es exitosa, retornar falso
-      return lista;
+      return [];
     }
   } catch (e) {
     // Si ocurre algún error, retornar falso
     print("Error al realizar la solicitud HTTP: $e");
-    return lista;
+    return [];
   }
 }
 
-Future<Lista_Canciones> canciones = listar_canciones();
-
 Route _createRoute() {
   return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => pantalla_opciones(),
+    pageBuilder: (context, animation, secondaryAnimation) =>
+        pantalla_opciones(),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       const begin = Offset(-1.0, 0.0);
       const end = Offset.zero;
       const curve = Curves.ease;
-
       var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
 
       return SlideTransition(
@@ -67,24 +72,21 @@ Route _createRoute() {
   );
 }
 
-class pantalla_opciones extends StatelessWidget{
+class pantalla_opciones extends StatelessWidget {
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        leading: Row(
-            children: [
-              IconButton(
-              icon: Icon(Icons.arrow_back, color: Colors.white),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-          ]
-        ),
-
-        backgroundColor: Colors.black
+        leading: Row(children: [
+          IconButton(
+            icon: Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+        ]),
+        backgroundColor: Colors.black,
       ),
       body: Column(
         children: [
@@ -95,40 +97,49 @@ class pantalla_opciones extends StatelessWidget{
                   Container(
                     height: 125,
                     child: TextButton(
-                      child: Text('Ver perfil', style: TextStyle(color: Colors.white, fontSize: 24, ), textAlign: TextAlign.center,),
+                      child: Text(
+                        'Ver perfil',
+                        style: TextStyle(color: Colors.white, fontSize: 24),
+                        textAlign: TextAlign.center,
+                      ),
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(
-                              builder: (context) => verPerfil()),
+                          MaterialPageRoute(builder: (context) => verPerfil()),
                         );
-                      }
+                      },
                     ),
                   ),
                   Container(
                     height: 125,
                     child: TextButton(
-                        child: Text('Historial', style: TextStyle(color: Colors.white, fontSize: 24), textAlign: TextAlign.center),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => historial()),
-                          );
-                        }
+                      child: Text(
+                        'Historial',
+                        style: TextStyle(color: Colors.white, fontSize: 24),
+                        textAlign: TextAlign.center,
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => historial()),
+                        );
+                      },
                     ),
                   ),
                   Container(
                     height: 125,
                     child: TextButton(
-                        child: Text('Configuración y privacidad', style: TextStyle(color: Colors.white, fontSize: 24), textAlign: TextAlign.center),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => configuracion()),
-                          );
-                        }
+                      child: Text(
+                        'Configuración y privacidad',
+                        style: TextStyle(color: Colors.white, fontSize: 24),
+                        textAlign: TextAlign.center,
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => configuracion()),
+                        );
+                      },
                     ),
                   )
                 ],
@@ -139,6 +150,15 @@ class pantalla_opciones extends StatelessWidget{
       ),
     );
   }
+}
+
+// Función de manejo de tap
+void handleTap(BuildContext context, Cancion cancion) {
+  // Aquí puedes manejar la acción de tap con la canción específica
+  Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => reproductor()), // cancion: cancion dentro de reproductor cuando esto funcione
+  );
 }
 
 class pantalla_principal extends StatelessWidget {
@@ -155,583 +175,263 @@ class pantalla_principal extends StatelessWidget {
           onPressed: () {
             Navigator.of(context).push(_createRoute());
           }
-            // Manejar la selección del desplegable
-            /*if (value == 'verPerfil') {
-              // Navegar a la pantalla "verPerfil"
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => verPerfil()),
-              );
-            } else if (value == 'historial') {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => historial()),
-              );
-            } else if (value == 'configuracion') {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => configuracion()),
-              );
-            }
-          },
-          itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-            const PopupMenuItem<String>(
-              value: 'verPerfil',
-              child: ListTile(
-                leading: Icon(Icons.person),
-                title: Text('Ver Perfil'),
-              ),
-            ),
-            const PopupMenuItem<String>(
-              value: 'historial',
-              child: ListTile(
-                leading: Icon(Icons.history),
-                title: Text('Historial'),
-              ),
-            ),
-            const PopupMenuItem<String>(
-              value: 'configuracion',
-              child: ListTile(
-                leading: Icon(Icons.settings),
-                title: Text('Configuración y Privacidad'),
-              ),
-            ),
-          ],
-        ),*/
         ),
         title: const Text(
           'Título de la pantalla',
           style: TextStyle(color: Colors.white),
         ),
         actions: [
-          const Spacer(),
-
-          const Spacer(),
-          // Botón Todo
+          Spacer(),
           buildTopButton(context, 'Todo', pantalla_todo()),
-
-          // Botón Música
           buildTopButton(context, 'Música', pantalla_musica()),
-
-          // Botón Podcast
           buildTopButton(context, 'Podcast', pantalla_podcast()),
         ],
       ),
-      body: Column(
+      body: FutureBuilder<List<Cancion>>(
+        future: conseguir_canciones(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          } else if (snapshot.hasError) {
+            return Center(
+              child: Text('Error: ${snapshot.error}'),
+            );
+          } else {
+            List<Cancion> canciones = snapshot.data ?? [];
+            return ListView.builder(
+              itemCount: canciones.length,
+              itemBuilder: (context, index) {
+                return GestureDetector(
+                  onTap: () {
+                    handleTap(context, canciones[index]);
+                    // Aquí puedes manejar el tap según tus necesidades
+                  },
+                  child: Column(
+                    children: [
+                      SizedBox(height: 20),
+                      Text(
+                        '    Has escuchado recientemente',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      Container(
+                        height: 125,
+                        width: 350,
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: [
+                              // Aquí deberías colocar tu código para mostrar las canciones recientes
 
-         children: [
-           const SizedBox(height: 20),
-          Expanded(
-            child: Container(
-              child: ListView(
-
+                                Container(
+                                  height: 75,
+                                  width: 75,
+                                  margin: const EdgeInsets.symmetric(horizontal: 16),
+                                  child: Image.memory(
+                                    base64Decode(canciones[index].foto),
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                                SizedBox(height: 8), // Espacio entre contenedores
+                            ],
+                          ),
+                        ),
+                      ),
+                      Text(
+                        '    Hecho para el usuario',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      Container(
+                        height: 125,
+                        width: 350,
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: [
+                              // Aquí deberías colocar tu código para mostrar las canciones personalizadas
+                              Container(
+                                height: 75,
+                                width: 75,
+                                margin: const EdgeInsets.symmetric(horizontal: 16),
+                                child: Image.memory(
+                                  base64Decode(canciones[index].foto),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                              SizedBox(height: 8), // Espacio entre contenedores
+                            ],
+                          ),
+                        ),
+                      ),
+                      Text(
+                        '    Top Canciones',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      Container(
+                        height: 125,
+                        width: 350,
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: [
+                              // Aquí deberías colocar tu código para mostrar las canciones principales
+                              Container(
+                                height: 75,
+                                width: 75,
+                                margin: const EdgeInsets.symmetric(horizontal: 16),
+                                child: Image.memory(
+                                  base64Decode(canciones[index].foto),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                              SizedBox(height: 8), // Espacio entre contenedores
+                            ],
+                          ),
+                        ),
+                      ),
+                      Text(
+                        '    Top Podcasts',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      Container(
+                        height: 125,
+                        width: 350,
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: [
+                              // Aquí deberías colocar tu código para mostrar los podcasts principales
+                              Container(
+                                height: 75,
+                                width: 75,
+                                margin: const EdgeInsets.symmetric(horizontal: 16),
+                                child: Image.memory(
+                                  base64Decode(canciones[index].foto),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
+          }
+        },
+      ),
+      bottomNavigationBar: Container(
+        height: 70,
+        decoration: BoxDecoration(
+          border: Border(
+            top: BorderSide(width: 1.0, color: Colors.white),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => pantalla_principal()),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
+              child: Column(
                 children: [
-                  const SizedBox(height: 20),
-                  const Text(
-
-                    '    Has escuchado recientemente',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  Container(
-
-                    height: 125,
-                    width: 350,
-
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                    child:
-                      Expanded(
-                          child:
-                          Row(
-                            children: [
-
-                              Container(
-                                  height: 75,
-                                  width: 75,
-                                  margin: const EdgeInsets.symmetric(horizontal: 16),
-                                  child: ElevatedButton(onPressed: (){
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => reproductor()),
-                                    );
-                                  },
-                                    style: ElevatedButton.styleFrom(backgroundColor: Colors.grey, shape: const RoundedRectangleBorder()),
-                                    child: const Text(''),
-                                  )
-                              ),
-
-                              Container(
-                                  height: 75,
-                                  width: 75,
-                                  margin: const EdgeInsets.symmetric(horizontal: 16),
-                                  child: ElevatedButton(onPressed: (){
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => reproductor()),
-                                    );
-                                  },
-                                    style: ElevatedButton.styleFrom(backgroundColor: Colors.grey, shape: const RoundedRectangleBorder()),
-                                    child: const Text(''),
-                                  )
-                              ),
-
-                              Container(
-                                  height: 75,
-                                  width: 75,
-                                  margin: const EdgeInsets.symmetric(horizontal: 16),
-                                  child: ElevatedButton(onPressed: (){
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => reproductor()),
-                                    );
-                                  },
-                                    style: ElevatedButton.styleFrom(backgroundColor: Colors.grey, shape: const RoundedRectangleBorder()),
-                                    child: const Text(''),
-                                  )
-                              ),
-
-                              Container(
-                                  height: 75,
-                                  width: 75,
-                                  margin: const EdgeInsets.symmetric(horizontal: 16),
-                                  child: ElevatedButton(onPressed: (){
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => reproductor()),
-                                    );
-                                  },
-                                    style: ElevatedButton.styleFrom(backgroundColor: Colors.grey, shape: const RoundedRectangleBorder()),
-                                    child: const Text(''),
-                                  )
-                              ),
-
-                            ],
-                          )
-
-                      ),
-
-
-                    ),
-                  ),
-
-                  const Text(
-                    '    Hecho para el usuario',
-                    style: TextStyle(color: Colors.white),
-                  ),
-
-                  Container(
-
-                    height: 125,
-                    width: 350,
-
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child:
-                      Expanded(
-                          child:
-                          Row(
-                            children: [
-
-                              Container(
-                                  height: 75,
-                                  width: 75,
-                                  margin: const EdgeInsets.symmetric(horizontal: 16),
-                                  child: ElevatedButton(onPressed: (){
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => reproductor()),
-                                    );
-                                  },
-                                    style: ElevatedButton.styleFrom(backgroundColor: Colors.grey, shape: const RoundedRectangleBorder()),
-                                    child: Text(''),
-                                  )
-                              ),
-
-                              Container(
-                                  height: 75,
-                                  width: 75,
-                                  margin: const EdgeInsets.symmetric(horizontal: 16),
-                                  child: ElevatedButton(onPressed: (){
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => reproductor()),
-                                    );
-                                  },
-                                    style: ElevatedButton.styleFrom(backgroundColor: Colors.grey, shape: const RoundedRectangleBorder()),
-                                    child: Text(''),
-                                  )
-                              ),
-
-                              Container(
-                                  height: 75,
-                                  width: 75,
-                                  margin: const EdgeInsets.symmetric(horizontal: 16),
-                                  child: ElevatedButton(onPressed: (){
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => reproductor()),
-                                    );
-                                  },
-                                    style: ElevatedButton.styleFrom(backgroundColor: Colors.grey, shape: const RoundedRectangleBorder()),
-                                    child: Text(''),
-                                  )
-                              ),
-
-                              Container(
-                                  height: 75,
-                                  width: 75,
-                                  margin: const EdgeInsets.symmetric(horizontal: 16),
-                                  child: ElevatedButton(onPressed: (){
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => reproductor()),
-                                    );
-                                  },
-                                    style: ElevatedButton.styleFrom(backgroundColor: Colors.grey, shape: const RoundedRectangleBorder()),
-                                    child: Text(''),
-                                  )
-                              ),
-
-
-                            ],
-                          )
-
-                      ),
-
-
-                    ),
-                  ),
-
+                  SizedBox(height: 8),
+                  Icon(Icons.house_outlined, color: Colors.grey, size: 37.0),
                   Text(
-                    '    Top Canciones',
-                    style: TextStyle(color: Colors.white),
+                    'Inicio',
+                    style: TextStyle(color: Colors.white, fontSize: 12),
                   ),
-
-                  Container(
-
-                    height: 125,
-                    width: 350,
-
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child:
-                      Expanded(
-                          child:
-                          Row(
-                            children: [
-
-                              Container(
-                                  height: 75,
-                                  width: 75,
-                                  margin: const EdgeInsets.symmetric(horizontal: 16),
-                                  child: ElevatedButton(onPressed: (){
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => reproductor()),
-                                    );
-                                  },
-                                    style: ElevatedButton.styleFrom(backgroundColor: Colors.grey, shape: const RoundedRectangleBorder()),
-                                    child: Text(''),
-                                  )
-                              ),
-
-                              Container(
-                                  height: 75,
-                                  width: 75,
-                                  margin: const EdgeInsets.symmetric(horizontal: 16),
-                                  child: ElevatedButton(onPressed: (){
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => reproductor()),
-                                    );
-                                  },
-                                    style: ElevatedButton.styleFrom(backgroundColor: Colors.grey, shape: const RoundedRectangleBorder()),
-                                    child: Text(''),
-                                  )
-                              ),
-
-                              Container(
-                                  height: 75,
-                                  width: 75,
-                                  margin: const EdgeInsets.symmetric(horizontal: 16),
-                                  child: ElevatedButton(onPressed: (){
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => reproductor()),
-                                    );
-                                  },
-                                    style: ElevatedButton.styleFrom(backgroundColor: Colors.grey, shape: const RoundedRectangleBorder()),
-                                    child: Text(''),
-                                  )
-                              ),
-
-                              Container(
-                                  height: 75,
-                                  width: 75,
-                                  margin: const EdgeInsets.symmetric(horizontal: 16),
-                                  child: ElevatedButton(onPressed: (){
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => reproductor()),
-                                    );
-                                  },
-                                    style: ElevatedButton.styleFrom(backgroundColor: Colors.grey, shape: const RoundedRectangleBorder()),
-                                    child: const Text(''),
-                                  )
-                              ),
-
-
-                            ],
-                          )
-
-                      ),
-
-
-                    ),
-                  ),
-                  const Text(
-                    '    Top Podcasts',
-                    style: TextStyle(color: Colors.white),
-                  ),
-
-                  Container(
-
-                    height: 125,
-                    width: 350,
-
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child:
-                      Expanded(
-                          child:
-                          Row(
-                            children: [
-
-                              Container(
-                                  height: 75,
-                                  width: 75,
-                                  margin: const EdgeInsets.symmetric(horizontal: 16),
-                                  child: ElevatedButton(onPressed: (){
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => reproductor()),
-                                    );
-                                  },
-                                    style: ElevatedButton.styleFrom(backgroundColor: Colors.grey, shape: const RoundedRectangleBorder()),
-                                    child: Text(''),
-                                  )
-                              ),
-
-                              Container(
-                                  height: 75,
-                                  width: 75,
-                                  margin: const EdgeInsets.symmetric(horizontal: 16),
-                                  child: ElevatedButton(onPressed: (){
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => reproductor()),
-                                    );
-                                  },
-                                    style: ElevatedButton.styleFrom(backgroundColor: Colors.grey, shape: const RoundedRectangleBorder()),
-                                    child: Text(''),
-                                  )
-                              ),
-
-                              Container(
-                                  height: 75,
-                                  width: 75,
-                                  margin: const EdgeInsets.symmetric(horizontal: 16),
-                                  child: ElevatedButton(onPressed: (){
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => reproductor()),
-                                    );
-                                  },
-                                    style: ElevatedButton.styleFrom(backgroundColor: Colors.grey, shape: const RoundedRectangleBorder()),
-                                    child: Text(''),
-                                  )
-                              ),
-
-                              Container(
-                                  height: 75,
-                                  width: 75,
-                                  margin: const EdgeInsets.symmetric(horizontal: 16),
-                                  child: ElevatedButton(onPressed: (){
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => reproductor()),
-                                    );
-                                  },
-                                    style: ElevatedButton.styleFrom(backgroundColor: Colors.grey, shape: const RoundedRectangleBorder()),
-                                    child: Text(''),
-                                  )
-                              ),
-
-
-                            ],
-                          )
-
-                      ),
-
-
-                    ),
-                  ),
-
-                  Expanded(
-                    child: Container(
-                      // Contenido principal (puedes colocar aquí tu imagen o cualquier otro contenido)
-                    ),
-                  ),
-
-
                 ],
               ),
-
             ),
-          ),
-
-           Container(
-             height: 70,
-             decoration: const BoxDecoration(
-               border: Border(
-                 top: BorderSide(width: 1.0, color: Colors.white),
-               ),
-             ),
-             child: Row(
-
-               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-               children: [
-
-                 ElevatedButton(
-                 onPressed: () {
-                   Navigator.push(
-                     context,
-                     MaterialPageRoute(
-                         builder: (context) => pantalla_principal()),
-                      );
-                 },
-                   style: ElevatedButton.styleFrom(
-                     backgroundColor:Colors.transparent,
-                     shape: RoundedRectangleBorder(
-                       borderRadius: BorderRadius.circular(20),
-                     ),
-                   ),
-                   child: const Column(
-
-                     children: [
-                       SizedBox(height: 8),
-                       Icon(Icons.house_outlined, color: Colors.grey, size: 37.0),
-                       Text(
-                           'Inicio',
-                           style: TextStyle(color: Colors.white, fontSize: 12),
-                         ),
-                       ]
-                 ),
-           ),
-
-
-                 ElevatedButton(
-                   onPressed: () {
-                     Navigator.push(
-                       context,
-                       MaterialPageRoute(
-                           builder: (context) => pantalla_buscar()),
-                     );
-                   },
-                   style: ElevatedButton.styleFrom(
-                     backgroundColor:Colors.transparent,
-                     shape: RoundedRectangleBorder(
-                       borderRadius: BorderRadius.circular(20),
-                     ),
-                   ),
-                   child: const Column(
-
-                       children: [
-                         SizedBox(height: 8),
-                         Icon(Icons.question_mark_outlined, color: Colors.grey, size: 37.0),
-                         Text(
-                           'Buscar',
-                           style: TextStyle(color: Colors.white, fontSize: 12),
-                         ),
-                       ]
-                   ),
-                 ),
-
-                 ElevatedButton(
-                   onPressed: () {
-                     Navigator.push(
-                       context,
-                       MaterialPageRoute(
-                           builder: (context) => pantalla_biblioteca()),
-                     );
-                   },
-                   style: ElevatedButton.styleFrom(
-                     backgroundColor:Colors.transparent,
-                     shape: RoundedRectangleBorder(
-                       borderRadius: BorderRadius.circular(20),
-                     ),
-                   ),
-                   child: const Column(
-
-                       children: [
-                         SizedBox(height: 8),
-                         Icon(Icons.library_books_rounded, color: Colors.grey, size: 37.0),
-                         Text(
-                           'Biblioteca',
-                           style: TextStyle(color: Colors.white, fontSize: 12),
-                         ),
-                       ]
-                   ),
-                 ),
-
-                 ElevatedButton(
-                   onPressed: () {
-                     Navigator.push(
-                       context,
-                       MaterialPageRoute(
-                           builder: (context) => pantalla_salas()),
-                     );
-                   },
-                   style: ElevatedButton.styleFrom(
-                     backgroundColor:Colors.transparent,
-                     shape: RoundedRectangleBorder(
-                       borderRadius: BorderRadius.circular(20),
-                     ),
-                   ),
-                   child: const Column(
-
-                       children: [
-                         SizedBox(height: 8),
-                         Icon(Icons.chat_bubble_rounded, color: Colors.grey, size: 37.0),
-                         Text(
-                           'Salas',
-                           style: TextStyle(color: Colors.white, fontSize: 12),
-                         ),
-                       ]
-                   ),
-                 ),
-               ],
-             ),
-
-           ),
-            ]
-           ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => pantalla_buscar()),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
+              child: Column(
+                children: [
+                  SizedBox(height: 8),
+                  Icon(Icons.question_mark_outlined, color: Colors.grey, size: 37.0),
+                  Text(
+                    'Buscar',
+                    style: TextStyle(color: Colors.white, fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => pantalla_biblioteca()),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
+              child: Column(
+                children: [
+                  SizedBox(height: 8),
+                  Icon(Icons.library_books_rounded, color: Colors.grey, size: 37.0),
+                  Text(
+                    'Biblioteca',
+                    style: TextStyle(color: Colors.white, fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => pantalla_salas()),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
+              child: Column(
+                children: [
+                  SizedBox(height: 8),
+                  Icon(Icons.chat_bubble_rounded, color: Colors.grey, size: 37.0),
+                  Text(
+                    'Salas',
+                    style: TextStyle(color: Colors.white, fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -739,10 +439,9 @@ class pantalla_principal extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Aquí puedes agregar tu propio widget de imagen si es necesario
         Text(
           title,
-          style: TextStyle(color: Colors.white, fontSize: 18), // Ajusta el tamaño de la fuente según sea necesario
+          style: TextStyle(color: Colors.white, fontSize: 18),
         ),
       ],
     );
@@ -753,14 +452,13 @@ class pantalla_principal extends StatelessWidget {
       margin: EdgeInsets.all(4),
       child: ElevatedButton(
         onPressed: () {
-          // Navegar a la pantalla correspondiente
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => reproductor()),
           );
         },
         style: ElevatedButton.styleFrom(
-          backgroundColor:Colors.grey,
+          backgroundColor: Colors.grey,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
@@ -773,7 +471,3 @@ class pantalla_principal extends StatelessWidget {
     );
   }
 }
-
-
-
-

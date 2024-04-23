@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'biblioteca.dart';
 import 'buscar.dart';
 
-class Configuracion extends StatelessWidget {
+class configuracion extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
