@@ -5,36 +5,17 @@ import 'biblioteca.dart';
 import 'buscar.dart';
 import 'chatSalaDisponible.dart';
 
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-
-class rap extends StatefulWidget {
+class electro extends StatefulWidget {
   @override
-  _rap_State createState() => _rap_State();
+  _electro_State createState() => _electro_State();
 }
 
-class _rap_State extends State<rap> {
-  List<dynamic> canciones = [];
+class _electro_State extends State<electro> {
 
   @override
   void initState() {
     super.initState();
-    //filtrarCanciones();
   }
-  /*
-  // función para cargar las canciones desde la API
-  void filtrarCanciones async {
-    // realizar la solicitud a la API
-    var response = await http.post {
-      Uri.parse('http://localhost:8000'),
-      body: {'genero': 'rap'},
-    };
-
-    // procesar la respuesta de la API
-    if (response.statusCode == 200) {
-
-    }
-  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +27,7 @@ class _rap_State extends State<rap> {
             SizedBox(width: 10),
             Icon(Icons.account_circle, color: Colors.white, size: 30), // Icono redondeado de la foto de perfil
             SizedBox(width: 10),
-            Text('Buscar rap', style: TextStyle(color: Colors.white)),
+            Text('Buscar electro', style: TextStyle(color: Colors.white)),
           ],
         ),
         backgroundColor: Colors.black,

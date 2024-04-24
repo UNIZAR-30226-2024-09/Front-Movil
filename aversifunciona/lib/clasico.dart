@@ -5,36 +5,17 @@ import 'biblioteca.dart';
 import 'buscar.dart';
 import 'chatSalaDisponible.dart';
 
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-
-class rap extends StatefulWidget {
+class clasico extends StatefulWidget {
   @override
-  _rap_State createState() => _rap_State();
+  _clasico_State createState() => _clasico_State();
 }
 
-class _rap_State extends State<rap> {
-  List<dynamic> canciones = [];
+class _clasico_State extends State<clasico> {
 
   @override
   void initState() {
     super.initState();
-    //filtrarCanciones();
   }
-  /*
-  // función para cargar las canciones desde la API
-  void filtrarCanciones async {
-    // realizar la solicitud a la API
-    var response = await http.post {
-      Uri.parse('http://localhost:8000'),
-      body: {'genero': 'rap'},
-    };
-
-    // procesar la respuesta de la API
-    if (response.statusCode == 200) {
-
-    }
-  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +27,7 @@ class _rap_State extends State<rap> {
             SizedBox(width: 10),
             Icon(Icons.account_circle, color: Colors.white, size: 30), // Icono redondeado de la foto de perfil
             SizedBox(width: 10),
-            Text('Buscar rap', style: TextStyle(color: Colors.white)),
+            Text('Buscar clasico', style: TextStyle(color: Colors.white)),
           ],
         ),
         backgroundColor: Colors.black,
