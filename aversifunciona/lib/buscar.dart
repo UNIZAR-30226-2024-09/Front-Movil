@@ -1,7 +1,12 @@
 import 'package:aversifunciona/biblioteca.dart';
 import 'package:aversifunciona/pantalla_principal.dart';
+import 'package:aversifunciona/pop.dart';
+import 'package:aversifunciona/reggaeton.dart';
+import 'package:aversifunciona/rock.dart';
 import 'package:flutter/material.dart';
 import 'package:aversifunciona/salas.dart';
+import 'clasico.dart';
+import 'electro.dart';
 import 'rap.dart';
 
 
@@ -265,6 +270,26 @@ class _pantalla_buscarState extends State<pantalla_buscar> {
             Navigator.push(
                context,
                MaterialPageRoute(builder: (context) => rap()));
+          } else if (title == 'Clásico') {
+            Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => clasico()));
+          } else if (title == 'Electro') {
+            Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => electro()));
+          } else if (title == 'Pop') {
+            Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => pop()));
+          } else if (title == 'Rock') {
+            Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => rock()));
+          } else {
+            Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => reggaeton()));
           }
           // Acción al presionar el botón
         },

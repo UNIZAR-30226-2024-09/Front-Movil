@@ -1,3 +1,4 @@
+import 'package:aversifunciona/cancion.dart';
 import 'package:aversifunciona/pantalla_principal.dart';
 import 'package:flutter/material.dart';
 
@@ -19,22 +20,58 @@ class _rap_State extends State<rap> {
   @override
   void initState() {
     super.initState();
-    //filtrarCanciones();
+    /*filtrarCanciones().then((canciones) {
+      setState(() {
+        this.canciones = canciones;
+      });
+    });*/
+    filtrarCanciones();
   }
   /*
   // función para cargar las canciones desde la API
-  void filtrarCanciones async {
-    // realizar la solicitud a la API
-    var response = await http.post {
-      Uri.parse('http://localhost:8000'),
-      body: {'genero': 'rap'},
-    };
+  Future<List<Cancion>> filtrarCanciones() async {
+    try {
+      // realizar la solicitud a la API
+      final response = await http.post(
+          Uri.parse('http://172.0.0.1:8000/filtrarCancionesPorGenero/'),
+          body: {'genero': 'rap'});
 
-    // procesar la respuesta de la API
-    if (response.statusCode == 200) {
-
+      // procesar la respuesta de la API
+      if (response.statusCode == 200) {
+        Map<String, dynamic> data = jsonDecode(response.body);
+        setState(() {
+          canciones = data['canciones'];
+        });
+      } else {
+        // manejar errores ??
+      }
+    } catch (e) {
+      print("Error al realizar la solicitud HTTP: $e");
+      return canciones;
     }
   }*/
+
+  Future<List<dynamic>> filtrarCanciones() async {
+    try {
+      final response = await http.post(
+        Uri.parse('http://127.0.0.1:8000/filtrarCancionesPorGenero/'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode({'genero': 'Rap'}),
+      );
+      if (response.statusCode == 200) {
+        // Assuming the response is a JSON array
+        return jsonDecode(response.body);
+      } else {
+        // Handle error or unexpected status code
+        throw Exception('Failed to load songs');
+      }
+    } catch (e) {
+      // Handle any errors that occur during the request
+      throw Exception('Error fetching songs: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,6 +88,15 @@ class _rap_State extends State<rap> {
         ),
         backgroundColor: Colors.black,
         automaticallyImplyLeading: false, // Eliminar el botón de retroceso predeterminado
+      ),
+      body: ListView.builder(
+        itemCount: canciones.length,
+        itemBuilder: (context, index) {
+          return ListTile(
+            title: Text(canciones[index]['nombre']),
+            subtitle: Text(canciones[index]['miAlbum']['nombre']),
+          );
+        },
       ),
       bottomNavigationBar: Container(
         height: 70,

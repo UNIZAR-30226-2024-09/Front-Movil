@@ -360,7 +360,7 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.grey,
+                    //primary: Colors.grey,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),

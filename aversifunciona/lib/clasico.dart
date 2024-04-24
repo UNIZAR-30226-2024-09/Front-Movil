@@ -27,7 +27,7 @@ class _clasico_State extends State<clasico> {
             SizedBox(width: 10),
             Icon(Icons.account_circle, color: Colors.white, size: 30), // Icono redondeado de la foto de perfil
             SizedBox(width: 10),
-            Text('Buscar clasico', style: TextStyle(color: Colors.white)),
+            Text('Buscar clásico', style: TextStyle(color: Colors.white)),
           ],
         ),
         backgroundColor: Colors.black,
