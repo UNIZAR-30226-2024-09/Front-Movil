@@ -153,15 +153,21 @@ class pantalla_opciones extends StatelessWidget {
 }
 
 // Función de manejo de tap
-void handleTap(BuildContext context, Cancion cancion) {
+/*void handleTap(BuildContext context, Cancion cancion) {
   // Aquí puedes manejar la acción de tap con la canción específica
   Navigator.push(
     context,
     MaterialPageRoute(builder: (context) => reproductor()), // cancion: cancion dentro de reproductor cuando esto funcione
   );
+}*/
+
+class pantalla_principal extends StatefulWidget {
+  @override
+  _PantallaPrincipalState createState() => _PantallaPrincipalState();
 }
 
-class pantalla_principal extends StatelessWidget {
+class _PantallaPrincipalState extends State<pantalla_principal> {
+  Cancion? _selectedSong; // Canción seleccionada inicializada a null
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -205,7 +211,10 @@ class pantalla_principal extends StatelessWidget {
               itemBuilder: (context, index) {
                 return GestureDetector(
                   onTap: () {
-                    handleTap(context, canciones[index]);
+                    //handleTap(context, canciones[index]);
+                    setState(() { // asi podemos mantener el estado de la cancion
+                      _selectedSong = canciones[index];
+                    });
                     // Aquí puedes manejar el tap según tus necesidades
                   },
                   child: Column(
@@ -323,115 +332,159 @@ class pantalla_principal extends StatelessWidget {
           }
         },
       ),
-      bottomNavigationBar: Container(
-        height: 70,
-        decoration: BoxDecoration(
-          border: Border(
-            top: BorderSide(width: 1.0, color: Colors.white),
+
+      bottomNavigationBar: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _selectedSong != null
+              ? Container(
+            height: 70,
+            decoration: BoxDecoration(
+              border: Border(
+                top: BorderSide(width: 1.0, color: Colors.white),
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  _selectedSong?.nombre ?? '',
+                  style: TextStyle(color: Colors.white),
+                ),
+                SizedBox(width: 16),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => reproductor(cancion: _selectedSong)),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.grey,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                  child: Text(
+                    'Reproducir',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ],
+            ),
+          )
+              : Container(), // Asegura que siempre haya un widget para evitar errores de diseño
+          Container(
+            height: 70,
+            decoration: BoxDecoration(
+              border: Border(
+                top: BorderSide(width: 1.0, color: Colors.white),
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => pantalla_principal()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      SizedBox(height: 8),
+                      Icon(Icons.house_outlined, color: Colors.grey, size: 37.0),
+                      Text(
+                        'Inicio',
+                        style: TextStyle(color: Colors.white, fontSize: 12),
+                      ),
+                    ],
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => pantalla_buscar()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      SizedBox(height: 8),
+                      Icon(Icons.question_mark_outlined, color: Colors.grey, size: 37.0),
+                      Text(
+                        'Buscar',
+                        style: TextStyle(color: Colors.white, fontSize: 12),
+                      ),
+                    ],
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => pantalla_biblioteca()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      SizedBox(height: 8),
+                      Icon(Icons.library_books_rounded, color: Colors.grey, size: 37.0),
+                      Text(
+                        'Biblioteca',
+                        style: TextStyle(color: Colors.white, fontSize: 12),
+                      ),
+                    ],
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => pantalla_salas()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      SizedBox(height: 8),
+                      Icon(Icons.chat_bubble_rounded, color: Colors.grey, size: 37.0),
+                      Text(
+                        'Salas',
+                        style: TextStyle(color: Colors.white, fontSize: 12),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => pantalla_principal()),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.transparent,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-              ),
-              child: Column(
-                children: [
-                  SizedBox(height: 8),
-                  Icon(Icons.house_outlined, color: Colors.grey, size: 37.0),
-                  Text(
-                    'Inicio',
-                    style: TextStyle(color: Colors.white, fontSize: 12),
-                  ),
-                ],
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => pantalla_buscar()),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.transparent,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-              ),
-              child: Column(
-                children: [
-                  SizedBox(height: 8),
-                  Icon(Icons.question_mark_outlined, color: Colors.grey, size: 37.0),
-                  Text(
-                    'Buscar',
-                    style: TextStyle(color: Colors.white, fontSize: 12),
-                  ),
-                ],
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => pantalla_biblioteca()),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.transparent,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-              ),
-              child: Column(
-                children: [
-                  SizedBox(height: 8),
-                  Icon(Icons.library_books_rounded, color: Colors.grey, size: 37.0),
-                  Text(
-                    'Biblioteca',
-                    style: TextStyle(color: Colors.white, fontSize: 12),
-                  ),
-                ],
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => pantalla_salas()),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.transparent,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-              ),
-              child: Column(
-                children: [
-                  SizedBox(height: 8),
-                  Icon(Icons.chat_bubble_rounded, color: Colors.grey, size: 37.0),
-                  Text(
-                    'Salas',
-                    style: TextStyle(color: Colors.white, fontSize: 12),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
+        ],
+      )
     );
   }
 
@@ -452,10 +505,10 @@ class pantalla_principal extends StatelessWidget {
       margin: EdgeInsets.all(4),
       child: ElevatedButton(
         onPressed: () {
-          Navigator.push(
+          /*Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => reproductor()),
-          );
+          );*/
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.grey,

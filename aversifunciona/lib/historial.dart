@@ -244,10 +244,10 @@ class historial extends StatelessWidget {
       child: ElevatedButton(
         onPressed: () {
           // Navegar a la pantalla correspondiente
-          Navigator.push(
+          /*Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => reproductor()),
-          );
+          );*/
         },
         style: ElevatedButton.styleFrom(
           backgroundColor:Colors.grey,

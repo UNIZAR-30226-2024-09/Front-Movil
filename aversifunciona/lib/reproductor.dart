@@ -1,7 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 
+import 'cancion.dart';
+
 class reproductor extends StatelessWidget {
+  final Cancion? cancion; // Agregar el parámetro cancion
+  reproductor({required this.cancion});
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -11,12 +15,14 @@ class reproductor extends StatelessWidget {
         primaryColor: Colors.white,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MusicPlayerScreen(),
+      home: MusicPlayerScreen(cancion: cancion),
     );
   }
 }
 
 class MusicPlayerScreen extends StatefulWidget {
+  final Cancion? cancion; // Agregar el parámetro cancion
+  MusicPlayerScreen({required this.cancion});
   @override
   _MusicPlayerScreenState createState() => _MusicPlayerScreenState();
 }
@@ -169,6 +175,4 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
   }
 }
 
-void main() {
-  runApp(reproductor());
-}
+

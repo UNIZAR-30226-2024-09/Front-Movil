@@ -16,15 +16,7 @@ class pantalla_biblioteca extends StatelessWidget {
       appBar: AppBar(
 
         backgroundColor: Colors.black,
-          /* leading: GestureDetector(
-                  onTap: () {
-                    // Navegar a la pantalla "crearListaOCarpeta"
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => crearListaOCarpeta()),
-                    );
-                    child: lo de abajo
-                  },*/
+
           leading: PopupMenuButton<String>(
             icon: CircleAvatar(
               backgroundImage: AssetImage('tu_ruta_de_imagen'),
@@ -78,15 +70,7 @@ class pantalla_biblioteca extends StatelessWidget {
           style: TextStyle(color: Colors.white, fontSize: 20),
         ),
         actions: [
-          /*GestureDetector(
-                  onTap: () {
-                    // Navegar a la pantalla "crearListaOCarpeta"
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => crearListaOCarpeta()),
-                    );
-                  },
-                  child: lo de abajo*/
+
           const Text(
             '+  ',
             style: const TextStyle(color: Colors.white, fontSize: 20),
