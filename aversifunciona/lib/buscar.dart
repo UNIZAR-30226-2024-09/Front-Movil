@@ -2,6 +2,7 @@ import 'package:aversifunciona/biblioteca.dart';
 import 'package:aversifunciona/pantalla_principal.dart';
 import 'package:flutter/material.dart';
 import 'package:aversifunciona/salas.dart';
+import 'rap.dart';
 
 
 class HistorialItem {
@@ -260,6 +261,11 @@ class _pantalla_buscarState extends State<pantalla_buscar> {
       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
       child: ElevatedButton(
         onPressed: () {
+          if(title == 'Rap') {
+            Navigator.push(
+               context,
+               MaterialPageRoute(builder: (context) => rap()));
+          }
           // Acción al presionar el botón
         },
         style: ElevatedButton.styleFrom(
