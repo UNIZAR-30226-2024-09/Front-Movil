@@ -27,42 +27,31 @@ class _rap_State extends State<rap> {
     });*/
     filtrarCanciones();
   }
-  /*
-  // función para cargar las canciones desde la API
-  Future<List<Cancion>> filtrarCanciones() async {
-    try {
-      // realizar la solicitud a la API
-      final response = await http.post(
-          Uri.parse('http://172.0.0.1:8000/filtrarCancionesPorGenero/'),
-          body: {'genero': 'rap'});
 
-      // procesar la respuesta de la API
-      if (response.statusCode == 200) {
-        Map<String, dynamic> data = jsonDecode(response.body);
-        setState(() {
-          canciones = data['canciones'];
-        });
-      } else {
-        // manejar errores ??
-      }
-    } catch (e) {
-      print("Error al realizar la solicitud HTTP: $e");
-      return canciones;
-    }
-  }*/
-
-  Future<List<dynamic>> filtrarCanciones() async {
+  Future<void> filtrarCanciones() async {
     try {
       final response = await http.post(
-        Uri.parse('http://127.0.0.1:8000/filtrarCancionesPorGenero/'),
+        Uri.parse('http://192.168.56.1:8000/filtrarCancionesPorGenero/'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
         body: jsonEncode({'genero': 'Rap'}),
       );
+      print('Response: ${response.body}');
       if (response.statusCode == 200) {
-        // Assuming the response is a JSON array
-        return jsonDecode(response.body);
+        Map<String, dynamic> data = jsonDecode(response.body);
+        dynamic cancionesData = data['canciones'];
+        if (cancionesData is List<dynamic>) {
+          List<dynamic> nuevasCanciones = List<dynamic>.from(cancionesData);
+
+          // Actualizar el estado con las nuevas canciones
+          setState(() {
+            canciones = nuevasCanciones;
+          });
+        } else {
+          print('Error: El campo canciones no es una lista.');
+          throw Exception('Failed to load songs');
+        }
       } else {
         // Handle error or unexpected status code
         throw Exception('Failed to load songs');
@@ -72,6 +61,7 @@ class _rap_State extends State<rap> {
       throw Exception('Error fetching songs: $e');
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -93,8 +83,7 @@ class _rap_State extends State<rap> {
         itemCount: canciones.length,
         itemBuilder: (context, index) {
           return ListTile(
-            title: Text(canciones[index]['nombre']),
-            subtitle: Text(canciones[index]['miAlbum']['nombre']),
+            title: Text(canciones[index]['nombre'], style: TextStyle(color: Colors.white, fontSize: 12),),
           );
         },
       ),
