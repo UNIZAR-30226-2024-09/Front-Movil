@@ -5,16 +5,55 @@ import 'biblioteca.dart';
 import 'buscar.dart';
 import 'chatSalaDisponible.dart';
 
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
 class electro extends StatefulWidget {
   @override
   _electro_State createState() => _electro_State();
 }
 
 class _electro_State extends State<electro> {
+  List<dynamic> canciones = [];
 
   @override
   void initState() {
     super.initState();
+    filtrarCanciones();
+  }
+
+  Future<void> filtrarCanciones() async {
+    try {
+      final response = await http.post(
+        Uri.parse('http://192.168.56.1:8000/filtrarCancionesPorGenero/'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode({'genero': 'Electro'}),
+      );
+      print('Response: ${response.body}');
+      if (response.statusCode == 200) {
+        Map<String, dynamic> data = jsonDecode(response.body);
+        dynamic cancionesData = data['canciones'];
+        if (cancionesData is List<dynamic>) {
+          List<dynamic> nuevasCanciones = List<dynamic>.from(cancionesData);
+
+          // Actualizar el estado con las nuevas canciones
+          setState(() {
+            canciones = nuevasCanciones;
+          });
+        } else {
+          print('Error: El campo canciones no es una lista.');
+          throw Exception('Failed to load songs');
+        }
+      } else {
+        // Handle error or unexpected status code
+        throw Exception('Failed to load songs');
+      }
+    } catch (e) {
+      // Handle any errors that occur during the request
+      throw Exception('Error fetching songs: $e');
+    }
   }
 
   @override
@@ -32,6 +71,14 @@ class _electro_State extends State<electro> {
         ),
         backgroundColor: Colors.black,
         automaticallyImplyLeading: false, // Eliminar el botón de retroceso predeterminado
+      ),
+      body: ListView.builder(
+        itemCount: canciones.length,
+        itemBuilder: (context, index) {
+          return ListTile(
+            title: Text(canciones[index]['nombre'], style: TextStyle(color: Colors.white, fontSize: 12),),
+          );
+        },
       ),
       bottomNavigationBar: Container(
         height: 70,

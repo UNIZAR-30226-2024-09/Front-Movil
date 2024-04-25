@@ -20,11 +20,6 @@ class _rap_State extends State<rap> {
   @override
   void initState() {
     super.initState();
-    /*filtrarCanciones().then((canciones) {
-      setState(() {
-        this.canciones = canciones;
-      });
-    });*/
     filtrarCanciones();
   }
 
