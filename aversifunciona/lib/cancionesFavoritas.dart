@@ -1,11 +1,14 @@
+import 'dart:async';
+import 'dart:convert';
+import 'package:aversifunciona/reproductor.dart';
 import 'package:flutter/material.dart';
 import 'package:aversifunciona/pantalla_principal.dart';
 import 'package:aversifunciona/salas.dart';
-
-import 'ListaOCarpeta.dart';
 import 'biblioteca.dart';
 import 'buscar.dart';
-import 'chatDeSala.dart';
+import 'cancion.dart';
+import 'package:http/http.dart' as http;
+
 
 class cancionesFavoritas extends StatefulWidget {
   @override
@@ -13,7 +16,122 @@ class cancionesFavoritas extends StatefulWidget {
 }
 
 class _CancionesFavoritasState extends State<cancionesFavoritas> {
-  String selectedSong = ''; // Estado para almacenar la canción seleccionada
+  List<Cancion> canciones = []; // Lista para almacenar las canciones
+  Cancion? selectedSong; // Canción seleccionada
+
+  bool isPlaying = false;
+  double progress = 0.0; // Representa la posición de reproducción de la canción
+  Timer? timer;
+  @override
+  void initState() {
+    super.initState();
+    // Llama a la función para cargar las canciones al inicializar el widget
+    loadSongs();
+  }
+
+  Future<void> loadSongs() async {
+    try {
+      final response = await http.get(
+        Uri.parse("<URL_de_tu_endpoint_para_obtener_canciones>"),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8'
+        },
+      );
+
+      if (response.statusCode == 200) {
+        var lista = jsonDecode(response.body);
+        List<Cancion> fetchedSongs = [];
+
+        for (var indice in lista) {
+          /*Cancion cancion = Cancion(
+            nombre: indice["nombre"],
+            foto: indice["foto"],
+          );
+          fetchedSongs.add(cancion);*/
+        }
+
+        setState(() {
+          canciones = fetchedSongs;
+        });
+      } else {
+        print("Error" + (response.statusCode).toString());
+      }
+    } catch (e) {
+      print("Error al realizar la solicitud HTTP: $e");
+    }
+  }
+
+
+  void togglePlay() {
+    setState(() {
+      isPlaying = !isPlaying;
+      // Simulamos el progreso de la canción
+      if (isPlaying) {
+        startPlaying();
+      } else {
+        stopPlaying();
+      }
+    });
+  }
+
+  void startPlaying() {
+    // Cancelar el temporizador anterior si existe
+    timer?.cancel();
+    // Aquí podrías iniciar la reproducción de la canción
+    // Por ahora solo actualizamos el progreso de forma simulada
+    const progressIncrement = 0.01;
+    const duration = Duration(seconds: 1);
+    timer = Timer.periodic(duration, (timer) {
+      setState(() {
+        if (progress >= 1.0) {
+          progress = 0.0;
+          stopPlaying();
+        } else {
+          progress += progressIncrement;
+        }
+      });
+    });
+  }
+
+  void stopPlaying() {
+    // Detener el temporizador si existe
+    timer?.cancel();
+    isPlaying = false;
+  }
+
+  void nextSong() {
+    // Aquí iría la lógica para avanzar a la siguiente canción
+  }
+
+  void previousSong() {
+    // Aquí iría la lógica para volver a la canción anterior
+  }
+
+  void replaySong() {
+    setState(() {
+      progress = 0.0;
+      startPlaying();
+      isPlaying = true;
+    });
+  }
+
+  @override
+  void dispose() {
+    // Asegurarse de cancelar el temporizador cuando se desmonta el widget
+    timer?.cancel();
+    super.dispose();
+  }
+
+  void goToReproductor() {
+    // Aquí iría la lógica para dirigirse a la pantalla del reproductor
+    // junto con los datos de la canción para seguir reproduciendo
+    /*Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => reproductor(cancion: selectedSong),
+      ),
+    );*/
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,10 +146,14 @@ class _CancionesFavoritasState extends State<cancionesFavoritas> {
             padding: const EdgeInsets.all(8.0),
             child: Row(
               children: [
-                CircleAvatar(
-                  radius: 20,
-                  // Aquí deberías cargar la imagen de la canción
-                  backgroundImage: AssetImage('ruta_de_la_imagen'),
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.grey, // Puedes ajustar el color del cuadrado
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Image.asset('ruta_de_la_imagen_cuadrado'), //imagen de la cancion
                 ),
                 SizedBox(width: 10),
                 Text(
@@ -45,7 +167,7 @@ class _CancionesFavoritasState extends State<cancionesFavoritas> {
             onTap: () {
               // Al hacer clic en la canción, establece la canción seleccionada
               setState(() {
-                selectedSong = 'Nombre de la canción';
+                //selectedSong = canciones[index];
               });
             },
             child: Row(
@@ -75,41 +197,85 @@ class _CancionesFavoritasState extends State<cancionesFavoritas> {
           ),
         ],
       ),
-      bottomNavigationBar: selectedSong.isNotEmpty
+      bottomNavigationBar: selectedSong != null
           ? Container(
-        height: 70,
+        height: 150,
         color: Colors.grey[900],
-        child: Row(
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            IconButton(
-              onPressed: () {
-                // Acción del botón para reproducir la canción anterior
-              },
-              icon: Icon(Icons.skip_previous, color: Colors.white),
+            // Contenedor para la imagen y el nombre de la canción
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 10),
+              child: Row(
+                children: [
+                  // Imagen de la canción
+
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: Colors.grey, // Puedes ajustar el color del cuadrado
+                      borderRadius: BorderRadius.circular(8),
+
+                    ),
+                    child: Image.asset('ruta_de_la_imagen_cuadrado'), //imagen de la cancion
+                  ),
+                  SizedBox(width: 10),
+                  // Nombre de la canción
+                  /*Text(
+                    selectedSong.nombre,
+                    style: TextStyle(color: Colors.white),
+                  ),*/
+                ],
+              ),
             ),
-            IconButton(
-              onPressed: () {
-                // Acción del botón de reproducción
-              },
-              icon: Icon(Icons.play_arrow, color: Colors.white),
-            ),
-            IconButton(
-              onPressed: () {
-                // Acción del botón para reproducir la siguiente canción
-              },
-              icon: Icon(Icons.skip_next, color: Colors.white),
-            ),
-            IconButton(
-              onPressed: () {
-                // Acción del botón para reiniciar la canción
-              },
-              icon: Icon(Icons.replay, color: Colors.white),
-            ),
-            SizedBox(width: 16),
-            Text(
-              selectedSong,
-              style: TextStyle(color: Colors.white),
+            // Iconos de reproducción y barra de progreso
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Iconos de reproducción
+                Row(
+                  children: [
+                    IconButton(
+                      onPressed: previousSong,
+                      icon: Icon(Icons.skip_previous, color: Colors.white),
+                    ),
+                    IconButton(
+                      onPressed: togglePlay,
+                      icon: Icon(isPlaying ? Icons.pause : Icons.play_arrow, color: Colors.white),
+                    ),
+                    IconButton(
+                      onPressed: nextSong,
+                      icon: Icon(Icons.skip_next, color: Colors.white),
+                    ),
+                    IconButton(
+                      onPressed: replaySong,
+                      icon: Icon(Icons.replay, color: Colors.white),
+                    ),
+                  ],
+                ),
+                // Barra de progreso
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Slider(
+                        value: progress,
+                        onChanged: (newValue) {
+                          setState(() {
+                            progress = newValue;
+                          });
+                        },
+                        activeColor: Colors.white,
+                        inactiveColor: Colors.grey,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -124,6 +290,7 @@ class _CancionesFavoritasState extends State<cancionesFavoritas> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
+            // Botones de navegación
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
@@ -226,3 +393,5 @@ class _CancionesFavoritasState extends State<cancionesFavoritas> {
     );
   }
 }
+
+
