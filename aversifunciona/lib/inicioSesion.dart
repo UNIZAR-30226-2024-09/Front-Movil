@@ -9,12 +9,13 @@ import 'package:aversifunciona/pantalla_principal.dart';
 import 'userPassword.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:aversifunciona/sesionManager.dart';
 
 class InicioSesion extends StatelessWidget {
   var _contrasegna = TextEditingController();
   var _correo = TextEditingController();
 
-
+// Guardar la sesión del usuario
   Future<bool> loginValido(String correo, String contrasegna) async {
     try{
       final response = await http.post(
@@ -172,6 +173,7 @@ class InicioSesion extends StatelessWidget {
                   textColor: Colors.white,
                   onPressed: () async{
                     if (await loginValido(_correo.text, _contrasegna.text)){
+                      SessionManager.saveUserSession(email: _correo.text, password: _contrasegna.text);
                       Navigator.push(
                           context,
                           MaterialPageRoute(builder: (context) => pantalla_principal())
