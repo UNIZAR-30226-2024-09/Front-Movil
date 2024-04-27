@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -15,44 +17,7 @@ import 'cancion.dart';
 import 'env.dart';
 import 'reproductor.dart';
 
-Future<List<Cancion>> conseguir_canciones() async {
-  try {
-    final response = await http.get(
-      Uri.parse("${Env.URL_PREFIX}/listarCanciones/"),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8'
-      },
-    );
-
-    var lista = jsonDecode(response.body);
-    List<Cancion> canciones = [];
-
-    for (var indice in lista) {
-      Cancion cancion = Cancion(
-        nombre: indice["nombre"],
-        miAlbum: indice["miAlbum"],
-        puntuacion: indice["puntuacion"],
-        numPuntuaciones: indice["numPuntuaciones"],
-        archivo_mp3: indice["archivo_mp3"],
-        foto: indice["foto"],
-      );
-      canciones.add(cancion);
-    }
-
-    if (response.statusCode == 200) {
-      // Si la solicitud es exitosa, retornar verdadero
-      return canciones;
-    } else {
-      print("Error" + (response.statusCode).toString());
-      // Si la solicitud no es exitosa, retornar falso
-      return [];
-    }
-  } catch (e) {
-    // Si ocurre algún error, retornar falso
-    print("Error al realizar la solicitud HTTP: $e");
-    return [];
-  }
-}
+List<dynamic> canciones = [];
 
 Route _createRoute() {
   return PageRouteBuilder(
@@ -72,6 +37,31 @@ Route _createRoute() {
   );
 }
 
+class listaCanciones{
+  final List<dynamic> canciones;
+
+  const listaCanciones({
+    required this.canciones
+  });
+
+  factory listaCanciones.fromJson(Map<String, dynamic> json) {
+    return switch (json) {
+      {
+      'canciones': List<dynamic> id,
+
+
+      } =>
+          listaCanciones(
+            canciones: id,
+
+          ),
+      _ => throw const FormatException('Failed to load album.'),
+    };
+  }
+
+
+}
+
 class pantalla_opciones extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -80,7 +70,7 @@ class pantalla_opciones extends StatelessWidget {
       appBar: AppBar(
         leading: Row(children: [
           IconButton(
-            icon: Icon(Icons.arrow_back, color: Colors.white),
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
             onPressed: () {
               Navigator.pop(context);
             },
@@ -97,7 +87,7 @@ class pantalla_opciones extends StatelessWidget {
                   Container(
                     height: 125,
                     child: TextButton(
-                      child: Text(
+                      child: const Text(
                         'Ver perfil',
                         style: TextStyle(color: Colors.white, fontSize: 24),
                         textAlign: TextAlign.center,
@@ -113,7 +103,7 @@ class pantalla_opciones extends StatelessWidget {
                   Container(
                     height: 125,
                     child: TextButton(
-                      child: Text(
+                      child: const Text(
                         'Historial',
                         style: TextStyle(color: Colors.white, fontSize: 24),
                         textAlign: TextAlign.center,
@@ -129,7 +119,7 @@ class pantalla_opciones extends StatelessWidget {
                   Container(
                     height: 125,
                     child: TextButton(
-                      child: Text(
+                      child: const Text(
                         'Configuración y privacidad',
                         style: TextStyle(color: Colors.white, fontSize: 24),
                         textAlign: TextAlign.center,
@@ -153,13 +143,13 @@ class pantalla_opciones extends StatelessWidget {
 }
 
 // Función de manejo de tap
-/*void handleTap(BuildContext context, Cancion cancion) {
+void handleTap(BuildContext context, Cancion cancion) {
   // Aquí puedes manejar la acción de tap con la canción específica
   Navigator.push(
     context,
-    MaterialPageRoute(builder: (context) => reproductor()), // cancion: cancion dentro de reproductor cuando esto funcione
+    MaterialPageRoute(builder: (context) => reproductor(cancion: cancion,)), // cancion: cancion dentro de reproductor cuando esto funcione
   );
-}*/
+}
 
 class pantalla_principal extends StatefulWidget {
   @override
@@ -167,7 +157,67 @@ class pantalla_principal extends StatefulWidget {
 }
 
 class _PantallaPrincipalState extends State<pantalla_principal> {
-  Cancion? _selectedSong; // Canción seleccionada inicializada a null
+
+  Uint8List decodeBase64ToImage(String base64String) {
+    try {
+      return base64Decode(base64String);
+    } catch (e) {
+      throw Exception('Error decoding base64 string: $e');
+    }
+  }
+
+  String base64ToImageSrc(String base64) {
+    return base64.replaceAll(RegExp('/^data:image/[a-z]+;base64,/'), '');
+  }
+
+  Future<void> conseguirCanciones() async {
+    try {
+      final response = await http
+          .post(Uri.parse("${Env.URL_PREFIX}/listarCanciones/"),
+          headers: <String, String>{
+            'Content-Type': 'application/json'
+          },
+          body: jsonEncode({})
+      );
+      canciones = [];
+
+      if (response.statusCode == 200) {
+        // If the server did return a 200 OK response,
+        // then parse the JSON.
+        var lista = jsonDecode(response.body);
+        var listaCanciones = lista['canciones'];
+
+        for (var i = 0; i < 3 && i < listaCanciones.length; i++) {
+          Cancion cancion = Cancion.fromJson(listaCanciones[i]);
+          canciones.add(cancion);
+        }
+        debugPrint(base64ToImageSrc(canciones[1].foto).toString());
+        debugPrint((canciones[1].foto).toString());
+        if (base64ToImageSrc(canciones[1].foto).toString() == (canciones[1].foto).toString()){
+          print(true);
+        }
+        else{
+          print(false);
+        }
+        setState(() {});
+      } else {
+        // If the server did not return a 200 OK response,
+        // then throw an exception.
+        throw Exception('Failed to load album');
+      }
+    }
+    catch(e){
+      print("Error: $e");
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Llama a la función para obtener canciones cuando la pantalla se inicia
+    conseguirCanciones();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -175,318 +225,492 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
       appBar: AppBar(
         backgroundColor: Colors.black,
         leading: TextButton(
-          child: CircleAvatar(
-            backgroundImage: AssetImage('tu_ruta_de_imagen'),
-          ),
-          onPressed: () {
-            Navigator.of(context).push(_createRoute());
-          }
+            child: const CircleAvatar(
+              child: Icon(Icons.person_rounded, color: Colors.white,),
+            ),
+            onPressed: () {
+              Navigator.of(context).push(_createRoute());
+            }
         ),
         title: const Text(
           'Título de la pantalla',
           style: TextStyle(color: Colors.white),
         ),
         actions: [
-          Spacer(),
+          const Spacer(),
           buildTopButton(context, 'Todo', pantalla_todo()),
           buildTopButton(context, 'Música', pantalla_musica()),
           buildTopButton(context, 'Podcast', pantalla_podcast()),
         ],
       ),
-      body: FutureBuilder<List<Cancion>>(
-        future: conseguir_canciones(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          } else if (snapshot.hasError) {
-            return Center(
-              child: Text('Error: ${snapshot.error}'),
-            );
-          } else {
-            List<Cancion> canciones = snapshot.data ?? [];
-            return ListView.builder(
-              itemCount: canciones.length,
-              itemBuilder: (context, index) {
-                return GestureDetector(
-                  onTap: () {
-                    //handleTap(context, canciones[index]);
-                    setState(() { // asi podemos mantener el estado de la cancion
-                      _selectedSong = canciones[index];
-                    });
-                    // Aquí puedes manejar el tap según tus necesidades
-                  },
-                  child: Column(
-                    children: [
-                      SizedBox(height: 20),
-                      Text(
-                        '    Has escuchado recientemente',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      Container(
-                        height: 125,
-                        width: 350,
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: [
-                              // Aquí deberías colocar tu código para mostrar las canciones recientes
 
-                                Container(
+      body: Center(
+
+          child: canciones.isEmpty
+              ? const CircularProgressIndicator() // Muestra el indicador de carga si canciones está vacío
+              : SingleChildScrollView(
+
+            child: Column(
+              children: [
+
+                const Text('Texto numero 1', style: TextStyle(color: Colors.white),),
+                const SizedBox(height: 8,),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Row(
+                    children: [
+                      const SizedBox(width: 20,),
+                      Container(height: 75, width: 75, padding: const EdgeInsets.symmetric(horizontal: 8), decoration: const BoxDecoration(color: Colors.grey),
+                        child: FutureBuilder<Uint8List>(
+                          future: Future.microtask(() => base64Decode(canciones[0].foto)),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              // Muestra un indicador de carga mientras se decodifica la imagen
+                              return const CircularProgressIndicator();
+                            } else if (snapshot.hasError) {
+                              // Muestra un mensaje de error si ocurre un error durante la decodificación
+                              return Text('Error: ${snapshot.error}');
+                            } else {
+                              // Si la decodificación fue exitosa, muestra la imagen
+                              return Image.memory(
+                                height: 75,
+                                width: 75,
+                                snapshot.data!,
+                                fit: BoxFit.cover,
+                              );
+                            }
+                          },
+                        ),
+                      ),
+
+                      const SizedBox(width: 50,),
+
+                      Container(height: 75, width: 75, padding: const EdgeInsets.symmetric(horizontal: 8), decoration: const BoxDecoration(color: Colors.grey),
+                        child: FutureBuilder<Uint8List>(
+                          future: Future.microtask(() => base64Decode(canciones[1].foto)),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              // Muestra un indicador de carga mientras se decodifica la imagen
+                              return const CircularProgressIndicator();
+                            } else if (snapshot.hasError) {
+                              // Muestra un mensaje de error si ocurre un error durante la decodificación
+                              return Text('Error: ${snapshot.error}');
+                            } else {
+                              // Si la decodificación fue exitosa, muestra la imagen
+                              return Image.memory(
+                                height: 75,
+                                width: 75,
+                                snapshot.data!,
+                                fit: BoxFit.cover,
+                              );
+                            }
+                          },
+                        ),
+                      ),
+
+                      const SizedBox(width: 50,),
+                      Container(height: 75, width: 75, padding: const EdgeInsets.symmetric(horizontal: 8), decoration: const BoxDecoration(color: Colors.grey),
+                        child: FutureBuilder<Uint8List>(
+                          future: Future.microtask(() => base64Decode(canciones[2].foto)),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              // Muestra un indicador de carga mientras se decodifica la imagen
+                              return const CircularProgressIndicator();
+                            } else if (snapshot.hasError) {
+                              // Muestra un mensaje de error si ocurre un error durante la decodificación
+                              return Text('Error: ${snapshot.error}');
+                            } else {
+                              // Si la decodificación fue exitosa, muestra la imagen
+                              return Image.memory(
+                                height: 75,
+                                width: 75,
+                                snapshot.data!,
+                                fit: BoxFit.cover,
+                              );
+                            }
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 50,),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 20,),
+                const Text('Texto numero 2', style:  TextStyle(color: Colors.white),),
+                const SizedBox(height: 8,),
+                SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: Row(
+                      children: [
+                        const SizedBox(width: 20,),
+                        Container(height: 75, width: 75, padding: const EdgeInsets.symmetric(horizontal: 8), decoration: const BoxDecoration(color: Colors.grey),
+                          child: FutureBuilder<Uint8List>(
+                            future: Future.microtask(() => base64Decode(canciones[0].foto)),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState == ConnectionState.waiting) {
+                                // Muestra un indicador de carga mientras se decodifica la imagen
+                                return const CircularProgressIndicator();
+                              } else if (snapshot.hasError) {
+                                // Muestra un mensaje de error si ocurre un error durante la decodificación
+                                return Text('Error: ${snapshot.error}');
+                              } else {
+                                // Si la decodificación fue exitosa, muestra la imagen
+                                return Image.memory(
                                   height: 75,
                                   width: 75,
-                                  margin: const EdgeInsets.symmetric(horizontal: 16),
-                                  child: Image.memory(
-                                    base64Decode(canciones[index].foto),
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                                SizedBox(height: 8), // Espacio entre contenedores
-                            ],
+                                  snapshot.data!,
+                                  fit: BoxFit.cover,
+                                );
+                              }
+                            },
                           ),
                         ),
-                      ),
-                      Text(
-                        '    Hecho para el usuario',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      Container(
-                        height: 125,
-                        width: 350,
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: [
-                              // Aquí deberías colocar tu código para mostrar las canciones personalizadas
-                              Container(
+
+                        const SizedBox(width: 50,),
+
+                        Container(height: 75, width: 75, padding: const EdgeInsets.symmetric(horizontal: 8), decoration: const BoxDecoration(color: Colors.grey),
+                          child: FutureBuilder<Uint8List>(
+                            future: Future.microtask(() => base64Decode(canciones[1].foto)),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState == ConnectionState.waiting) {
+                                // Muestra un indicador de carga mientras se decodifica la imagen
+                                return const CircularProgressIndicator();
+                              } else if (snapshot.hasError) {
+                                // Muestra un mensaje de error si ocurre un error durante la decodificación
+                                return Text('Error: ${snapshot.error}');
+                              } else {
+                                // Si la decodificación fue exitosa, muestra la imagen
+                                return Image.memory(
+                                  height: 75,
+                                  width: 75,
+                                  snapshot.data!,
+                                  fit: BoxFit.cover,
+                                );
+                              }
+                            },
+                          ),
+                        ),
+
+                        const SizedBox(width: 50,),
+                        Container(height: 75, width: 75, padding: const EdgeInsets.symmetric(horizontal: 8), decoration: const BoxDecoration(color: Colors.grey),
+                          child: FutureBuilder<Uint8List>(
+                            future: Future.microtask(() => base64Decode(canciones[2].foto)),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState == ConnectionState.waiting) {
+                                // Muestra un indicador de carga mientras se decodifica la imagen
+                                return const CircularProgressIndicator();
+                              } else if (snapshot.hasError) {
+                                // Muestra un mensaje de error si ocurre un error durante la decodificación
+                                return Text('Error: ${snapshot.error}');
+                              } else {
+                                // Si la decodificación fue exitosa, muestra la imagen
+                                return Image.memory(
+                                  height: 75,
+                                  width: 75,
+                                  snapshot.data!,
+                                  fit: BoxFit.cover,
+                                );
+                              }
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 50,),
+                      ],
+                    ),
+                  ),
+
+                const SizedBox(height: 20,),
+                const Text('Texto numero 3', style: TextStyle(color: Colors.white),),
+                const SizedBox(height: 8,),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Row(
+                    children: [
+                      const SizedBox(width: 20,),
+                      Container(height: 75, width: 75, padding: const EdgeInsets.symmetric(horizontal: 8), decoration: const BoxDecoration(color: Colors.grey),
+                        child: FutureBuilder<Uint8List>(
+                          future: Future.microtask(() => base64Decode(canciones[0].foto)),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              // Muestra un indicador de carga mientras se decodifica la imagen
+                              return const CircularProgressIndicator();
+                            } else if (snapshot.hasError) {
+                              // Muestra un mensaje de error si ocurre un error durante la decodificación
+                              return Text('Error: ${snapshot.error}');
+                            } else {
+                              // Si la decodificación fue exitosa, muestra la imagen
+                              return Image.memory(
                                 height: 75,
                                 width: 75,
-                                margin: const EdgeInsets.symmetric(horizontal: 16),
-                                child: Image.memory(
-                                  base64Decode(canciones[index].foto),
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                              SizedBox(height: 8), // Espacio entre contenedores
-                            ],
-                          ),
+                                snapshot.data!,
+                                fit: BoxFit.cover,
+                              );
+                            }
+                          },
                         ),
                       ),
-                      Text(
-                        '    Top Canciones',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      Container(
-                        height: 125,
-                        width: 350,
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: [
-                              // Aquí deberías colocar tu código para mostrar las canciones principales
-                              Container(
+
+                      const SizedBox(width: 50,),
+
+                      Container(height: 75, width: 75, padding: const EdgeInsets.symmetric(horizontal: 8), decoration: const BoxDecoration(color: Colors.grey),
+                        child: FutureBuilder<Uint8List>(
+                          future: Future.microtask(() => base64Decode(canciones[1].foto)),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              // Muestra un indicador de carga mientras se decodifica la imagen
+                              return const CircularProgressIndicator();
+                            } else if (snapshot.hasError) {
+                              // Muestra un mensaje de error si ocurre un error durante la decodificación
+                              return Text('Error: ${snapshot.error}');
+                            } else {
+                              // Si la decodificación fue exitosa, muestra la imagen
+                              return Image.memory(
                                 height: 75,
                                 width: 75,
-                                margin: const EdgeInsets.symmetric(horizontal: 16),
-                                child: Image.memory(
-                                  base64Decode(canciones[index].foto),
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                              SizedBox(height: 8), // Espacio entre contenedores
-                            ],
-                          ),
+                                snapshot.data!,
+                                fit: BoxFit.cover,
+                              );
+                            }
+                          },
                         ),
                       ),
-                      Text(
-                        '    Top Podcasts',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      Container(
-                        height: 125,
-                        width: 350,
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: [
-                              // Aquí deberías colocar tu código para mostrar los podcasts principales
-                              Container(
+
+                      const SizedBox(width: 50,),
+                      Container(height: 75, width: 75, padding: const EdgeInsets.symmetric(horizontal: 8), decoration: const BoxDecoration(color: Colors.grey),
+                        child: FutureBuilder<Uint8List>(
+                          future: Future.microtask(() => base64Decode(canciones[2].foto)),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              // Muestra un indicador de carga mientras se decodifica la imagen
+                              return const CircularProgressIndicator();
+                            } else if (snapshot.hasError) {
+                              // Muestra un mensaje de error si ocurre un error durante la decodificación
+                              return Text('Error: ${snapshot.error}');
+                            } else {
+                              // Si la decodificación fue exitosa, muestra la imagen
+                              return Image.memory(
                                 height: 75,
                                 width: 75,
-                                margin: const EdgeInsets.symmetric(horizontal: 16),
-                                child: Image.memory(
-                                  base64Decode(canciones[index].foto),
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ],
-                          ),
+                                snapshot.data!,
+                                fit: BoxFit.cover,
+                              );
+                            }
+                          },
                         ),
                       ),
+                      const SizedBox(width: 50,),
                     ],
                   ),
-                );
-              },
-            );
-          }
-        },
+                ),
+                const SizedBox(height: 20,),
+                const Text('Texto numero 4', style: TextStyle(color: Colors.white),),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Row(
+                    children: [
+                      const SizedBox(width: 20,),
+                      Container(height: 75, width: 75, padding: const EdgeInsets.symmetric(horizontal: 8), decoration: const BoxDecoration(color: Colors.grey),
+                        child: FutureBuilder<Uint8List>(
+                          future: Future.microtask(() => base64Decode(canciones[0].foto)),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              // Muestra un indicador de carga mientras se decodifica la imagen
+                              return const CircularProgressIndicator();
+                            } else if (snapshot.hasError) {
+                              // Muestra un mensaje de error si ocurre un error durante la decodificación
+                              return Text('Error: ${snapshot.error}');
+                            } else {
+                              // Si la decodificación fue exitosa, muestra la imagen
+                              return Image.memory(
+                                height: 75,
+                                width: 75,
+                                snapshot.data!,
+                                fit: BoxFit.cover,
+                              );
+                            }
+                          },
+                        ),
+                      ),
+
+                      const SizedBox(width: 50,),
+
+                      Container(height: 75, width: 75, padding: const EdgeInsets.symmetric(horizontal: 8), decoration: const BoxDecoration(color: Colors.grey),
+                        child: FutureBuilder<Uint8List>(
+                          future: Future.microtask(() => base64Decode(canciones[1].foto)),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              // Muestra un indicador de carga mientras se decodifica la imagen
+                              return const CircularProgressIndicator();
+                            } else if (snapshot.hasError) {
+                              // Muestra un mensaje de error si ocurre un error durante la decodificación
+                              return Text('Error: ${snapshot.error}');
+                            } else {
+                              // Si la decodificación fue exitosa, muestra la imagen
+                              return Image.memory(
+                                height: 75,
+                                width: 75,
+                                snapshot.data!,
+                                fit: BoxFit.cover,
+                              );
+                            }
+                          },
+                        ),
+                      ),
+
+                      const SizedBox(width: 50,),
+                      Container(height: 75, width: 75, padding: const EdgeInsets.symmetric(horizontal: 8), decoration: const BoxDecoration(color: Colors.grey),
+                        child: FutureBuilder<Uint8List>(
+                          future: Future.microtask(() => base64Decode(canciones[2].foto)),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              // Muestra un indicador de carga mientras se decodifica la imagen
+                              return const CircularProgressIndicator();
+                            } else if (snapshot.hasError) {
+                              // Muestra un mensaje de error si ocurre un error durante la decodificación
+                              return Text('Error: ${snapshot.error}');
+                            } else {
+                              // Si la decodificación fue exitosa, muestra la imagen
+                              return Image.memory(
+                                height: 75,
+                                width: 75,
+                                snapshot.data!,
+                                fit: BoxFit.cover,
+                              );
+                            }
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 50,),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 8,),
+
+              ],
+            )
+            ,
+          )
       ),
 
-      bottomNavigationBar: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _selectedSong != null
-              ? Container(
-            height: 70,
-            decoration: BoxDecoration(
-              border: Border(
-                top: BorderSide(width: 1.0, color: Colors.white),
-              ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  _selectedSong?.nombre ?? '',
-                  style: TextStyle(color: Colors.white),
-                ),
-                SizedBox(width: 16),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => reproductor(cancion: _selectedSong)),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    //primary: Colors.grey,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                  ),
-                  child: Text(
-                    'Reproducir',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              ],
-            ),
-          )
-              : Container(), // Asegura que siempre haya un widget para evitar errores de diseño
-          Container(
-            height: 70,
-            decoration: BoxDecoration(
-              border: Border(
-                top: BorderSide(width: 1.0, color: Colors.white),
-              ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => pantalla_principal()),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.transparent,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                  ),
-                  child: Column(
-                    children: [
-                      SizedBox(height: 8),
-                      Icon(Icons.house_outlined, color: Colors.grey, size: 37.0),
-                      Text(
-                        'Inicio',
-                        style: TextStyle(color: Colors.white, fontSize: 12),
-                      ),
-                    ],
-                  ),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => pantalla_buscar()),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.transparent,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                  ),
-                  child: Column(
-                    children: [
-                      SizedBox(height: 8),
-                      Icon(Icons.question_mark_outlined, color: Colors.grey, size: 37.0),
-                      Text(
-                        'Buscar',
-                        style: TextStyle(color: Colors.white, fontSize: 12),
-                      ),
-                    ],
-                  ),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => pantalla_biblioteca()),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.transparent,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                  ),
-                  child: Column(
-                    children: [
-                      SizedBox(height: 8),
-                      Icon(Icons.library_books_rounded, color: Colors.grey, size: 37.0),
-                      Text(
-                        'Biblioteca',
-                        style: TextStyle(color: Colors.white, fontSize: 12),
-                      ),
-                    ],
-                  ),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => pantalla_salas()),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.transparent,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                  ),
-                  child: Column(
-                    children: [
-                      SizedBox(height: 8),
-                      Icon(Icons.chat_bubble_rounded, color: Colors.grey, size: 37.0),
-                      Text(
-                        'Salas',
-                        style: TextStyle(color: Colors.white, fontSize: 12),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+
+      bottomNavigationBar: Container(
+        height: 70,
+        decoration: const BoxDecoration(
+          border: Border(
+            top: BorderSide(width: 1.0, color: Colors.white),
           ),
-        ],
-      )
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => pantalla_principal()),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
+              child: const Column(
+                children: [
+                  SizedBox(height: 8),
+                  Icon(Icons.house_outlined, color: Colors.grey, size: 37.0),
+                  Text(
+                    'Inicio',
+                    style: TextStyle(color: Colors.white, fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => pantalla_buscar()),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
+              child: const Column(
+                children: [
+                  SizedBox(height: 8),
+                  Icon(Icons.question_mark_outlined, color: Colors.grey, size: 37.0),
+                  Text(
+                    'Buscar',
+                    style: TextStyle(color: Colors.white, fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => pantalla_biblioteca()),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
+              child: const Column(
+                children: [
+                  SizedBox(height: 8),
+                  Icon(Icons.library_books_rounded, color: Colors.grey, size: 37.0),
+                  Text(
+                    'Biblioteca',
+                    style: TextStyle(color: Colors.white, fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => pantalla_salas()),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
+              child: const Column(
+                children: [
+                  SizedBox(height: 8),
+                  Icon(Icons.chat_bubble_rounded, color: Colors.grey, size: 37.0),
+                  Text(
+                    'Salas',
+                    style: TextStyle(color: Colors.white, fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
+
+
 
   Widget buildOption(String title) {
     return Column(
@@ -494,7 +718,7 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
       children: [
         Text(
           title,
-          style: TextStyle(color: Colors.white, fontSize: 18),
+          style: const TextStyle(color: Colors.white, fontSize: 18),
         ),
       ],
     );
@@ -502,13 +726,13 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
 
   Widget buildTopButton(BuildContext context, String title, Widget screen) {
     return Container(
-      margin: EdgeInsets.all(4),
+      margin: const EdgeInsets.all(4),
       child: ElevatedButton(
         onPressed: () {
-          /*Navigator.push(
+          Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => reproductor()),
-          );*/
+            MaterialPageRoute(builder: (context) => screen),
+          );
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.grey,
@@ -518,7 +742,7 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
         ),
         child: Text(
           title,
-          style: TextStyle(color: Colors.white),
+          style: const TextStyle(color: Colors.white),
         ),
       ),
     );

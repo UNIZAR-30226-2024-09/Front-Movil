@@ -4,9 +4,27 @@ import 'package:flutter/material.dart';
 import 'biblioteca.dart';
 import 'buscar.dart';
 import 'chatSalaDisponible.dart';
-
+import 'env.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+
+Route _createRoute() {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) =>
+        pantalla_opciones(),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      const begin = Offset(-1.0, 0.0);
+      const end = Offset.zero;
+      const curve = Curves.ease;
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
+}
 
 class clasico extends StatefulWidget {
   @override
@@ -25,7 +43,7 @@ class _clasico_State extends State<clasico> {
   Future<void> filtrarCanciones() async {
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.56.1:8000/filtrarCancionesPorGenero/'),
+        Uri.parse('${Env.URL_PREFIX}filtrarCancionesPorGenero/'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
@@ -61,18 +79,24 @@ class _clasico_State extends State<clasico> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: Row(
+        leading: TextButton(
+            child: const CircleAvatar(
+              child: Icon(Icons.person_rounded, color: Colors.white,),
+            ),
+            onPressed: () {
+              Navigator.of(context).push(_createRoute());
+            }
+        ),
+        title: const Row(
           children: [
-            SizedBox(width: 10),
-            Icon(Icons.account_circle, color: Colors.white, size: 30), // Icono redondeado de la foto de perfil
-            SizedBox(width: 10),
-            Text('Buscar clásico', style: TextStyle(color: Colors.white)),
+            Text('Buscar rap', style: TextStyle(color: Colors.white)),
           ],
         ),
         backgroundColor: Colors.black,
         automaticallyImplyLeading: false, // Eliminar el botón de retroceso predeterminado
       ),
-      body: ListView.builder(
+      body: canciones.isEmpty
+          ? const Center(child: const CircularProgressIndicator()): ListView.builder(
         itemCount: canciones.length,
         itemBuilder: (context, index) {
           return ListTile(

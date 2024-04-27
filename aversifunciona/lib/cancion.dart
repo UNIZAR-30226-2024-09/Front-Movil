@@ -1,21 +1,41 @@
-//Creating a class user to store the data;
 import 'package:flutter/material.dart';
 
 class Cancion {
-  final String nombre;
-  final String miAlbum;
-  final int puntuacion;
-  final int numPuntuaciones;
-  final List<int> archivo_mp3;
+  final int? id;
+  final String? nombre;
+  final int? miAlbum;
+  final int? puntuacion;
+  final String? archivomp3;
   final String foto;
 
 
   const Cancion({
+    required this.id,
     required this.nombre,
     required this.miAlbum,
     required this.puntuacion,
-    required this.numPuntuaciones,
-    required this.archivo_mp3,
+    required this.archivomp3,
+
     required this.foto
   });
+
+  factory Cancion.fromJson(Map<String, dynamic> json) {
+    if (json.containsKey('id') &&
+        json.containsKey('nombre') &&
+        json.containsKey('miAlbum') &&
+        json.containsKey('puntuacion') &&
+        json.containsKey('archivoMp3') &&
+        json.containsKey('foto')) {
+      return Cancion(
+        id: json['id'] as int?,
+        nombre: json['nombre'] as String?,
+        miAlbum: json['miAlbum'] as int?,
+        puntuacion: json['puntuacion'] as int?,
+        archivomp3: json['archivoMp3'] as String?,
+        foto: json['foto'] as String,
+      );
+    } else {
+      throw const FormatException('Failed to load album.');
+    }
+  }
 }
