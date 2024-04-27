@@ -1,5 +1,7 @@
 import 'package:aversifunciona/registro4.dart';
+import 'package:aversifunciona/sesionManager.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Registro1 extends StatelessWidget {
   final _correo = TextEditingController();
@@ -7,6 +9,8 @@ class Registro1 extends StatelessWidget {
   final _fecha = TextEditingController();
   final _pais = TextEditingController();
   bool visible = false;
+
+
 
   String obtenerCorreoDesdeRegistro1() {
     return _correo.text;

@@ -1,7 +1,8 @@
+import 'package:aversifunciona/getUserSession.dart';
 import 'package:flutter/material.dart';
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 class reportarProblema extends StatelessWidget {
   final TextEditingController _problemController = TextEditingController();
 
@@ -85,11 +86,33 @@ class reportarProblema extends StatelessWidget {
             ),
             SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () {
-                // Lógica para enviar el reporte del problema
+              onPressed: () async {
+                String problemType = ''; // Variable para almacenar el tipo de problema seleccionado
                 String problemDescription = _problemController.text;
-                // Aquí puedes realizar la acción necesaria, como enviar el reporte a través de una API
-                // Por ahora, simplemente mostraremos un diálogo de confirmación
+
+                // Lógica para obtener el tipo de problema seleccionado
+                // Asumo que has definido una variable para almacenar el tipo de problema seleccionado
+                // Por ejemplo, puedes hacerlo en el onChanged del DropdownButton
+
+                // Configuración del servidor SMTP para enviar el correo
+                final smtpServer = gmail(await getUserEmail() ?? 'correo_por_defecto', await getUserPassword() ?? 'contrasena_por_defecto');
+
+                // Creación del mensaje de correo electrónico
+                final message = Message()
+                  ..from = Address(await getUserEmail() ?? 'correo_por_defecto', 'Tu Nombre')
+                  ..recipients.add('musify@gmail.com') // Correo de destino
+                  ..subject = 'Reporte de problema en Musify'
+                  ..text = 'Tipo de problema: $problemType\n\nDescripción del problema:\n$problemDescription';
+
+                try {
+                  // Envío del correo electrónico
+                  final sendReport = await send(message, smtpServer);
+                  print('Reporte enviado: $sendReport');
+                } catch (e) {
+                  print('Error al enviar el reporte: $e');
+                }
+
+                // Mostrar el diálogo de confirmación
                 showDialog(
                   context: context,
                   builder: (context) => AlertDialog(
@@ -108,6 +131,7 @@ class reportarProblema extends StatelessWidget {
               },
               child: Text('Enviar', style: TextStyle(color: Colors.white)),
             ),
+
           ],
         ),
       ),

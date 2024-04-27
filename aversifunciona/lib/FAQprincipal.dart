@@ -15,7 +15,7 @@ class FAQprincipal extends StatelessWidget {
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.blue,
-            padding: EdgeInsets.symmetric(vertical: 15),
+            padding: const EdgeInsets.symmetric(vertical: 15),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
             ),
@@ -35,15 +35,15 @@ class MainScreen extends StatelessWidget {
         title: Row(
           children: [
             IconButton(
-              icon: Icon(Icons.arrow_back, color: Colors.white),
+              icon: const Icon(Icons.arrow_back, color: Colors.white),
               onPressed: () {
                 Navigator.pop(context);
               },
             ),
-            SizedBox(width: 10),
-            Icon(Icons.account_circle, color: Colors.white, size: 30), // Icono redondeado de la foto de perfil
-            SizedBox(width: 10),
-            Text('Ayuda con la cuenta', style: TextStyle(color: Colors.white)),
+            const SizedBox(width: 10),
+            const Icon(Icons.account_circle, color: Colors.white, size: 30), // Icono redondeado de la foto de perfil
+            const SizedBox(width: 10),
+            const Text('Ayuda con la cuenta', style: TextStyle(color: Colors.white)),
           ],
         ),
         backgroundColor: Colors.black,
@@ -54,7 +54,7 @@ class MainScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
             RoundedButton(
               title: 'Ayuda con la cuenta',
               onPressed: () {
@@ -64,7 +64,7 @@ class MainScreen extends StatelessWidget {
                 );
               },
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             RoundedButton(
               title: 'Ayuda con la aplicación',
               onPressed: () {
@@ -74,7 +74,7 @@ class MainScreen extends StatelessWidget {
                 );
               },
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             RoundedButton(
               title: 'Seguridad y privacidad',
               onPressed: () {
@@ -84,7 +84,7 @@ class MainScreen extends StatelessWidget {
                 );
               },
             ),
-            Spacer(), // Espacio flexible para empujar los botones hacia abajo
+            const Spacer(), // Espacio flexible para empujar los botones hacia abajo
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 10.0),
               child: Row(
@@ -97,7 +97,7 @@ class MainScreen extends StatelessWidget {
                         MaterialPageRoute(builder: (context) => FAQprincipal()),
                       );
                     },
-                    child: Text('Preguntas FAQ'),
+                    child: const Text('Preguntas FAQ'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.transparent,
                       foregroundColor: Colors.white,
@@ -140,7 +140,7 @@ class RoundedButton extends StatelessWidget {
       onPressed: onPressed,
       child: Text(
         title,
-        style: TextStyle(fontSize: 18, color: Colors.white),
+        style: const TextStyle(fontSize: 18, color: Colors.white),
       ),
     );
   }

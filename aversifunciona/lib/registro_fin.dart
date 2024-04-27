@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:aversifunciona/pantalla_principal.dart';
 import 'package:aversifunciona/registroValido.dart';
+import 'package:aversifunciona/sesionManager.dart';
 import 'package:flutter/material.dart';
 import 'env.dart';
 import 'registro4.dart';
@@ -162,6 +163,7 @@ class _Registro_finState extends State<Registro_fin> {
                     Future<bool> registroExitoso = registroValido(nombre, correo, contrasegna, fecha, pais, genero, _politicaPrivacidadAceptada);
 
                     if (registroExitoso == true) {
+                      SessionManager.saveUserSession(email: correo, password: contrasegna, fecha: fecha, pais: pais, genero: genero, nombre: nombre);
                       // Si el registro es exitoso, puedes navegar a la siguiente pantalla
                       Navigator.push(
                         context,
