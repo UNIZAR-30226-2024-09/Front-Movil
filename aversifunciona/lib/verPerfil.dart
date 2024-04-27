@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:aversifunciona/getUserSession.dart';
 import 'package:flutter/material.dart';
 
 import 'EditarContrasena.dart';
@@ -8,7 +11,47 @@ import 'EditarPais.dart';
 import 'EditarSexo.dart';
 
 
-class verPerfil extends StatelessWidget {
+class verPerfil extends StatefulWidget {
+  @override
+  _verPerfilState createState() => _verPerfilState();
+}
+
+class _verPerfilState extends State<verPerfil> {
+
+  String _username = '';
+  String _email = '';
+  String _nacimiento = '';
+  String _sexo = '';
+  String _pais = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _getUserInfo();
+  }
+
+  Future<void> _getUserInfo() async {
+    try {
+      String? token = await getUserSession.getToken(); // Espera a que el token se resuelva
+      print("Token: $token");
+      if (token != null) {
+        // Llama al método AuthService para obtener la información del usuario
+        Map<String, dynamic> userInfo = await getUserSession.getUserInfo(token);
+        setState(() {
+          _username = userInfo['nombre'];
+          _email = userInfo['correo'];
+          _nacimiento = userInfo['nacimiento'];
+          _sexo = userInfo['sexo'];
+          _pais = userInfo['pais'];
+        });
+      } else {
+        print('Token is null');
+      }
+    } catch (e) {
+      print('Error fetching user info: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,13 +79,13 @@ class verPerfil extends StatelessWidget {
             ),
           ),
           // Opciones para editar
-          buildProfileItem(context, 'Nombre de usuario', 'Sinnuvva', EditarNombreUsuario()),
+          buildProfileItem(context, 'Nombre de usuario', _username, EditarNombreUsuario()),
           buildProfileItem(context, 'Contraseña', '************', EditarContrasena()),
           // Agrega más opciones aquí según sea necesario
-          buildProfileItem(context, 'Fecha de nacimiento', '19/02/2002', EditarFechaNacimiento()),
-          buildProfileItem(context, 'Correo electrónico', 'sinnuvva@gmail.com', EditarCorreo()),
-          buildProfileItem(context, 'Sexo', 'Femenino', EditarSexo()),
-          buildProfileItem(context, 'País o región', 'España', EditarPais()),
+          buildProfileItem(context, 'Fecha de nacimiento', _nacimiento, EditarFechaNacimiento()),
+          buildProfileItem(context, 'Correo electrónico', _email, EditarCorreo()),
+          buildProfileItem(context, 'Sexo', _sexo, EditarSexo()),
+          buildProfileItem(context, 'País o región', _pais, EditarPais()),
         ],
       ),
     );
@@ -67,5 +110,7 @@ class verPerfil extends StatelessWidget {
       },
     );
   }
+
+
 }
 

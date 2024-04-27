@@ -16,13 +16,13 @@ class _EditarNombreUsuarioState extends State<EditarNombreUsuario> {
 
   Future<bool> actualizarNombreUsuario(String nuevoNombreUsuario) async {
     try {
-      final response = await http.put(
-        Uri.parse("${Env.URL_PREFIX}/actualizarNombreUsuario/"),
+      final response = await http.post(
+        Uri.parse("http://192.168.56.1:8000/actualizarUsuario/"),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8'
         },
         body: jsonEncode(<String, dynamic>{
-          'nuevoNombreUsuario': nuevoNombreUsuario,
+          'nombre': nuevoNombreUsuario,
         }),
       );
 
@@ -63,13 +63,23 @@ class _EditarNombreUsuarioState extends State<EditarNombreUsuario> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   ElevatedButton(
-                    onPressed: () {
-                      String nuevoPais = _nuevoNombreUsuarioController.text;
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => verPerfil()), // Reemplazar 'NuevaPantalla' con el nombre de tu nueva pantalla
-                      );
+                    onPressed: () async {
+                      String nuevoNombreUsuario = _nuevoNombreUsuarioController.text;
 
+                      // Enviar la solicitud para actualizar el nombre de usuario
+                      bool success = await actualizarNombreUsuario(nuevoNombreUsuario);
+                      /*
+                      String nuevoPais = _nuevoNombreUsuarioController.text;
+                       */
+                      if (success) {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) =>
+                              verPerfil()), // Reemplazar 'NuevaPantalla' con el nombre de tu nueva pantalla
+                        );
+                      } else {
+                        print('Error al actualizar el nombre de usuario');
+                      }
                     },
                     child: Text('Aceptar'),
                   ),

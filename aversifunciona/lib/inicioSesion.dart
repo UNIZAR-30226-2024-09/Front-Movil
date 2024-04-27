@@ -1,12 +1,11 @@
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'env.dart';
 
 import 'package:aversifunciona/pantalla_principal.dart';
-import 'userPassword.dart';
+import 'package:aversifunciona/getUserSession.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -18,7 +17,7 @@ class InicioSesion extends StatelessWidget {
   Future<bool> loginValido(String correo, String contrasegna) async {
     try{
       final response = await http.post(
-        Uri.parse("${Env.URL_PREFIX}/iniciarSesion/"),
+        Uri.parse("http://192.168.56.1:8000/iniciarSesion/"),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8'
         },
@@ -32,6 +31,9 @@ class InicioSesion extends StatelessWidget {
       if (response.statusCode == 200) {
         debugPrint("Paula");
         // Si la solicitud es exitosa, retornar verdadero
+        Map<String, dynamic> data = jsonDecode(response.body);
+        String token = data['token'];
+        await getUserSession.saveToken(token);
         return true;
       } else {
         // Si la solicitud no es exitosa, retornar falso
