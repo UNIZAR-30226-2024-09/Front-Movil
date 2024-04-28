@@ -4,12 +4,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
 class getUserSession {
-  Future<String?> getUserEmail() async {
+  static Future<String?> getUserEmail() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString('userEmail');
   }
 
-  Future<String?> getUserPassword() async {
+  static Future<String?> getUserPassword() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString('userPassword');
   }

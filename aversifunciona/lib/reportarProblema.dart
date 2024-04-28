@@ -95,11 +95,11 @@ class reportarProblema extends StatelessWidget {
                 // Por ejemplo, puedes hacerlo en el onChanged del DropdownButton
 
                 // Configuración del servidor SMTP para enviar el correo
-                final smtpServer = gmail(await getUserEmail() ?? 'correo_por_defecto', await getUserPassword() ?? 'contrasena_por_defecto');
+                final smtpServer = gmail(await getUserSession.getUserEmail() ?? 'correo_por_defecto', await getUserSession.getUserPassword() ?? 'contrasena_por_defecto');
 
                 // Creación del mensaje de correo electrónico
                 final message = Message()
-                  ..from = Address(await getUserEmail() ?? 'correo_por_defecto', 'Tu Nombre')
+                  ..from = Address(await getUserSession.getUserEmail() ?? 'correo_por_defecto', 'Tu Nombre')
                   ..recipients.add('musify@gmail.com') // Correo de destino
                   ..subject = 'Reporte de problema en Musify'
                   ..text = 'Tipo de problema: $problemType\n\nDescripción del problema:\n$problemDescription';
