@@ -1,10 +1,122 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
 import 'package:aversifunciona/getUserSession.dart';
 import 'package:flutter/material.dart';
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-class reportarProblema extends StatelessWidget {
+class reportarProblema extends StatefulWidget {
+  @override
+  _reportarProblema createState() => _reportarProblema();
+}
+
+class _reportarProblema extends State<reportarProblema> {
+  String _tipoProblema = '';
+  String _descripcion = '';
+  Map<String, dynamic> _user = {};
+
   final TextEditingController _problemController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserDetails();
+  }
+
+
+  Future<void> _fetchUserDetails() async {
+    final token = getUserSession.getToken();
+    final url = 'http://127.0.0.1:8000/obtenerUsuarioSesionAPI/';
+
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({'token': token}),
+      );
+      final data = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        setState(() {
+          _user = data;
+        });
+      } else {
+        print('Failed to fetch user details: $data');
+      }
+    } catch (error) {
+      print('Error fetching user details: $error');
+    }
+  }
+
+
+  Future<void> _enviarReporte() async {
+    if (_user['correo'] == null) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Usuario no identificado'),
+          content: Text('Asegúrate de haber iniciado sesión.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
+    final url = 'http://localhost:8000/reporteAPI/';
+    final body = jsonEncode({
+      'correo': _user['correo'],
+      'mensaje': 'Tipo de problema: $_tipoProblema, Descripción: $_descripcion',
+    });
+
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'accept': 'application/json',
+        },
+        body: body,
+      );
+      final data = jsonDecode(response.body);
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Mensaje del servidor'),
+          content: Text(data['message']), 
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      );
+    } catch (error) {
+      print('Error al enviar el reporte: $error');
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Error'),
+          content: Text('Error al enviar el reporte.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -64,8 +176,10 @@ class reportarProblema extends StatelessWidget {
 
               ],
               onChanged: (value) {
-                // Aquí puedes manejar la selección del tipo de problema
-                // Por ejemplo, podrías almacenar el valor seleccionado en una variable
+                setState(() {
+                  _tipoProblema = value ?? '';
+                });
+
               },
             ),
             SizedBox(height: 20), // Espacio entre el desplegable y el campo de texto de descripción
@@ -87,30 +201,12 @@ class reportarProblema extends StatelessWidget {
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () async {
-                String problemType = ''; // Variable para almacenar el tipo de problema seleccionado
                 String problemDescription = _problemController.text;
 
-                // Lógica para obtener el tipo de problema seleccionado
-                // Asumo que has definido una variable para almacenar el tipo de problema seleccionado
-                // Por ejemplo, puedes hacerlo en el onChanged del DropdownButton
-
-                // Configuración del servidor SMTP para enviar el correo
-                final smtpServer = gmail(await getUserSession.getUserEmail() ?? 'correo_por_defecto', await getUserSession.getUserPassword() ?? 'contrasena_por_defecto');
-
-                // Creación del mensaje de correo electrónico
-                final message = Message()
-                  ..from = Address(await getUserSession.getUserEmail() ?? 'correo_por_defecto', 'Tu Nombre')
-                  ..recipients.add('musify@gmail.com') // Correo de destino
-                  ..subject = 'Reporte de problema en Musify'
-                  ..text = 'Tipo de problema: $problemType\n\nDescripción del problema:\n$problemDescription';
-
-                try {
-                  // Envío del correo electrónico
-                  final sendReport = await send(message, smtpServer);
-                  print('Reporte enviado: $sendReport');
-                } catch (e) {
-                  print('Error al enviar el reporte: $e');
-                }
+                setState(() {
+                  _descripcion = problemDescription;
+                });
+                _enviarReporte();
 
                 // Mostrar el diálogo de confirmación
                 showDialog(
