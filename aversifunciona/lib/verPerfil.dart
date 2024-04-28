@@ -63,12 +63,6 @@ class _verPerfilState extends State<verPerfil> {
           'Content-Type': 'application/json; charset=UTF-8'
         },
         body: jsonEncode(<String, dynamic>{
-          // Aquí envía los datos que deseas actualizar, por ejemplo:
-          // 'nombre': _nuevoNombreUsuarioController.text,
-          // 'contrasena': _nuevaContrasenaController.text,
-          // 'fecha_nacimiento': _nuevaFechaNacimientoController.text,
-          // 'correo': _nuevoCorreoController.text,
-          // Y así sucesivamente para cada campo que desees actualizar
           'correo': _correoS,
           'nombre': nombre.text,
           'sexo': sexo.text,
@@ -130,8 +124,6 @@ class _verPerfilState extends State<verPerfil> {
           ),
           // Opciones para editar
 
-          //buildProfileItem(context, 'Nombre de usuario', _username, EditarNombreUsuario()),
-          //TextEditingController _controller = TextEditingController(text: value);
           ListTile(
             title: Text(
               'Nombre de usuario',
@@ -141,16 +133,8 @@ class _verPerfilState extends State<verPerfil> {
               controller: _nombre,
               style: TextStyle(color: Colors.grey),
             ),
-            /*trailing: Icon(Icons.edit, color: Colors.white),
-            onTap: () {
-                Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => editScreen),
-                );
-              },*/
-            ),
+          ),
 
-          //buildProfileItem(context, 'Contraseña', '', EditarContrasena()),
             ListTile(
               title: Text(
                 'Contraseña',
@@ -162,7 +146,6 @@ class _verPerfilState extends State<verPerfil> {
               ),
             ),
 
-          //buildProfileItem(context, 'Fecha de nacimiento', _nacimientoS, EditarFechaNacimiento()),
           ListTile(
             title: Text(
               'Fecha de nacimiento',
@@ -174,7 +157,6 @@ class _verPerfilState extends State<verPerfil> {
             ),
           ),
 
-          //buildProfileItem(context, 'Correo electrónico', _correoS, EditarCorreo()),
           ListTile(
             title: Text(
               'Correo electrónico',
@@ -186,7 +168,6 @@ class _verPerfilState extends State<verPerfil> {
             ),
           ),
 
-          //buildProfileItem(context, 'Sexo', _sexoS, EditarSexo()),
           ListTile(
             title: Text(
               'Sexo',
@@ -198,7 +179,6 @@ class _verPerfilState extends State<verPerfil> {
             ),
           ),
 
-          //buildProfileItem(context, 'País o región', _paisS, EditarPais()),
           ListTile(
             title: Text(
               'País o región',
@@ -217,6 +197,7 @@ class _verPerfilState extends State<verPerfil> {
               ElevatedButton(
                 onPressed: () {
                   // Lógica para cancelar los cambios
+                  _getUserInfo(); // Recargar la información del usuario
                 },
                 child: Text('Cancelar'),
               ),
@@ -250,32 +231,5 @@ class _verPerfilState extends State<verPerfil> {
       ),
     );
   }
-
-  /*
-  Widget buildProfileItem(BuildContext context, String label, String value, Widget editScreen) {
-    TextEditingController _controller = TextEditingController(text: value);
-    return ListTile(
-      title: Text(
-        label,
-        style: TextStyle(color: Colors.white),
-      ),
-      subtitle: TextField(
-        controller: _controller,
-        //decoration: InputDecoration(
-          //labelText: value,
-        //),
-        //value,
-        style: TextStyle(color: Colors.grey),
-      ),
-      trailing: Icon(Icons.edit, color: Colors.white),
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => editScreen),
-        );
-      },
-    );
-  }
-*/
 }
 

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:aversifunciona/biblioteca.dart';
 import 'package:aversifunciona/pantalla_principal.dart';
 import 'package:aversifunciona/pop.dart';
@@ -5,9 +7,11 @@ import 'package:aversifunciona/reggaeton.dart';
 import 'package:aversifunciona/rock.dart';
 import 'package:flutter/material.dart';
 import 'package:aversifunciona/salas.dart';
+import 'package:http/http.dart' as http;
 import 'clasico.dart';
 import 'electro.dart';
 import 'rap.dart';
+import 'env.dart';
 
 
 class HistorialItem {
@@ -24,7 +28,7 @@ class pantalla_buscar extends StatefulWidget {
 
 class _pantalla_buscarState extends State<pantalla_buscar> {
   List<HistorialItem> elHistorial = [];
-  List<String> resultados = []; // Lista para almacenar los resultados de la búsqueda
+  List<dynamic> resultados = []; // Lista para almacenar los resultados de la búsqueda
   TextEditingController _searchController = TextEditingController();
 
   @override
@@ -63,6 +67,36 @@ class _pantalla_buscarState extends State<pantalla_buscar> {
     });
   }
 
+  Future<void> buscar(String query) async {
+    try {
+      final response = await http.post(
+        Uri.parse('${Env.URL_PREFIX}/buscar/'), // Reemplaza con la URL de tu API de búsqueda
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8'
+        },
+        body: jsonEncode(<String, dynamic>{
+          'nombre': query,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        // Procesar la respuesta de la API y mostrar los resultados
+        //List<dynamic> resultados = jsonDecode(response.body);
+        setState(() {
+          resultados = jsonDecode(response.body);
+        });
+        // Aquí puedes mostrar los resultados en tu aplicación de acuerdo a tus necesidades
+        print('Resultados de la búsqueda: $resultados');
+      } else {
+        // Mostrar un mensaje de error si la solicitud no fue exitosa
+        print('Error al realizar la búsqueda');
+      }
+    } catch (e) {
+      // Manejar cualquier error que ocurra durante la búsqueda
+      print("Error al realizar la búsqueda: $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -97,8 +131,25 @@ class _pantalla_buscarState extends State<pantalla_buscar> {
                     borderSide: BorderSide.none,
                   ),
                 ),
+                onSubmitted: (query) {
+                  buscar(query);
+                },
               ),
             ),
+            if (resultados.isNotEmpty)
+              Expanded(
+                child: ListView.builder(
+                  itemCount: resultados.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    // Construir cada elemento de la lista de resultados
+                    // Aquí puedes decidir cómo mostrar cada resultado en la lista
+                    // Por ejemplo, puedes mostrar el título y el artista de una canción
+                    return ListTile(
+                      title: Text(resultados[index]['nombre'], style: TextStyle(color: Colors.white, fontSize: 12),),
+                    );
+                  },
+                ),
+              ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

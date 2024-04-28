@@ -89,7 +89,7 @@ class _rock_State extends State<rock> {
         ),
         title: const Row(
           children: [
-            Text('Buscar rap', style: TextStyle(color: Colors.white)),
+            Text('Buscar rock', style: TextStyle(color: Colors.white)),
           ],
         ),
         backgroundColor: Colors.black,
