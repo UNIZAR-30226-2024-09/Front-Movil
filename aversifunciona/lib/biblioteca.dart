@@ -3,10 +3,28 @@ import 'package:aversifunciona/pantalla_principal.dart';
 import 'package:aversifunciona/salas.dart';
 import 'package:flutter/material.dart';
 import 'package:aversifunciona/verPerfil.dart';
-
-import 'configuracion.dart';
 import 'historial.dart';
+import 'verPerfil.dart';
+import 'configuracion.dart';
 import 'buscar.dart';
+
+Route _createRoute() {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) =>
+        pantalla_opciones(),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      const begin = Offset(-1.0, 0.0);
+      const end = Offset.zero;
+      const curve = Curves.ease;
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
+}
 
 class pantalla_biblioteca extends StatelessWidget {
   @override
@@ -17,53 +35,13 @@ class pantalla_biblioteca extends StatelessWidget {
 
         backgroundColor: Colors.black,
 
-          leading: PopupMenuButton<String>(
-            icon: CircleAvatar(
-              backgroundImage: AssetImage('tu_ruta_de_imagen'),
-            ),
-            onSelected: (value) {
-              // Manejar la selección del desplegable
-              if (value == 'verPerfil') {
-                // Navegar a la pantalla "verPerfil"
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => verPerfil()),
-                );
-              } else if (value == 'historial') {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => historial()),
-                );
-              } else if (value == 'configuracion') {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => configuracion()),
-                );
+          leading: TextButton(
+              child: const CircleAvatar(
+                child: Icon(Icons.person_rounded, color: Colors.white,),
+              ),
+              onPressed: () {
+                Navigator.of(context).push(_createRoute());
               }
-            },
-            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-              const PopupMenuItem<String>(
-                value: 'verPerfil',
-                child: ListTile(
-                  leading: Icon(Icons.person),
-                  title: Text('Ver Perfil'),
-                ),
-              ),
-              const PopupMenuItem<String>(
-                value: 'historial',
-                child: ListTile(
-                  leading: Icon(Icons.history),
-                  title: Text('Historial'),
-                ),
-              ),
-              const PopupMenuItem<String>(
-                value: 'configuracion',
-                child: ListTile(
-                  leading: Icon(Icons.settings),
-                  title: Text('Configuración y Privacidad'),
-                ),
-              ),
-            ],
           ),
         title: const Text(
           'Tu biblioteca',

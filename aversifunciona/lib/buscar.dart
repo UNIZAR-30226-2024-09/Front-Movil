@@ -9,6 +9,27 @@ import 'clasico.dart';
 import 'electro.dart';
 import 'rap.dart';
 
+import 'historial.dart';
+import 'verPerfil.dart';
+import 'configuracion.dart';
+
+Route _createRoute() {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) =>
+        pantalla_opciones(),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      const begin = Offset(-1.0, 0.0);
+      const end = Offset.zero;
+      const curve = Curves.ease;
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
+}
 
 class HistorialItem {
   final String term;
@@ -68,15 +89,22 @@ class _pantalla_buscarState extends State<pantalla_buscar> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: Row(
+        backgroundColor: Colors.black,
+        leading: TextButton(
+
+          child: const CircleAvatar(
+            child: Icon(Icons.person_rounded, color: Colors.white,),
+          ),
+          onPressed: () {
+              Navigator.of(context).push(_createRoute());
+          }
+        ),
+        title: const Row(
           children: [
-            SizedBox(width: 10),
-            Icon(Icons.account_circle, color: Colors.white, size: 30), // Icono redondeado de la foto de perfil
-            SizedBox(width: 10),
             Text('Buscar', style: TextStyle(color: Colors.white)),
           ],
         ),
-        backgroundColor: Colors.black,
+
         automaticallyImplyLeading: false, // Eliminar el botón de retroceso predeterminado
       ),
       body: SingleChildScrollView(
