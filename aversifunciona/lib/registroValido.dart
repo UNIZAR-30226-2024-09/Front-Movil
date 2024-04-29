@@ -3,7 +3,7 @@ import 'dart:convert';
 
 import 'env.dart';
 
-Future<bool> registroValido(String nombre, String correo, String contrasegna, String fecha, String pais, String genero, bool politicaAceptada) async {
+Future<bool> registroValido(String nombre, String correo, String contrasegna, String fecha, String pais, String genero) async {
   try {
     final response = await http.post(
       Uri.parse("${Env.URL_PREFIX}/registro/"), // Ajusta la URL según tu API
@@ -11,12 +11,12 @@ Future<bool> registroValido(String nombre, String correo, String contrasegna, St
         'Content-Type': 'application/json; charset=UTF-8'
       },
       body: jsonEncode(<String, dynamic>{
-        'nombre': nombre,
         'correo': correo,
-        'contrasegna': contrasegna,
-        'fecha': fecha,
+        'nombre': nombre,
+        'sexo': genero,
+        'nacimiento': fecha,
+        'contrasgena': contrasegna,
         'pais': pais,
-        'genero': genero
       }),
     );
 

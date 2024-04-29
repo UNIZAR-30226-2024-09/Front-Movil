@@ -78,7 +78,7 @@ class Registro1 extends StatelessWidget {
                     children: [
                       const SizedBox(height: 10),
 
-                      // Campo de Correo Electrónico
+                      // Campo de Contraseña
                       InputField(
                         controller: _contrasegna,
                         hintText: 'Contraseña',
@@ -94,7 +94,7 @@ class Registro1 extends StatelessWidget {
                   children: [
                     const SizedBox(height: 10),
 
-                    // Campo de Correo Electrónico
+                    // Campo de Fecha de nacimiento
                     InputField(
                       controller: _fecha,
                       hintText: 'Fecha de nacimiento',
@@ -110,7 +110,7 @@ class Registro1 extends StatelessWidget {
                   children: [
                     const SizedBox(height: 10),
 
-                    // Campo de Correo Electrónico
+                    // Campo de País de nacimiento
                     InputField(
                       controller: _pais,
                       hintText: 'Pais de nacimiento',

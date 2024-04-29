@@ -1,12 +1,12 @@
 import 'dart:convert';
 
 import 'package:aversifunciona/pantalla_principal.dart';
-import 'package:aversifunciona/registroValido.dart';
+//import 'package:aversifunciona/registroValido.dart';
 import 'package:aversifunciona/sesionManager.dart';
 import 'package:flutter/material.dart';
 import 'env.dart';
 import 'registro4.dart';
-import 'registro1.dart';
+import 'package:aversifunciona/registro1.dart';
 import 'package:http/http.dart' as http;
 
 class Registro_fin extends StatefulWidget {
@@ -20,6 +20,8 @@ class Registro_fin extends StatefulWidget {
   final String fecha;
   final String pais;
   final String genero;
+
+
 }
 
 class _Registro_finState extends State<Registro_fin> {
@@ -33,11 +35,46 @@ class _Registro_finState extends State<Registro_fin> {
   final String genero;
 
   final TextEditingController _nombre = TextEditingController();
+  /*
   final TextEditingController _correo = TextEditingController();
-  final TextEditingController _contrasena = TextEditingController();
+  final TextEditingController _contrasegna = TextEditingController();
   final TextEditingController _fecha = TextEditingController();
   final TextEditingController _pais = TextEditingController();
+  */
   bool _politicaPrivacidadAceptada = false;
+
+  Future<bool> registroValido(String nombre, String correo, String contrasegna, String fecha, String pais, String genero) async {
+    print("registrado");
+    try {
+      final response = await http.post(
+        Uri.parse('${Env.URL_PREFIX}/registro/'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, dynamic>{
+          'correo': correo,
+          'nombre': nombre,
+          'sexo': genero,
+          'nacimiento': fecha,
+          'contrasgena': contrasegna,
+          'pais': pais,
+          //'politicaPrivacidadAceptada': politicaPrivacidadAceptada,
+        }),
+      );
+      if (response.statusCode == 200) {
+        // Si la solicitud fue exitosa, puedes procesar la respuesta aquí si es necesario
+        return true;
+      } else {
+        // Si la solicitud no fue exitosa, puedes manejar el error aquí
+        print('Error al registrar usuario: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      // Si ocurrió un error durante la solicitud, puedes manejarlo aquí
+      print('Error al registrar usuario: $e');
+      return false;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -159,8 +196,10 @@ class _Registro_finState extends State<Registro_fin> {
                   }
                   else{
                     String nombre = _nombre.text;
+                    print(nombre + ' ' + correo + ' ' + contrasegna + ' ' + fecha + ' ' + pais + ' ' + genero + ' ');
                     // Verificar si se ha aceptado la política de privacidad
-                    Future<bool> registroExitoso = registroValido(nombre, correo, contrasegna, fecha, pais, genero, _politicaPrivacidadAceptada);
+                    //Future<bool> registroExitoso = registroValido(nombre, correo, contrasegna, fecha, pais, genero);
+                    Future<bool> registroExitoso = registroValido(nombre, correo, contrasegna, fecha, pais, genero);
 
                     if (registroExitoso == true) {
                       SessionManager.saveUserSession(email: correo, password: contrasegna, fecha: fecha, pais: pais, genero: genero, nombre: nombre);
