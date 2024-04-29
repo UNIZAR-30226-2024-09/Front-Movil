@@ -33,6 +33,8 @@ class _Registro_finState extends State<Registro_fin> {
   final String fecha;
   final String pais;
   final String genero;
+  int responseCode = 0;
+  String responseBody = '';
 
   final TextEditingController _nombre = TextEditingController();
   /*
@@ -42,9 +44,9 @@ class _Registro_finState extends State<Registro_fin> {
   final TextEditingController _pais = TextEditingController();
   */
   bool _politicaPrivacidadAceptada = false;
+  bool _datosPersonalesAceptados = false;
 
   Future<bool> registroValido(String nombre, String correo, String contrasegna, String fecha, String pais, String genero) async {
-    print("registrado");
     try {
       final response = await http.post(
         Uri.parse('${Env.URL_PREFIX}/registro/'),
@@ -56,22 +58,26 @@ class _Registro_finState extends State<Registro_fin> {
           'nombre': nombre,
           'sexo': genero,
           'nacimiento': fecha,
-          'contrasgena': contrasegna,
+          'contrasegna': contrasegna,
           'pais': pais,
           //'politicaPrivacidadAceptada': politicaPrivacidadAceptada,
         }),
       );
       if (response.statusCode == 200) {
         // Si la solicitud fue exitosa, puedes procesar la respuesta aquí si es necesario
+        print("registrado");
         return true;
       } else {
         // Si la solicitud no fue exitosa, puedes manejar el error aquí
-        print('Error al registrar usuario: ${response.statusCode}');
+        print('Else: Error al registrar usuario: ${response.statusCode}');
+        print('${response.body}');
+        responseCode = response.statusCode;
+        responseBody = response.body;
         return false;
       }
     } catch (e) {
       // Si ocurrió un error durante la solicitud, puedes manejarlo aquí
-      print('Error al registrar usuario: $e');
+      print('Catch: Error al registrar usuario: $e');
       return false;
     }
   }
@@ -141,10 +147,27 @@ class _Registro_finState extends State<Registro_fin> {
             const SizedBox(height: 10),
             Column(
               children: [
-                genderOption('Acepto la política de privacidad de Musify'),
-                genderOption('Permito que Musify utilice mis datos personales para fines estadísticos y esas cosas que se dicen'),
+                PrivacyOption(
+                  optionText: 'Acepto la política de privacidad de Musify',
+                  initialValue: _politicaPrivacidadAceptada,
+                  onChanged: (value) {
+                    setState(() {
+                      _politicaPrivacidadAceptada = value;
+                    });
+                  },
+                ),
+                PrivacyOption(
+                  optionText: 'Permito que Musify utilice mis datos personales para fines estadísticos y esas cosas que se dicen',
+                  initialValue: _datosPersonalesAceptados,
+                  onChanged: (value) {
+                    setState(() {
+                      _datosPersonalesAceptados = value;
+                    });
+                  },
+                ),
               ],
             ),
+
 
             const SizedBox(height: 20),
 
@@ -155,7 +178,7 @@ class _Registro_finState extends State<Registro_fin> {
                 text: 'Crear cuenta',
                 backgroundColor: Colors.white,
                 textColor: Colors.black,
-                onPressed: () {
+                onPressed: () async {
                   if (_nombre.text == ''){
                     showDialog(
                       context: context,
@@ -196,13 +219,9 @@ class _Registro_finState extends State<Registro_fin> {
                   }
                   else{
                     String nombre = _nombre.text;
-                    print(nombre + ' ' + correo + ' ' + contrasegna + ' ' + fecha + ' ' + pais + ' ' + genero + ' ');
-                    // Verificar si se ha aceptado la política de privacidad
-                    //Future<bool> registroExitoso = registroValido(nombre, correo, contrasegna, fecha, pais, genero);
                     Future<bool> registroExitoso = registroValido(nombre, correo, contrasegna, fecha, pais, genero);
 
-                    if (registroExitoso == true) {
-                      SessionManager.saveUserSession(email: correo, password: contrasegna, fecha: fecha, pais: pais, genero: genero, nombre: nombre);
+                    if (await registroExitoso) {
                       // Si el registro es exitoso, puedes navegar a la siguiente pantalla
                       Navigator.push(
                         context,
@@ -216,7 +235,7 @@ class _Registro_finState extends State<Registro_fin> {
                         builder: (BuildContext context) {
                           return AlertDialog(
                             title: Text('Error'),
-                            content: Text('El registro no se pudo completar. Por favor, inténtalo de nuevo.'),
+                            content: Text('El registro no se pudo completar.' + responseBody),
                             actions: [
                               TextButton(
                                 onPressed: () {
@@ -239,28 +258,6 @@ class _Registro_finState extends State<Registro_fin> {
         ),
       ),
       )
-    );
-  }
-
-  Widget genderOption(String gender) {
-    return RadioListTile(
-      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      visualDensity: const VisualDensity(
-        horizontal: VisualDensity.minimumDensity,
-        vertical: VisualDensity.minimumDensity,
-      ),
-      title: Text(
-        gender,
-        style: TextStyle(color: Colors.white),
-      ),
-      value: gender,
-      groupValue: null, // No es necesario el groupValue si no se almacena internamente
-      onChanged: (value) {
-        setState(() {
-          _politicaPrivacidadAceptada = true; // Actualizar el género seleccionado
-        });
-      },
-      activeColor: Colors.white,
     );
   }
 }
@@ -344,4 +341,49 @@ class InputField extends StatelessWidget {
     );
   }
 
+}
+
+class PrivacyOption extends StatefulWidget {
+  final String optionText;
+  final bool initialValue;
+  final void Function(bool) onChanged;
+
+  const PrivacyOption({
+    required this.optionText,
+    required this.initialValue,
+    required this.onChanged,
+  });
+
+  @override
+  _PrivacyOptionState createState() => _PrivacyOptionState();
+}
+
+class _PrivacyOptionState extends State<PrivacyOption> {
+  late bool _value;
+
+  @override
+  void initState() {
+    super.initState();
+    _value = widget.initialValue;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return CheckboxListTile(
+      controlAffinity: ListTileControlAffinity.leading,
+      title: Text(
+        widget.optionText,
+        style: TextStyle(color: Colors.white),
+      ),
+      value: _value,
+      onChanged: (value) {
+        setState(() {
+          _value = value ?? false;
+          widget.onChanged(_value);
+        });
+      },
+      activeColor: Colors.white,
+      checkColor: Colors.black,
+    );
+  }
 }
