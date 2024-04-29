@@ -51,6 +51,7 @@ class _pantalla_buscarState extends State<pantalla_buscar> {
   List<HistorialItem> elHistorial = [];
   List<dynamic> resultados = []; // Lista para almacenar los resultados de la búsqueda
   TextEditingController _searchController = TextEditingController();
+  bool mostrarCategorias = true; // Variable para controlar la visibilidad de las categorías
 
   @override
   void initState() {
@@ -68,16 +69,15 @@ class _pantalla_buscarState extends State<pantalla_buscar> {
     String searchTerm = _searchController.text;
     if (searchTerm.isNotEmpty) {
       _agregarAlHistorial(searchTerm);
-      // Lógica para filtrar los resultados según la búsqueda
+      buscar(searchTerm);
+      // Oculta las categorías al realizar la búsqueda
       setState(() {
-        resultados = elHistorial
-            .where((item) => item.term.toLowerCase().contains(searchTerm.toLowerCase()))
-            .map((item) => item.term)
-            .toList();
+        mostrarCategorias = false;
       });
     } else {
       setState(() {
-        resultados.clear(); // Limpiar resultados si la búsqueda está vacía
+        resultados.clear();
+        mostrarCategorias = true; // Muestra las categorías si la búsqueda está vacía
       });
     }
   }
@@ -107,7 +107,7 @@ class _pantalla_buscarState extends State<pantalla_buscar> {
           resultados = jsonDecode(response.body);
         });
         // Aquí puedes mostrar los resultados en tu aplicación de acuerdo a tus necesidades
-        print('Resultados de la búsqueda: $resultados');
+        //print('Resultados de la búsqueda: $resultados');
       } else {
         // Mostrar un mensaje de error si la solicitud no fue exitosa
         print('Error al realizar la búsqueda');
@@ -138,7 +138,6 @@ class _pantalla_buscarState extends State<pantalla_buscar> {
             Text('Buscar', style: TextStyle(color: Colors.white)),
           ],
         ),
-
         automaticallyImplyLeading: false, // Eliminar el botón de retroceso predeterminado
       ),
       body: SingleChildScrollView(
@@ -164,7 +163,7 @@ class _pantalla_buscarState extends State<pantalla_buscar> {
                 },
               ),
             ),
-            if (resultados.isNotEmpty)
+            if (!mostrarCategorias)
               Expanded(
                 child: ListView.builder(
                   itemCount: resultados.length,
@@ -178,48 +177,49 @@ class _pantalla_buscarState extends State<pantalla_buscar> {
                   },
                 ),
               ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text(
-                    'Explorar todo',
-                    style: TextStyle(color: Colors.white, fontSize: 24),
+            if (mostrarCategorias)
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text(
+                      'Explorar todo',
+                      style: TextStyle(color: Colors.white, fontSize: 24),
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      buildTopButton('Rap', Colors.blue.shade400),
-                      buildTopButton('Clásico', Colors.red.shade400),
-                    ],
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        buildTopButton('Rap', Colors.blue.shade400),
+                        buildTopButton('Clásico', Colors.red.shade400),
+                      ],
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      buildTopButton('Electro', Colors.green.shade400),
-                      buildTopButton('Pop', Colors.deepPurple.shade400),
-                    ],
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        buildTopButton('Electro', Colors.green.shade400),
+                        buildTopButton('Pop', Colors.deepPurple.shade400),
+                      ],
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      buildTopButton('Rock', Colors.green.shade900),
-                      buildTopButton('Reggaeton', Colors.yellow.shade400),
-                    ],
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        buildTopButton('Rock', Colors.green.shade900),
+                        buildTopButton('Reggaeton', Colors.yellow.shade400),
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
           ],
         ),
       ),
