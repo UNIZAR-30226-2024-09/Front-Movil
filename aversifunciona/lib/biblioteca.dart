@@ -3,9 +3,9 @@ import 'package:aversifunciona/pantalla_principal.dart';
 import 'package:aversifunciona/salas.dart';
 import 'package:flutter/material.dart';
 import 'package:aversifunciona/verPerfil.dart';
-
-import 'configuracion.dart';
 import 'historial.dart';
+import 'verPerfil.dart';
+import 'configuracion.dart';
 import 'buscar.dart';
 
 Route _createRoute() {
