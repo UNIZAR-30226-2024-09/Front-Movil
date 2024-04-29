@@ -191,14 +191,7 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
           Cancion cancion = Cancion.fromJson(listaCanciones[i]);
           canciones.add(cancion);
         }
-        debugPrint(base64ToImageSrc(canciones[1].foto).toString());
-        debugPrint((canciones[1].foto).toString());
-        if (base64ToImageSrc(canciones[1].foto).toString() == (canciones[1].foto).toString()){
-          print(true);
-        }
-        else{
-          print(false);
-        }
+
         setState(() {});
       } else {
         // If the server did not return a 200 OK response,
