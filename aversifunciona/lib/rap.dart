@@ -1,5 +1,6 @@
 import 'package:aversifunciona/cancion.dart';
 import 'package:aversifunciona/pantalla_principal.dart';
+import 'package:aversifunciona/reproductor.dart';
 import 'package:flutter/material.dart';
 
 import 'biblioteca.dart';
@@ -52,20 +53,22 @@ class _rap_State extends State<rap> {
         body: jsonEncode({'genero': 'Rap'}),
       );
       print('Response: ${response.body}');
+
       if (response.statusCode == 200) {
         Map<String, dynamic> data = jsonDecode(response.body);
         dynamic cancionesData = data['canciones'];
-        if (cancionesData is List<dynamic>) {
-          List<dynamic> nuevasCanciones = List<dynamic>.from(cancionesData);
 
-          // Actualizar el estado con las nuevas canciones
-          setState(() {
-            canciones = nuevasCanciones;
-          });
-        } else {
-          print('Error: El campo canciones no es una lista.');
-          throw Exception('Failed to load songs');
+        List<dynamic> nuevasCanciones = [];
+
+        for (var i = 0; i < cancionesData.length; i++) {
+          Cancion cancion = Cancion.fromJson(cancionesData[i]);
+          nuevasCanciones.add(cancion);
         }
+
+        setState(() {
+          canciones = nuevasCanciones;
+        });
+
       } else {
         // Handle error or unexpected status code
         throw Exception('Failed to load songs');
@@ -99,11 +102,27 @@ class _rap_State extends State<rap> {
         automaticallyImplyLeading: false, // Eliminar el botón de retroceso predeterminado
       ),
       body: canciones.isEmpty
-          ? const Center(child: const CircularProgressIndicator()): ListView.builder(
+          ? const Center(child: CircularProgressIndicator()): ListView.builder(
         itemCount: canciones.length,
         itemBuilder: (context, index) {
           return ListTile(
-            title: Text(canciones[index]['nombre'], style: TextStyle(color: Colors.white, fontSize: 12),),
+            leading: Image.memory(base64Decode(canciones[index].foto), height: 25, width: 25,),
+            title: TextButton(
+              onPressed:() {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => reproductor(cancion: canciones[index])
+                  ),
+                );
+              },
+              child: Row(
+                children: [
+                  Text(canciones[index].nombre, style: const TextStyle(color: Colors.white, fontSize: 14),),
+                  const SizedBox(width: 20,)
+                ]
+              ),
+            ),
           );
         },
       ),

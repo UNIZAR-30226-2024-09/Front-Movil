@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'cancion.dart';
 
 class reproductor extends StatelessWidget {
-  final Cancion? cancion; // Agregar el parámetro cancion
+  final Cancion cancion; // Agregar el parámetro cancion
   reproductor({required this.cancion});
   @override
   Widget build(BuildContext context) {
@@ -21,16 +21,21 @@ class reproductor extends StatelessWidget {
 }
 
 class MusicPlayerScreen extends StatefulWidget {
-  final Cancion? cancion; // Agregar el parámetro cancion
+  final Cancion cancion; // Agregar el parámetro cancion
   MusicPlayerScreen({required this.cancion});
   @override
-  _MusicPlayerScreenState createState() => _MusicPlayerScreenState();
+  _MusicPlayerScreenState createState() => _MusicPlayerScreenState(cancion);
 }
 
 class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
   bool isPlaying = false;
   double progress = 0.0; // Representa la posición de reproducción de la canción
   Timer? timer;
+  Cancion cancion = const Cancion(id: 0, nombre: '', miAlbum: 0, puntuacion: 0, archivomp3: '', foto: '');
+
+  _MusicPlayerScreenState(Cancion song){
+    cancion = song;
+  }
 
   void togglePlay() {
     setState(() {
@@ -101,18 +106,19 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Text(
+                const Text(
                   'Now Playing',
                   style: TextStyle(fontSize: 24.0),
                 ),
-                SizedBox(height: 20.0),
+                const SizedBox(height: 20.0),
                 // Agregar aquí la imagen de la canción
-                SizedBox(height: 20.0),
+                const SizedBox(height: 20.0),
+
                 Text(
-                  'Song Name', // Nombre de la canción actual
-                  style: TextStyle(fontSize: 20.0),
+                  cancion.nombre, // Nombre de la canción actual
+                  style: const TextStyle(fontSize: 20.0, color: Colors.white),
                 ),
-                SizedBox(height: 20.0),
+                const SizedBox(height: 20.0),
                 Slider(
                   value: progress,
                   onChanged: (newValue) {
@@ -121,27 +127,27 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
                     });
                   },
                 ),
-                SizedBox(height: 20.0),
+                const SizedBox(height: 20.0),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     IconButton(
-                      icon: Icon(Icons.skip_previous, color: Colors.white), // Icono blanco
+                      icon: const Icon(Icons.skip_previous, color: Colors.white), // Icono blanco
                       iconSize: 64.0,
                       onPressed: previousSong,
                     ),
                     IconButton(
-                      icon: isPlaying ? Icon(Icons.pause, color: Colors.white) : Icon(Icons.play_arrow, color: Colors.white), // Iconos blancos
+                      icon: isPlaying ? const Icon(Icons.pause, color: Colors.white) : const Icon(Icons.play_arrow, color: Colors.white), // Iconos blancos
                       iconSize: 64.0,
                       onPressed: togglePlay,
                     ),
                     IconButton(
-                      icon: Icon(Icons.skip_next, color: Colors.white), // Icono blanco
+                      icon: const Icon(Icons.skip_next, color: Colors.white), // Icono blanco
                       iconSize: 64.0,
                       onPressed: nextSong,
                     ),
                     IconButton(
-                      icon: Icon(Icons.replay, color: Colors.white), // Icono blanco
+                      icon: const Icon(Icons.replay, color: Colors.white), // Icono blanco
                       iconSize: 64.0,
                       onPressed: replaySong,
                     ),
@@ -156,13 +162,13 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
             child: Row(
               children: [
                 IconButton(
-                  icon: Icon(Icons.keyboard_arrow_down, color: Colors.white),
+                  icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white),
                   onPressed: () {
                     Navigator.pop(context);
                   },
                 ),
-                SizedBox(width: 10),
-                Text(
+                const SizedBox(width: 10),
+                const Text(
                   'Nombre de la Playlist',
                   style: TextStyle(color: Colors.white),
                 ),

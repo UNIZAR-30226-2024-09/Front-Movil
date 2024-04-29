@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class Cancion {
   final int? id;
-  final String? nombre;
+  final String nombre;
   final int? miAlbum;
   final int? puntuacion;
   final String? archivomp3;
@@ -28,7 +28,7 @@ class Cancion {
         json.containsKey('foto')) {
       return Cancion(
         id: json['id'] as int?,
-        nombre: json['nombre'] as String?,
+        nombre: json['nombre'] as String,
         miAlbum: json['miAlbum'] as int?,
         puntuacion: json['puntuacion'] as int?,
         archivomp3: json['archivoMp3'] as String?,
