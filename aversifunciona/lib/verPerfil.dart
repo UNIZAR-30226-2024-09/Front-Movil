@@ -17,6 +17,8 @@ class _verPerfilState extends State<verPerfil> {
   String _nombreS = '';
   String _correoS = '';
   List<String> _playlists = [];
+  String _numSeguidos = '0';
+  String _numSeguidores = '0';
 
 
   @override
@@ -38,12 +40,46 @@ class _verPerfilState extends State<verPerfil> {
           _correoS = userInfo['correo'];
         });
         print(_correoS);
+        _fetchSeguidosSeguidores();
         _getUserPlaylists();
       } else {
         print('Token is null');
       }
     } catch (e) {
       print('Error fetching user info: $e');
+    }
+  }
+
+  Future<void> _fetchSeguidosSeguidores() async {
+    try {
+      // Hacer una solicitud HTTP para obtener los números de seguidos y seguidores
+      final responseSeguidos = await http.post(
+        Uri.parse('${Env.URL_PREFIX}/listarSeguidos/'),
+        body: jsonEncode({'correo': _correoS}),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      final responseSeguidores = await http.post(
+        Uri.parse('${Env.URL_PREFIX}/listarSeguidores/'),
+        body: jsonEncode({'correo': _correoS}),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      // Procesar la respuesta y extraer los números
+      if (responseSeguidos.statusCode == 200 && responseSeguidores.statusCode == 200) {
+        final Map<String, dynamic> dataSeguidos = jsonDecode(responseSeguidos.body);
+        final Map<String, dynamic> dataSeguidores = jsonDecode(responseSeguidores.body);
+        setState(() {
+          //_numSeguidos = dataSeguidos['numSeguidos'].toString() ?? '0';
+          //_numSeguidores = dataSeguidores['numSeguidores'].toString() ?? '0';
+          _numSeguidos = dataSeguidos['numSeguidos'] != null ? dataSeguidos['numSeguidos'].toString() : '0';
+          _numSeguidores = dataSeguidores['numSeguidores'] != null ? (dataSeguidores['numSeguidores']).toString() : '0';
+        });
+      } else {
+        throw Exception('Error al obtener los números de seguidos y seguidores');
+      }
+    } catch (e) {
+      print('Catch: $e');
     }
   }
 
@@ -117,15 +153,9 @@ class _verPerfilState extends State<verPerfil> {
                       SizedBox(height: 5),
                       Row(
                         children: [
-                          Text(
-                            'Siguiendo: X', // Reemplaza X con el número de usuarios a los que sigue
-                            style: TextStyle(color: Colors.grey),
-                          ),
+                          Text('Seguidos: $_numSeguidos', style: TextStyle(color: Colors.grey),),
                           SizedBox(width: 10),
-                          Text(
-                            'Seguidores: Y', // Reemplaza Y con el número de usuarios que lo siguen
-                            style: TextStyle(color: Colors.grey),
-                          ),
+                          Text('Seguidores: $_numSeguidores', style: TextStyle(color: Colors.grey)),
                         ],
                       ),
                     ],
