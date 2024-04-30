@@ -6,8 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import 'env.dart';
 class reportarProblema extends StatefulWidget {
   @override
   _reportarProblema createState() => _reportarProblema();
@@ -28,8 +26,9 @@ class _reportarProblema extends State<reportarProblema> {
 
 
   Future<void> _fetchUserDetails() async {
+    print('Solicitamos el token');
     final token = getUserSession.getToken();
-    final url = '${Env.URL_PREFIX}/obtenerUsuarioSesionAPI/';
+    final url = 'http://127.0.0.1:8000/obtenerUsuarioSesionAPI/';
 
     try {
       final response = await http.post(
@@ -44,6 +43,7 @@ class _reportarProblema extends State<reportarProblema> {
         setState(() {
           _user = data;
         });
+        print('Token conseguido');
       } else {
         print('Failed to fetch user details: $data');
       }
@@ -54,7 +54,9 @@ class _reportarProblema extends State<reportarProblema> {
 
 
   Future<void> _enviarReporte() async {
+    print("Llamada a _enviarReporte");
     if (_user['correo'] == null) {
+      print("El usuario no está identificado ");
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -68,14 +70,17 @@ class _reportarProblema extends State<reportarProblema> {
           ],
         ),
       );
+
       return;
     }
-
+    print("El usuario está identificado ");
     final url = 'http://localhost:8000/reporteAPI/';
     final body = jsonEncode({
       'correo': _user['correo'],
       'mensaje': 'Tipo de problema: $_tipoProblema, Descripción: $_descripcion',
     });
+    print('Tipo de problema: $_tipoProblema');
+    print('Descripción del problema: $_descripcion');
 
     try {
       final response = await http.post(
@@ -87,6 +92,7 @@ class _reportarProblema extends State<reportarProblema> {
         body: body,
       );
       final data = jsonDecode(response.body);
+      print('Mensaje del servidor');
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -100,6 +106,7 @@ class _reportarProblema extends State<reportarProblema> {
           ],
         ),
       );
+      print('Mensaje del servidor hecho');
     } catch (error) {
       print('Error al enviar el reporte: $error');
       showDialog(
