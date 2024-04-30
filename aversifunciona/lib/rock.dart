@@ -44,7 +44,7 @@ class _rock_State extends State<rock> {
   Future<void> filtrarCanciones() async {
     try {
       final response = await http.post(
-        Uri.parse('${Env.URL_PREFIX}filtrarCancionesPorGenero/'),
+        Uri.parse('${Env.URL_PREFIX}/filtrarCancionesPorGenero/'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },

@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'env.dart';
 class reportarProblema extends StatefulWidget {
   @override
   _reportarProblema createState() => _reportarProblema();
@@ -27,7 +29,7 @@ class _reportarProblema extends State<reportarProblema> {
 
   Future<void> _fetchUserDetails() async {
     final token = getUserSession.getToken();
-    final url = 'http://127.0.0.1:8000/obtenerUsuarioSesionAPI/';
+    final url = '${Env.URL_PREFIX}/obtenerUsuarioSesionAPI/';
 
     try {
       final response = await http.post(

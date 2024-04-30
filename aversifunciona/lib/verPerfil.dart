@@ -1,15 +1,10 @@
 import 'dart:convert';
 
+import 'package:aversifunciona/editarPerfil.dart';
 import 'package:aversifunciona/getUserSession.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-import 'EditarContrasena.dart';
-import 'EditarCorreo.dart';
-import 'EditarFechaNacimiento.dart';
-import 'EditarNombreUsuario.dart';
-import 'EditarPais.dart';
-import 'EditarSexo.dart';
 import 'env.dart';
 
 class verPerfil extends StatefulWidget {
@@ -21,15 +16,14 @@ class _verPerfilState extends State<verPerfil> {
 
   String _nombreS = '';
   String _correoS = '';
-  String _nacimientoS = '';
-  String _sexoS = '';
-  String _paisS = '';
-  String _contrasegnaS = '';
+  List<String> _playlists = [];
+
 
   @override
   void initState() {
     super.initState();
     _getUserInfo();
+
   }
 
   Future<void> _getUserInfo() async {
@@ -42,10 +36,9 @@ class _verPerfilState extends State<verPerfil> {
         setState(() {
           _nombreS = userInfo['nombre'];
           _correoS = userInfo['correo'];
-          _nacimientoS = userInfo['nacimiento'];
-          _sexoS = userInfo['sexo'];
-          _paisS = userInfo['pais'];
         });
+        print(_correoS);
+        _getUserPlaylists();
       } else {
         print('Token is null');
       }
@@ -54,44 +47,38 @@ class _verPerfilState extends State<verPerfil> {
     }
   }
 
-  Future<bool> actualizarUsuario(TextEditingController nombre, TextEditingController sexo, TextEditingController nacimiento,
-      TextEditingController contrasegna, TextEditingController pais) async {
+  Future<void> _getUserPlaylists() async {
     try {
       final response = await http.post(
-        Uri.parse('${Env.URL_PREFIX}/actualizarUsuario/'),
+        Uri.parse('${Env.URL_PREFIX}/listarPlaylistsUsuario/'),
         headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8'
+        'Content-Type': 'application/json; charset=UTF-8',
         },
-        body: jsonEncode(<String, dynamic>{
-          'correo': _correoS,
-          'nombre': nombre.text,
-          'sexo': sexo.text,
-          'nacimiento': nacimiento.text,
-          'contrasegna': contrasegna.text,
-          'pais': pais.text,
-        }),
+        body: jsonEncode({'correo': _correoS}),
       );
-
       if (response.statusCode == 200) {
-        return true; // Cambios guardados correctamente
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        print('Response: $responseData');
+        if (responseData.containsKey('playlists') && responseData['playlists'] != null) {
+          final List<dynamic> playlistData = responseData['playlists'];
+          final List<String> playlists = playlistData.map((data) => data['nombre'].toString()).toList();
+
+          setState(() {
+            _playlists = playlists;
+          });
+        } else {
+          print('No se encontraron listas de reproducción para este usuario.');
+        }
       } else {
-        return false; // Error al guardar los cambios
+        print('Else: Error al obtener las playlists: ${response.statusCode}');
       }
     } catch (e) {
-      print("Error al realizar la solicitud HTTP: $e");
-      return false; // Error al guardar los cambios
+      print('Catch: Error fetching user playlists: $e');
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
-    TextEditingController _nombre = TextEditingController(text: _nombreS);
-    TextEditingController _sexo = TextEditingController(text: _sexoS);
-    TextEditingController _nacimiento = TextEditingController(text: _nacimientoS);
-    TextEditingController _contrasegna = TextEditingController(text: _contrasegnaS);
-    TextEditingController _pais = TextEditingController(text: _paisS);
-    TextEditingController _correo = TextEditingController(text: _correoS);
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
@@ -102,134 +89,101 @@ class _verPerfilState extends State<verPerfil> {
             Navigator.pop(context);
           },
         ),
-        title: const Text('Editar Perfil', style: TextStyle(color: Colors.white))
+        title: const Text('Perfil', style: TextStyle(color: Colors.white))
         ,
       ),
       body: Column(
-        children: [
-          Expanded(
-            child: Container(
-              // Foto del usuario (puedes agregar la imagen del usuario aquí)
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white, // Puedes cambiar el color de fondo
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Divider(color: Colors.black),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    backgroundColor: Colors.white,
+                    // Puedes agregar la imagen del usuario aquí
+                    child: Icon(Icons.account_circle, size: 100, color: Colors.black),
+                    radius: 50,
+                  ),
+                  SizedBox(width: 20),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _nombreS,
+                        style: TextStyle(color: Colors.white, fontSize: 20),
+                      ),
+                      SizedBox(height: 5),
+                      Row(
+                        children: [
+                          Text(
+                            'Siguiendo: X', // Reemplaza X con el número de usuarios a los que sigue
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                          SizedBox(width: 10),
+                          Text(
+                            'Seguidores: Y', // Reemplaza Y con el número de usuarios que lo siguen
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
               ),
-              child: Center(
-                child: Text(
-                  'Foto del Usuario',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+
+            Divider(color: Colors.black),
+            Divider(color: Colors.black),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start, // Alinea el botón a la derecha
+              children: [
+                SizedBox(width: 16),
+                ElevatedButton(
+                  onPressed: () {
+                    // Lógica para editar el perfil
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => editarPerfil())
+                    );
+                  },
+                  child: Text('Editar perfil'),
                 ),
-              ),
+              ],
             ),
-          ),
-          // Opciones para editar
+            SizedBox(height: 20),
 
-          ListTile(
-            title: Text(
-              'Nombre de usuario',
-              style: TextStyle(color: Colors.white),
-            ),
-            subtitle: TextField(
-              controller: _nombre,
-              style: TextStyle(color: Colors.grey),
-            ),
-          ),
-
-            ListTile(
-              title: Text(
-                'Contraseña',
-                style: TextStyle(color: Colors.white),
-              ),
-              subtitle: TextField(
-                controller: _contrasegna,
-                style: TextStyle(color: Colors.grey),
-              ),
-            ),
-
-          ListTile(
-            title: Text(
-              'Fecha de nacimiento',
-              style: TextStyle(color: Colors.white),
-            ),
-            subtitle: TextField(
-              controller: _nacimiento,
-              style: TextStyle(color: Colors.grey),
-            ),
-          ),
-
-          ListTile(
-            title: Text(
-              'Correo electrónico',
-              style: TextStyle(color: Colors.white),
-            ),
-            subtitle: TextField(
-              controller: _correo,
-              style: TextStyle(color: Colors.grey),
-            ),
-          ),
-
-          ListTile(
-            title: Text(
-              'Sexo',
-              style: TextStyle(color: Colors.white),
-            ),
-            subtitle: TextField(
-              controller: _sexo,
-              style: TextStyle(color: Colors.grey),
-            ),
-          ),
-
-          ListTile(
-            title: Text(
-              'País o región',
-              style: TextStyle(color: Colors.white),
-            ),
-            subtitle: TextField(
-              controller: _pais,
-              style: TextStyle(color: Colors.grey),
-            ),
-          ),
-
-
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                  // Lógica para cancelar los cambios
-                  _getUserInfo(); // Recargar la información del usuario
+            Expanded(
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: _playlists.length,
+                itemBuilder: (context, index) {
+                  final playlistName = _playlists[index];
+                  return ListTile(
+                    title: Text(
+                      playlistName,
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  );
                 },
-                child: Text('Cancelar'),
               ),
-              ElevatedButton(
-                onPressed: () async {
-                  // Lógica para aceptar los cambios
-                  bool cambiosGuardados = await actualizarUsuario(_nombre, _sexo, _nacimiento, _contrasegna, _pais);
-                  if (cambiosGuardados) {
-                    // Mostrar mensaje de éxito
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Cambios guardados correctamente'),
-                        backgroundColor: Colors.green,
-                      ),
-                    );
-                  } else {
-                    // Mostrar mensaje de error
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Error al guardar los cambios'),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-                  }
-                },
-                child: Text('Guardar'),
-              ),
-            ],
-          )
-        ],
+            ),
+          ],
+      ),
+    );
+  }
+
+  Widget _buildListTile(String title, String subtitle) {
+    return ListTile(
+      title: Text(
+        title,
+        style: TextStyle(color: Colors.white),
+      ),
+      subtitle: Text(
+        subtitle,
+        style: TextStyle(color: Colors.grey),
       ),
     );
   }
 }
-

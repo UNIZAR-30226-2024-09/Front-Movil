@@ -1,12 +1,9 @@
 import 'dart:convert';
 
 import 'package:aversifunciona/pantalla_principal.dart';
-//import 'package:aversifunciona/registroValido.dart';
-import 'package:aversifunciona/sesionManager.dart';
 import 'package:flutter/material.dart';
+import 'package:aversifunciona/getUserSession.dart';
 import 'env.dart';
-import 'registro4.dart';
-import 'package:aversifunciona/registro1.dart';
 import 'package:http/http.dart' as http;
 
 class Registro_fin extends StatefulWidget {
@@ -65,6 +62,9 @@ class _Registro_finState extends State<Registro_fin> {
       );
       if (response.statusCode == 200) {
         // Si la solicitud fue exitosa, puedes procesar la respuesta aquí si es necesario
+        Map<String, dynamic> data = jsonDecode(response.body);
+        String token = data['token'];
+        await getUserSession.saveToken(token);
         print("registrado");
         return true;
       } else {

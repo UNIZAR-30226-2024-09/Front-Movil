@@ -18,7 +18,7 @@ class InicioSesion extends StatelessWidget {
   Future<bool> loginValido(String correo, String contrasegna) async {
     try{
       final response = await http.post(
-        Uri.parse("http://192.168.56.1:8000/iniciarSesion/"),
+        Uri.parse("${Env.URL_PREFIX}/iniciarSesion/"),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8'
         },
@@ -175,7 +175,7 @@ class InicioSesion extends StatelessWidget {
                   textColor: Colors.white,
                   onPressed: () async{
                     if (await loginValido(_correo.text, _contrasegna.text)){
-                      SessionManager.saveUserSession(email: _correo.text, password: _contrasegna.text);
+                      //SessionManager.saveUserSession(email: _correo.text, password: _contrasegna.text);
                       Navigator.push(
                           context,
                           MaterialPageRoute(builder: (context) => pantalla_principal())
