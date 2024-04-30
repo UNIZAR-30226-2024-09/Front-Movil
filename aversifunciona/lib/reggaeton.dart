@@ -90,7 +90,7 @@ class _reggaeton_State extends State<reggaeton> {
         ),
         title: const Row(
           children: [
-            Text('Buscar rap', style: TextStyle(color: Colors.white)),
+            Text('Buscar reggaeton', style: TextStyle(color: Colors.white)),
           ],
         ),
         backgroundColor: Colors.black,

@@ -91,7 +91,7 @@ class _electro_State extends State<electro> {
         ),
         title: const Row(
           children: [
-            Text('Buscar rap', style: TextStyle(color: Colors.white)),
+            Text('Buscar electronica', style: TextStyle(color: Colors.white)),
           ],
         ),
         backgroundColor: Colors.black,

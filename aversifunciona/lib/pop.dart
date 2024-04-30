@@ -90,7 +90,7 @@ class _pop_State extends State<pop> {
         ),
         title: const Row(
           children: [
-            Text('Buscar rap', style: TextStyle(color: Colors.white)),
+            Text('Buscar pop', style: TextStyle(color: Colors.white)),
           ],
         ),
         backgroundColor: Colors.black,

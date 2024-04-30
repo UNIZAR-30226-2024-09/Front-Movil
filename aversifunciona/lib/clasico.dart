@@ -91,7 +91,7 @@ class _clasico_State extends State<clasico> {
         ),
         title: const Row(
           children: [
-            Text('Buscar rap', style: TextStyle(color: Colors.white)),
+            Text('Buscar clasico', style: TextStyle(color: Colors.white)),
           ],
         ),
         backgroundColor: Colors.black,

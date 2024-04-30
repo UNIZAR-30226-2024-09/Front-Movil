@@ -1,10 +1,12 @@
 import 'dart:convert';
+import 'dart:async';
 
 import 'package:aversifunciona/biblioteca.dart';
 import 'package:aversifunciona/pantalla_principal.dart';
 import 'package:aversifunciona/pop.dart';
 import 'package:aversifunciona/reggaeton.dart';
 import 'package:aversifunciona/rock.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:aversifunciona/salas.dart';
 import 'package:http/http.dart' as http;
@@ -52,16 +54,25 @@ class _pantalla_buscarState extends State<pantalla_buscar> {
   List<dynamic> resultados = []; // Lista para almacenar los resultados de la búsqueda
   TextEditingController _searchController = TextEditingController();
   bool mostrarCategorias = true; // Variable para controlar la visibilidad de las categorías
+  Timer? debounce;
+
+  void _onSearchTextChanged() {
+    if (debounce?.isActive ?? false) debounce?.cancel();
+    debounce = Timer(const Duration(milliseconds: 500), () {
+      _onSearchSubmitted();
+    });
+  }
 
   @override
   void initState() {
     super.initState();
-    _searchController.addListener(_onSearchSubmitted);
+    _searchController.addListener(_onSearchTextChanged);
   }
 
   @override
   void dispose() {
     _searchController.dispose();
+    debounce?.cancel(); // Cancelar el temporizador si está activo
     super.dispose();
   }
 
@@ -103,9 +114,21 @@ class _pantalla_buscarState extends State<pantalla_buscar> {
       if (response.statusCode == 200) {
         // Procesar la respuesta de la API y mostrar los resultados
         //List<dynamic> resultados = jsonDecode(response.body);
+
+        List<dynamic> lista = jsonDecode(response.body);
+
+        List <dynamic> resultado = [];
+
+        for (var value in lista){
+          for (var valor in value.values) {
+            resultado.add(valor);
+          }
+        }
+
         setState(() {
-          resultados = jsonDecode(response.body);
+          resultados = resultado;
         });
+
         // Aquí puedes mostrar los resultados en tu aplicación de acuerdo a tus necesidades
         //print('Resultados de la búsqueda: $resultados');
       } else {
@@ -143,83 +166,32 @@ class _pantalla_buscarState extends State<pantalla_buscar> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                controller: _searchController,
-                style: const TextStyle(color: Colors.white),
-                decoration: InputDecoration(
-                  hintText: '¿Qué te apetece escuchar?',
-                  hintStyle: const TextStyle(color: Colors.white70),
-                  filled: true,
-                  fillColor: Colors.grey[900],
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    borderSide: BorderSide.none,
+            Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextField(
+                    controller: _searchController,
+                    style: const TextStyle(color: Colors.white),
+                    decoration: InputDecoration(
+                      hintText: '¿Qué te apetece escuchar?',
+                      hintStyle: const TextStyle(color: Colors.white70),
+                      filled: true,
+                      fillColor: Colors.grey[900],
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                    onSubmitted: (query) {
+                      buscar(query);
+                    },
                   ),
                 ),
-                onSubmitted: (query) {
-                  buscar(query);
-                },
-              ),
+              ]
             ),
-            if (!mostrarCategorias)
-              Expanded(
-                child: ListView.builder(
-                  itemCount: resultados.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    // Construir cada elemento de la lista de resultados
-                    // Aquí puedes decidir cómo mostrar cada resultado en la lista
-                    // Por ejemplo, puedes mostrar el título y el artista de una canción
-                    return ListTile(
-                      title: Text(resultados[index]['nombre'], style: TextStyle(color: Colors.white, fontSize: 12),),
-                    );
-                  },
-                ),
-              ),
-            if (mostrarCategorias)
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Text(
-                      'Explorar todo',
-                      style: TextStyle(color: Colors.white, fontSize: 24),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        buildTopButton('Rap', Colors.blue.shade400),
-                        buildTopButton('Clásico', Colors.red.shade400),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        buildTopButton('Electro', Colors.green.shade400),
-                        buildTopButton('Pop', Colors.deepPurple.shade400),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        buildTopButton('Rock', Colors.green.shade900),
-                        buildTopButton('Reggaeton', Colors.yellow.shade400),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+
+              _buildContent(),
           ],
         ),
       ),
@@ -338,6 +310,80 @@ class _pantalla_buscarState extends State<pantalla_buscar> {
     );
   }
 
+  Widget _buildContent() {
+    if (mostrarCategorias) {
+      return pantalla_categorias();
+    } else {
+      return resultados.isNotEmpty ? pantalla_busqueda() : const Center(child: CircularProgressIndicator());
+    }
+  }
+
+  Widget pantalla_busqueda(){
+
+    return Container(
+      height: MediaQuery.of(context).size.height,
+      child: ListView.builder(
+        shrinkWrap: true,
+        itemCount: resultados.length,
+        itemBuilder: (BuildContext context, int index) {
+          // Construir cada elemento de la lista de resultados
+          // Aquí puedes decidir cómo mostrar cada resultado en la lista
+          // Por ejemplo, puedes mostrar el título y el artista de una canción
+          String texto = resultados[index]['nombre'];
+
+          return ListTile(
+            title: Text(texto, style: const TextStyle(color: Colors.white, fontSize: 12),),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget pantalla_categorias(){
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Padding(
+          padding: EdgeInsets.all(8.0),
+          child: Text(
+            'Explorar todo',
+            style: TextStyle(color: Colors.white, fontSize: 24),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              buildTopButton('Rap', Colors.blue.shade400),
+              buildTopButton('Clásico', Colors.red.shade400),
+            ],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              buildTopButton('Electro', Colors.green.shade400),
+              buildTopButton('Pop', Colors.deepPurple.shade400),
+            ],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              buildTopButton('Rock', Colors.green.shade900),
+              buildTopButton('Reggaeton', Colors.yellow.shade400),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget buildTopButton(String title, Color color) {
     return Container(
       width: 150,
@@ -387,8 +433,3 @@ class _pantalla_buscarState extends State<pantalla_buscar> {
   }
 }
 
-void main() {
-  runApp(MaterialApp(
-    home: pantalla_buscar(),
-  ));
-}
