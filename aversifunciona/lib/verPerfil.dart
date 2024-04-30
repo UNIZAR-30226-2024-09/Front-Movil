@@ -83,6 +83,46 @@ class _verPerfilState extends State<verPerfil> {
     }
   }
 
+  Future<void> _fetchSeguidos() async {
+    try {
+      final response = await http.post(
+        Uri.parse('${Env.URL_PREFIX}/listarSeguidos/'),
+        body: jsonEncode({'correo': _correoS}),
+        headers: {'Content-Type': 'application/json'},
+      );
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        setState(() {
+          _numSeguidos = responseData['numSeguidos'].toString();
+        });
+      } else {
+        print('Error al obtener los usuarios seguidos: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error en la solicitud HTTP: $e');
+    }
+  }
+
+  Future<void> _fetchSeguidores() async {
+    try {
+      final response = await http.post(
+        Uri.parse('${Env.URL_PREFIX}/listarSeguidores/'),
+        body: jsonEncode({'correo': _correoS}),
+        headers: {'Content-Type': 'application/json'},
+      );
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        setState(() {
+          _numSeguidores = responseData['numSeguidores'].toString();
+        });
+      } else {
+        print('Error al obtener los usuarios seguidores: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error en la solicitud HTTP: $e');
+    }
+  }
+
   Future<void> _getUserPlaylists() async {
     try {
       final response = await http.post(
@@ -129,78 +169,89 @@ class _verPerfilState extends State<verPerfil> {
         ,
       ),
       body: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Divider(color: Colors.black),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                children: [
-                  CircleAvatar(
-                    backgroundColor: Colors.white,
-                    // Puedes agregar la imagen del usuario aquí
-                    child: Icon(Icons.account_circle, size: 100, color: Colors.black),
-                    radius: 50,
-                  ),
-                  SizedBox(width: 20),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        _nombreS,
-                        style: TextStyle(color: Colors.white, fontSize: 20),
-                      ),
-                      SizedBox(height: 5),
-                      Row(
-                        children: [
-                          Text('Seguidos: $_numSeguidos', style: TextStyle(color: Colors.grey),),
-                          SizedBox(width: 10),
-                          Text('Seguidores: $_numSeguidores', style: TextStyle(color: Colors.grey)),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-
-            Divider(color: Colors.black),
-            Divider(color: Colors.black),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start, // Alinea el botón a la derecha
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Divider(color: Colors.black),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(width: 16),
-                ElevatedButton(
-                  onPressed: () {
-                    // Lógica para editar el perfil
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => editarPerfil())
-                    );
-                  },
-                  child: Text('Editar perfil'),
+                Row(
+                  children: [
+                    CircleAvatar(
+                      backgroundColor: Colors.white,
+                      // Aquí colocas la imagen de la foto de perfil
+                      radius: 50,
+                    ),
+                    SizedBox(width: 20),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _nombreS,
+                          style: TextStyle(color: Colors.white, fontSize: 20),
+                        ),
+                        SizedBox(height: 10),
+
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              // Lógica para editar el perfil
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => editarPerfil()),
+                              );
+                            },
+                            child: Text('Editar perfil'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ],
             ),
-            SizedBox(height: 20),
-
-            Expanded(
-              child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: _playlists.length,
-                itemBuilder: (context, index) {
-                  final playlistName = _playlists[index];
-                  return ListTile(
-                    title: Text(
-                      playlistName,
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  );
+          ),
+          Divider(color: Colors.black),
+          SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Alinea los botones horizontalmente
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  _fetchSeguidos();
                 },
+                child: Text('Seguidos: $_numSeguidos'),
               ),
+              ElevatedButton(
+                onPressed: () {
+                  _fetchSeguidores();
+                },
+                child: Text('Seguidores: $_numSeguidores'),
+              ),
+            ],
+          ),
+          SizedBox(height: 20),
+          Expanded(
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: _playlists.length,
+              itemBuilder: (context, index) {
+                final playlistName = _playlists[index];
+                return ListTile(
+                  title: Text(
+                    playlistName,
+                    style: TextStyle(color: Colors.white),
+                  ),
+                );
+              },
             ),
-          ],
+          ),
+        ],
       ),
+
     );
   }
 
