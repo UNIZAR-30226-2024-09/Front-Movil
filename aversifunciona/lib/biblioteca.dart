@@ -1,12 +1,17 @@
+import 'dart:convert';
+
 import 'package:aversifunciona/cancionesFavoritas.dart';
 import 'package:aversifunciona/pantalla_principal.dart';
 import 'package:aversifunciona/salas.dart';
 import 'package:flutter/material.dart';
-import 'package:aversifunciona/verPerfil.dart';
+import 'package:aversifunciona/getUserSession.dart';
+import 'env.dart';
 import 'historial.dart';
 import 'verPerfil.dart';
 import 'configuracion.dart';
 import 'buscar.dart';
+import 'playlist.dart';
+import 'package:http/http.dart' as http;
 
 Route _createRoute() {
   return PageRouteBuilder(
@@ -26,7 +31,82 @@ Route _createRoute() {
   );
 }
 
-class pantalla_biblioteca extends StatelessWidget {
+class pantalla_biblioteca extends StatefulWidget {
+  @override
+  _pantalla_bibliotecaState createState() => _pantalla_bibliotecaState();
+}
+
+class _pantalla_bibliotecaState extends State<pantalla_biblioteca> {
+  int playlistId = 31;
+  String _correoS = '';
+  List<String> _playlists = [];
+  Map<String, int> _playlistsIds = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _getUserInfo();
+  }
+
+  Future<void> _getUserInfo() async {
+    try {
+      String? token = await getUserSession.getToken(); // Espera a que el token se resuelva
+      print("Token: $token");
+      if (token != null) {
+        // Llama al método AuthService para obtener la información del usuario
+        Map<String, dynamic> userInfo = await getUserSession.getUserInfo(token);
+        setState(() {
+          _correoS = userInfo['correo'];
+        });
+        _getUserPlaylists();
+      } else {
+        print('Token is null');
+      }
+    } catch (e) {
+      print('Error fetching user info: $e');
+    }
+  }
+
+  Future<void> _getUserPlaylists() async {
+    try {
+      final response = await http.post(
+        Uri.parse('${Env.URL_PREFIX}/listarPlaylistsUsuario/'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode({'correo': _correoS}),
+      );
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        print('Response: $responseData');
+        if (responseData.containsKey('playlists') && responseData['playlists'] != null) {
+          final List<dynamic> playlistData = responseData['playlists'];
+          final List<String> playlists = [];
+          final Map<String, int> playlistIds = {}; // Mapa para guardar IDs de playlists
+
+          playlistData.forEach((data) {
+            final nombre = data['nombre'].toString();
+            final id = data['id'] as int;
+            playlists.add(nombre);
+            playlistIds[nombre] = id; // Asociar nombre de playlist con su ID
+          });
+
+          setState(() {
+            _playlists = playlists;
+            _playlistsIds = playlistIds; // Guardar el mapa de IDs de playlist
+          });
+        } else {
+          print('No se encontraron listas de reproducción para este usuario.');
+        }
+      } else {
+        print('Else: Error al obtener las playlists: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Catch: Error fetching user playlists: $e');
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -64,175 +144,43 @@ class pantalla_biblioteca extends StatelessWidget {
               child: ListView(
                 children: [
                 SizedBox(height: 20),
-                Row(
-                  children: [
-                    // Botón con imagen y texto
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => cancionesFavoritas()),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor:Colors.transparent,
-                        padding: const EdgeInsets.all(0), // Sin relleno
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 40, // Ajusta el tamaño según sea necesario
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: Colors.grey, // Puedes ajustar el color del cuadrado
-                              borderRadius: BorderRadius.circular(8),
+                  Expanded(
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: _playlists.length,
+                      itemBuilder: (context, index) {
+                        final playlistName = _playlists[index];
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) {
+                                final playlistId = _playlistsIds[playlistName];
+                                if (playlistId != null) {
+                                  return Playlist(playlistId: playlistId);
+                                } else {
+                                  // Manejar el caso en que el ID de la playlist sea nulo
+                                  return Scaffold(
+                                    body: Center(
+                                      child: Text('No se encontró la playlist correspondiente.'),
+                                    ),
+                                  );
+                                }
+                              }),
+                            );
+
+                          },
+                          child: ListTile(
+                            title: Text(
+                              playlistName,
+                              style: TextStyle(color: Colors.white),
                             ),
-                            child: const Icon(Icons.heart_broken, color: Colors.white),
                           ),
-                          const SizedBox(width: 5),
-                          const Text(
-                            'Canciones que te gustan',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                // Sección 2
-                Row(
-                  children: [
-                    // Botón con imagen y texto
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => cancionesFavoritas()),
                         );
                       },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor:Colors.transparent,
-                        padding: EdgeInsets.all(0), // Sin relleno
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 40, // Ajusta el tamaño según sea necesario
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: Colors.grey, // Puedes ajustar el color del cuadrado
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Icon(Icons.music_note, color: Colors.grey.shade800),
-                          ),
-                          const SizedBox(width: 5),
-                          const Text(
-                            'Playlist Nº1',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ],
-                      ),
                     ),
-                  ],
-                ),
-                // Sección 3
-                Row(
-                  children: [
-                    // Botón con imagen y texto
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => cancionesFavoritas()),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor:Colors.transparent,
-                        padding: EdgeInsets.all(0), // Sin relleno
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 40, // Ajusta el tamaño según sea necesario
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: Colors.grey, // Puedes ajustar el color del cuadrado
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Icon(Icons.music_note, color: Colors.grey.shade800),
-                          ),
-                          const SizedBox(width: 5),
-                          const Text(
-                            'Playlist Nº2',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                // Sección 4
-                Row(
-                  children: [
-                    // Botón con imagen y texto
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => cancionesFavoritas()),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor:Colors.transparent,
-                        padding: EdgeInsets.all(0), // Sin relleno
-                      ),
-                      child: const Row(
-                        children: [
-                          CircleAvatar(
-                            radius: 20,
-                            backgroundImage: AssetImage('ruta_de_la_imagen'),
-                          ),
-                          SizedBox(width: 5),
-                          Text(
-                            'Añadir artistas',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    // Botón con imagen y texto
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => cancionesFavoritas()),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor:Colors.transparent,
-                        padding: EdgeInsets.all(0), // Sin relleno
-                      ),
-                      child: const Row(
-                        children: [
-                          CircleAvatar(
-                            radius: 20,
-                            backgroundImage: AssetImage('ruta_de_la_imagen'),
-                          ),
-                          SizedBox(width: 5),
-                          Text(
-                            'Añadir podcast',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-      ]
+                  ),
+              ]
               ),
 
             ),

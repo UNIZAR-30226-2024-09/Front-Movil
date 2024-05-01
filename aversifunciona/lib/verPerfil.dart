@@ -83,45 +83,6 @@ class _verPerfilState extends State<verPerfil> {
     }
   }
 
-  Future<void> _fetchSeguidos() async {
-    try {
-      final response = await http.post(
-        Uri.parse('${Env.URL_PREFIX}/listarSeguidos/'),
-        body: jsonEncode({'correo': _correoS}),
-        headers: {'Content-Type': 'application/json'},
-      );
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> responseData = jsonDecode(response.body);
-        setState(() {
-          _numSeguidos = responseData['numSeguidos'].toString();
-        });
-      } else {
-        print('Error al obtener los usuarios seguidos: ${response.statusCode}');
-      }
-    } catch (e) {
-      print('Error en la solicitud HTTP: $e');
-    }
-  }
-
-  Future<void> _fetchSeguidores() async {
-    try {
-      final response = await http.post(
-        Uri.parse('${Env.URL_PREFIX}/listarSeguidores/'),
-        body: jsonEncode({'correo': _correoS}),
-        headers: {'Content-Type': 'application/json'},
-      );
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> responseData = jsonDecode(response.body);
-        setState(() {
-          _numSeguidores = responseData['numSeguidores'].toString();
-        });
-      } else {
-        print('Error al obtener los usuarios seguidores: ${response.statusCode}');
-      }
-    } catch (e) {
-      print('Error en la solicitud HTTP: $e');
-    }
-  }
 
   Future<void> _getUserPlaylists() async {
     try {

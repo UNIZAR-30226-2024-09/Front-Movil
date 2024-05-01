@@ -28,7 +28,7 @@ class crearListaOCarpeta extends StatelessWidget {
                 SizedBox(width: 10),
                 Text(
                   'Tu biblioteca',
-                  style: TextStyle(color: Colors.white, fontSize: 20),
+                  style: TextStyle(color: Colors.red, fontSize: 20),
                 ),
               ],
             ),

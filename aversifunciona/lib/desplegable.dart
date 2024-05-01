@@ -45,6 +45,7 @@ class desplegable extends StatelessWidget {
                   MaterialPageRoute(builder: (context) => configuracion()),
                 );
               }
+
             },
             itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
               const PopupMenuItem<String>(
