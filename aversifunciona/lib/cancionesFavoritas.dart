@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:typed_data';
+import 'package:aversifunciona/getUserSession.dart';
 import 'package:aversifunciona/reproductor.dart';
 import 'package:flutter/material.dart';
 import 'package:aversifunciona/pantalla_principal.dart';
@@ -8,6 +10,7 @@ import 'biblioteca.dart';
 import 'buscar.dart';
 import 'cancion.dart';
 import 'package:http/http.dart' as http;
+import 'env.dart';
 
 
 class cancionesFavoritas extends StatefulWidget {
@@ -18,48 +21,102 @@ class cancionesFavoritas extends StatefulWidget {
 class _CancionesFavoritasState extends State<cancionesFavoritas> {
   List<Cancion> canciones = []; // Lista para almacenar las canciones
   Cancion? selectedSong; // Canción seleccionada
+  Map<String, dynamic> usuarioActual = {};
 
   bool isPlaying = false;
   double progress = 0.0; // Representa la posición de reproducción de la canción
   Timer? timer;
+
   @override
   void initState() {
+    final token;
     super.initState();
-    // Llama a la función para cargar las canciones al inicializar el widget
-    loadSongs();
+    // Llama a la función para obtener canciones cuando la pantalla se inicia
+    usuarioActual = getUserSession.getUserInfo(getUserSession.getToken() as String) as Map<String, dynamic>;
+    conseguirCancionesFavoritas();
   }
-
-  Future<void> loadSongs() async {
+  Uint8List decodeBase64ToImage(String base64String) {
     try {
-      final response = await http.get(
-        Uri.parse("<URL_de_tu_endpoint_para_obtener_canciones>"),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8'
-        },
-      );
-
-      if (response.statusCode == 200) {
-        var lista = jsonDecode(response.body);
-        List<Cancion> fetchedSongs = [];
-
-        for (var indice in lista) {
-          /*Cancion cancion = Cancion(
-            nombre: indice["nombre"],
-            foto: indice["foto"],
-          );
-          fetchedSongs.add(cancion);*/
-        }
-
-        setState(() {
-          canciones = fetchedSongs;
-        });
-      } else {
-        print("Error" + (response.statusCode).toString());
-      }
+      return base64Decode(base64String);
     } catch (e) {
-      print("Error al realizar la solicitud HTTP: $e");
+      throw Exception('Error decoding base64 string: $e');
     }
   }
+
+  String base64ToImageSrc(String base64) {
+    return base64.replaceAll(RegExp('/^data:image/[a-z]+;base64,/'), '');
+  }
+
+  Future<void> conseguirCancionesFavoritas() async {
+    try {
+      final response = await http
+          .post(Uri.parse("${Env.URL_PREFIX}/listarCanciones/"),
+          headers: <String, String>{
+            'Content-Type': 'application/json'
+          },
+          body: jsonEncode({})
+      );
+      canciones = [];
+
+      if (response.statusCode == 200) {
+        // If the server did return a 200 OK response,
+        // then parse the JSON.
+        var lista = jsonDecode(response.body);
+        var listaCanciones = lista['canciones'];
+
+        for (var i = 0; i < 3 && i < listaCanciones.length; i++) {
+          Cancion cancion = Cancion.fromJson(listaCanciones[i]);
+          bool esFavorita = await verificarFavorita(cancion.id);
+          if (esFavorita) {
+            canciones.add(cancion);
+          }
+        }
+
+        setState(() {});
+      } else {
+        // If the server did not return a 200 OK response,
+        // then throw an exception.
+        throw Exception('Failed to load album');
+      }
+    }
+    catch(e){
+      print("Error: $e");
+    }
+  }
+
+  Future<bool> verificarFavorita(int? cancionId) async {
+    try {
+      String? token = await getUserSession
+          .getToken(); // Espera a que el token se resuelva
+      //if (token != null) {
+        Map<String, dynamic> userInfo = await getUserSession.getUserInfo(token!);
+        final response = await http.post(
+          Uri.parse("${Env.URL_PREFIX}/EsFavorita/"),
+          headers: <String, String>{'Content-Type': 'application/json'},
+          body: jsonEncode({
+            'correo': userInfo['correo'],
+            'cancionId': cancionId.toString(),
+          }),
+
+
+        );
+
+
+        if (response.statusCode == 200) {
+          var responseData = jsonDecode(response.body);
+          return responseData['message'] == 'La canción está en favoritos';
+        } else {
+          throw Exception('Failed to verify favorite song');
+        }
+
+      } catch (e) {
+      print("Error: $e");
+      return false;
+    }
+
+  }
+
+
 
 
   void togglePlay() {
@@ -140,62 +197,357 @@ class _CancionesFavoritasState extends State<cancionesFavoritas> {
       appBar: AppBar(
         backgroundColor: Colors.black,
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
+      body: Center(
+
+          child: canciones.isEmpty
+              ? const CircularProgressIndicator() // Muestra el indicador de carga si canciones está vacío
+              : SingleChildScrollView(
+
+            child: Column(
               children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: Colors.grey, // Puedes ajustar el color del cuadrado
-                    borderRadius: BorderRadius.circular(8),
+
+                const Text('Texto numero 1', style: TextStyle(color: Colors.white),),
+                const SizedBox(height: 8,),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Row(
+                    children: [
+                      const SizedBox(width: 20,),
+                      Container(height: 75, width: 75, padding: const EdgeInsets.symmetric(horizontal: 8), decoration: const BoxDecoration(color: Colors.grey),
+                        child: FutureBuilder<Uint8List>(
+                          future: Future.microtask(() => base64Decode(canciones[0].foto)),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              // Muestra un indicador de carga mientras se decodifica la imagen
+                              return const CircularProgressIndicator();
+                            } else if (snapshot.hasError) {
+                              // Muestra un mensaje de error si ocurre un error durante la decodificación
+                              return Text('Error: ${snapshot.error}');
+                            } else {
+                              // Si la decodificación fue exitosa, muestra la imagen
+                              return Image.memory(
+                                height: 75,
+                                width: 75,
+                                snapshot.data!,
+                                fit: BoxFit.cover,
+                              );
+                            }
+                          },
+                        ),
+                      ),
+
+                      const SizedBox(width: 50,),
+
+                      Container(height: 75, width: 75, padding: const EdgeInsets.symmetric(horizontal: 8), decoration: const BoxDecoration(color: Colors.grey),
+                        child: FutureBuilder<Uint8List>(
+                          future: Future.microtask(() => base64Decode(canciones[1].foto)),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              // Muestra un indicador de carga mientras se decodifica la imagen
+                              return const CircularProgressIndicator();
+                            } else if (snapshot.hasError) {
+                              // Muestra un mensaje de error si ocurre un error durante la decodificación
+                              return Text('Error: ${snapshot.error}');
+                            } else {
+                              // Si la decodificación fue exitosa, muestra la imagen
+                              return Image.memory(
+                                height: 75,
+                                width: 75,
+                                snapshot.data!,
+                                fit: BoxFit.cover,
+                              );
+                            }
+                          },
+                        ),
+                      ),
+
+                      const SizedBox(width: 50,),
+                      Container(height: 75, width: 75, padding: const EdgeInsets.symmetric(horizontal: 8), decoration: const BoxDecoration(color: Colors.grey),
+                        child: FutureBuilder<Uint8List>(
+                          future: Future.microtask(() => base64Decode(canciones[2].foto)),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              // Muestra un indicador de carga mientras se decodifica la imagen
+                              return const CircularProgressIndicator();
+                            } else if (snapshot.hasError) {
+                              // Muestra un mensaje de error si ocurre un error durante la decodificación
+                              return Text('Error: ${snapshot.error}');
+                            } else {
+                              // Si la decodificación fue exitosa, muestra la imagen
+                              return Image.memory(
+                                height: 75,
+                                width: 75,
+                                snapshot.data!,
+                                fit: BoxFit.cover,
+                              );
+                            }
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 50,),
+                    ],
                   ),
-                  child: Image.asset('ruta_de_la_imagen_cuadrado'), //imagen de la cancion
                 ),
-                SizedBox(width: 10),
-                Text(
-                  'Tu biblioteca',
-                  style: TextStyle(color: Colors.white, fontSize: 20),
+
+                const SizedBox(height: 20,),
+                const Text('Texto numero 2', style:  TextStyle(color: Colors.white),),
+                const SizedBox(height: 8,),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Row(
+                    children: [
+                      const SizedBox(width: 20,),
+                      Container(height: 75, width: 75, padding: const EdgeInsets.symmetric(horizontal: 8), decoration: const BoxDecoration(color: Colors.grey),
+                        child: FutureBuilder<Uint8List>(
+                          future: Future.microtask(() => base64Decode(canciones[0].foto)),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              // Muestra un indicador de carga mientras se decodifica la imagen
+                              return const CircularProgressIndicator();
+                            } else if (snapshot.hasError) {
+                              // Muestra un mensaje de error si ocurre un error durante la decodificación
+                              return Text('Error: ${snapshot.error}');
+                            } else {
+                              // Si la decodificación fue exitosa, muestra la imagen
+                              return Image.memory(
+                                height: 75,
+                                width: 75,
+                                snapshot.data!,
+                                fit: BoxFit.cover,
+                              );
+                            }
+                          },
+                        ),
+                      ),
+
+                      const SizedBox(width: 50,),
+
+                      Container(height: 75, width: 75, padding: const EdgeInsets.symmetric(horizontal: 8), decoration: const BoxDecoration(color: Colors.grey),
+                        child: FutureBuilder<Uint8List>(
+                          future: Future.microtask(() => base64Decode(canciones[1].foto)),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              // Muestra un indicador de carga mientras se decodifica la imagen
+                              return const CircularProgressIndicator();
+                            } else if (snapshot.hasError) {
+                              // Muestra un mensaje de error si ocurre un error durante la decodificación
+                              return Text('Error: ${snapshot.error}');
+                            } else {
+                              // Si la decodificación fue exitosa, muestra la imagen
+                              return Image.memory(
+                                height: 75,
+                                width: 75,
+                                snapshot.data!,
+                                fit: BoxFit.cover,
+                              );
+                            }
+                          },
+                        ),
+                      ),
+
+                      const SizedBox(width: 50,),
+                      Container(height: 75, width: 75, padding: const EdgeInsets.symmetric(horizontal: 8), decoration: const BoxDecoration(color: Colors.grey),
+                        child: FutureBuilder<Uint8List>(
+                          future: Future.microtask(() => base64Decode(canciones[2].foto)),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              // Muestra un indicador de carga mientras se decodifica la imagen
+                              return const CircularProgressIndicator();
+                            } else if (snapshot.hasError) {
+                              // Muestra un mensaje de error si ocurre un error durante la decodificación
+                              return Text('Error: ${snapshot.error}');
+                            } else {
+                              // Si la decodificación fue exitosa, muestra la imagen
+                              return Image.memory(
+                                height: 75,
+                                width: 75,
+                                snapshot.data!,
+                                fit: BoxFit.cover,
+                              );
+                            }
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 50,),
+                    ],
+                  ),
                 ),
+
+                const SizedBox(height: 20,),
+                const Text('Texto numero 3', style: TextStyle(color: Colors.white),),
+                const SizedBox(height: 8,),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Row(
+                    children: [
+                      const SizedBox(width: 20,),
+                      Container(height: 75, width: 75, padding: const EdgeInsets.symmetric(horizontal: 8), decoration: const BoxDecoration(color: Colors.grey),
+                        child: FutureBuilder<Uint8List>(
+                          future: Future.microtask(() => base64Decode(canciones[0].foto)),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              // Muestra un indicador de carga mientras se decodifica la imagen
+                              return const CircularProgressIndicator();
+                            } else if (snapshot.hasError) {
+                              // Muestra un mensaje de error si ocurre un error durante la decodificación
+                              return Text('Error: ${snapshot.error}');
+                            } else {
+                              // Si la decodificación fue exitosa, muestra la imagen
+                              return Image.memory(
+                                height: 75,
+                                width: 75,
+                                snapshot.data!,
+                                fit: BoxFit.cover,
+                              );
+                            }
+                          },
+                        ),
+                      ),
+
+                      const SizedBox(width: 50,),
+
+                      Container(height: 75, width: 75, padding: const EdgeInsets.symmetric(horizontal: 8), decoration: const BoxDecoration(color: Colors.grey),
+                        child: FutureBuilder<Uint8List>(
+                          future: Future.microtask(() => base64Decode(canciones[1].foto)),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              // Muestra un indicador de carga mientras se decodifica la imagen
+                              return const CircularProgressIndicator();
+                            } else if (snapshot.hasError) {
+                              // Muestra un mensaje de error si ocurre un error durante la decodificación
+                              return Text('Error: ${snapshot.error}');
+                            } else {
+                              // Si la decodificación fue exitosa, muestra la imagen
+                              return Image.memory(
+                                height: 75,
+                                width: 75,
+                                snapshot.data!,
+                                fit: BoxFit.cover,
+                              );
+                            }
+                          },
+                        ),
+                      ),
+
+                      const SizedBox(width: 50,),
+                      Container(height: 75, width: 75, padding: const EdgeInsets.symmetric(horizontal: 8), decoration: const BoxDecoration(color: Colors.grey),
+                        child: FutureBuilder<Uint8List>(
+                          future: Future.microtask(() => base64Decode(canciones[2].foto)),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              // Muestra un indicador de carga mientras se decodifica la imagen
+                              return const CircularProgressIndicator();
+                            } else if (snapshot.hasError) {
+                              // Muestra un mensaje de error si ocurre un error durante la decodificación
+                              return Text('Error: ${snapshot.error}');
+                            } else {
+                              // Si la decodificación fue exitosa, muestra la imagen
+                              return Image.memory(
+                                height: 75,
+                                width: 75,
+                                snapshot.data!,
+                                fit: BoxFit.cover,
+                              );
+                            }
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 50,),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20,),
+                const Text('Texto numero 4', style: TextStyle(color: Colors.white),),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Row(
+                    children: [
+                      const SizedBox(width: 20,),
+                      Container(height: 75, width: 75, padding: const EdgeInsets.symmetric(horizontal: 8), decoration: const BoxDecoration(color: Colors.grey),
+                        child: FutureBuilder<Uint8List>(
+                          future: Future.microtask(() => base64Decode(canciones[0].foto)),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              // Muestra un indicador de carga mientras se decodifica la imagen
+                              return const CircularProgressIndicator();
+                            } else if (snapshot.hasError) {
+                              // Muestra un mensaje de error si ocurre un error durante la decodificación
+                              return Text('Error: ${snapshot.error}');
+                            } else {
+                              // Si la decodificación fue exitosa, muestra la imagen
+                              return Image.memory(
+                                height: 75,
+                                width: 75,
+                                snapshot.data!,
+                                fit: BoxFit.cover,
+                              );
+                            }
+                          },
+                        ),
+                      ),
+
+                      const SizedBox(width: 50,),
+
+                      Container(height: 75, width: 75, padding: const EdgeInsets.symmetric(horizontal: 8), decoration: const BoxDecoration(color: Colors.grey),
+                        child: FutureBuilder<Uint8List>(
+                          future: Future.microtask(() => base64Decode(canciones[1].foto)),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              // Muestra un indicador de carga mientras se decodifica la imagen
+                              return const CircularProgressIndicator();
+                            } else if (snapshot.hasError) {
+                              // Muestra un mensaje de error si ocurre un error durante la decodificación
+                              return Text('Error: ${snapshot.error}');
+                            } else {
+                              // Si la decodificación fue exitosa, muestra la imagen
+                              return Image.memory(
+                                height: 75,
+                                width: 75,
+                                snapshot.data!,
+                                fit: BoxFit.cover,
+                              );
+                            }
+                          },
+                        ),
+                      ),
+
+                      const SizedBox(width: 50,),
+                      Container(height: 75, width: 75, padding: const EdgeInsets.symmetric(horizontal: 8), decoration: const BoxDecoration(color: Colors.grey),
+                        child: FutureBuilder<Uint8List>(
+                          future: Future.microtask(() => base64Decode(canciones[2].foto)),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              // Muestra un indicador de carga mientras se decodifica la imagen
+                              return const CircularProgressIndicator();
+                            } else if (snapshot.hasError) {
+                              // Muestra un mensaje de error si ocurre un error durante la decodificación
+                              return Text('Error: ${snapshot.error}');
+                            } else {
+                              // Si la decodificación fue exitosa, muestra la imagen
+                              return Image.memory(
+                                height: 75,
+                                width: 75,
+                                snapshot.data!,
+                                fit: BoxFit.cover,
+                              );
+                            }
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 50,),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 8,),
+
               ],
-            ),
-          ),
-          GestureDetector(
-            onTap: () {
-              // Al hacer clic en la canción, establece la canción seleccionada
-              setState(() {
-                //selectedSong = canciones[index];
-              });
-            },
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // Cuadrado con la imagen
-                Container(
-                  width: 40, // Ajusta el tamaño según sea necesario
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: Colors.grey, // Puedes ajustar el color del cuadrado
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Image.asset('ruta_de_la_imagen_cuadrado'), //imagen de la cancion
-                ),
-                SizedBox(width: 10), // Espacio entre la imagen y el nombre de la canción
-                // Nombre de la canción
-                Expanded(
-                  child: Text(
-                    'La cancion',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-                // Botón a la derecha del nombre de la canción
-              ],
-            ),
-          ),
-        ],
+            )
+            ,
+          )
       ),
       bottomNavigationBar: selectedSong != null
           ? Container(

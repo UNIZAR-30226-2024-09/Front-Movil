@@ -1,11 +1,8 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-
 import 'package:aversifunciona/getUserSession.dart';
 import 'package:flutter/material.dart';
-import 'package:mailer/mailer.dart';
-import 'package:mailer/smtp_server.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
 class reportarProblema extends StatefulWidget {
   @override
   _reportarProblema createState() => _reportarProblema();
@@ -28,28 +25,7 @@ class _reportarProblema extends State<reportarProblema> {
   Future<void> _fetchUserDetails() async {
     print('Solicitamos el token');
     final token = getUserSession.getToken();
-    final url = 'http://192.168.56.1:8000/obtenerUsuarioSesionAPI/';
-
-    try {
-      final response = await http.post(
-        Uri.parse(url),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({'token': token}),
-      );
-      final data = jsonDecode(response.body);
-      if (response.statusCode == 200) {
-        setState(() {
-          _user = data;
-        });
-        print('Token conseguido');
-      } else {
-        print('Failed to fetch user details: $data');
-      }
-    } catch (error) {
-      print('Error fetching user details: $error');
-    }
+    _user = getUserSession.getUserInfo(token as String) as Map<String, dynamic>;
   }
 
 
