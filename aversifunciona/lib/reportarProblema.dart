@@ -28,7 +28,7 @@ class _reportarProblema extends State<reportarProblema> {
   Future<void> _fetchUserDetails() async {
     print('Solicitamos el token');
     final token = getUserSession.getToken();
-    final url = 'http://127.0.0.1:8000/obtenerUsuarioSesionAPI/';
+    final url = 'http://192.168.56.1:8000/obtenerUsuarioSesionAPI/';
 
     try {
       final response = await http.post(

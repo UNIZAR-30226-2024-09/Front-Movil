@@ -1,11 +1,19 @@
+import 'dart:convert';
+
 import 'package:aversifunciona/FAQprincipal.dart';
 import 'package:aversifunciona/pantalla_principal.dart';
 import 'package:aversifunciona/salas.dart';
 import 'package:aversifunciona/verPerfil.dart';
 import 'package:flutter/material.dart';
+import 'package:aversifunciona/getUserSession.dart';
+import 'package:aversifunciona/inicioSesion.dart';
 
 import 'biblioteca.dart';
 import 'buscar.dart';
+
+import 'package:http/http.dart' as http;
+
+import 'env.dart';
 
 class configuracion extends StatelessWidget {
   @override
@@ -79,6 +87,54 @@ class configuracion extends StatelessWidget {
                 buildOption(context, "Cuenta", Icon(Icons.arrow_forward)),
                 buildOption(context, "Ayuda", Icon(Icons.arrow_forward)),
 
+              ],
+            ),
+          ),
+          //SizedBox(height: 20),
+          Container(
+            height: 70,
+            decoration: const BoxDecoration(
+              border: Border(
+                top: BorderSide(width: 1.0, color: Colors.black),
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: () async {
+                    String? token = await getUserSession.getToken();
+                    print("token para cerrar sesión: $token");
+                    // Lógica para cerrar sesión
+                    final response = await http.post(
+                        Uri.parse('${Env.URL_PREFIX}/cerrarSesionAPI/'),
+                        headers: <String, String>{
+                          'Content-Type': 'application/json; charset=UTF-8',
+                        },
+                        body: jsonEncode({'token': token})
+                    );
+
+                    if (response.statusCode == 200) {
+                      // Elimina el token de autenticación almacenado localmente
+                      // Aquí deberías implementar la lógica para eliminar el token
+
+                      // Redirige al usuario a la pantalla de inicio de sesión
+                      //Navigator.pushReplacementNamed(context, '/inicioSesion/');
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => InicioSesion()),
+                      );
+                    } else {
+                      // Muestra un mensaje de error si falla la solicitud
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Error al cerrar sesión'),
+                        ),
+                      );
+                    }
+                  },
+                  child: Text('Cerrar sesión'),
+                ),
               ],
             ),
           ),

@@ -2,6 +2,9 @@ import 'dart:convert';
 
 import 'package:aversifunciona/editarPerfil.dart';
 import 'package:aversifunciona/getUserSession.dart';
+import 'package:aversifunciona/listaSeguidos.dart';
+import 'package:aversifunciona/listaSeguidores.dart';
+import 'package:aversifunciona/perfilAjeno.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -25,7 +28,6 @@ class _verPerfilState extends State<verPerfil> {
   void initState() {
     super.initState();
     _getUserInfo();
-
   }
 
   Future<void> _getUserInfo() async {
@@ -214,9 +216,8 @@ class _verPerfilState extends State<verPerfil> {
               ],
             ),
           ),
-          Divider(color: Colors.black),
-          SizedBox(height: 10),
-          Row(
+          //SizedBox(height: 5),
+          /*Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Alinea los botones horizontalmente
             children: [
               ElevatedButton(
@@ -232,7 +233,70 @@ class _verPerfilState extends State<verPerfil> {
                 child: Text('Seguidores: $_numSeguidores'),
               ),
             ],
+          ),*/
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start, // Alinea los botones horizontalmente
+            children: [
+              TextButton(
+                onPressed: () {
+                  // Lógica para navegar a la pantalla de seguidos
+                  // Aquí debes añadir la navegación
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ListaSeguidos()),
+                  );
+                },
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(Colors.black),
+                ),
+                child: Text(
+                  'Seguidos: $_numSeguidos',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                  // Lógica para navegar a la pantalla de seguidores
+                  // Aquí debes añadir la navegación
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ListaSeguidores()),
+                  );
+                },
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(Colors.black),
+                ),
+                child: Text(
+                  'Seguidores: $_numSeguidores',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ],
           ),
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start, // Alinea los botones horizontalmente
+            children: [
+              TextButton(
+                onPressed: () {
+                  // Lógica para navegar a la pantalla de seguidos
+                  // Aquí debes añadir la navegación
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => PerfilAjeno()),
+                  );
+                },
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(Colors.black),
+                ),
+                child: Text(
+                  'perfil ajeno',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ],
+          ),
+
           SizedBox(height: 20),
           Expanded(
             child: ListView.builder(
