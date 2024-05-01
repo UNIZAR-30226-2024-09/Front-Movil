@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
+import 'env.dart';
+
 class getUserSession {
 
   static Future<String?> saveToken(String token) async {
@@ -16,7 +18,7 @@ class getUserSession {
   }
 
   static Future<Map<String, dynamic>> getUserInfo(String token) async {
-    final url = Uri.parse('http://192.168.56.1:8000/obtenerUsuarioSesionAPI/');
+    final url = Uri.parse('${Env.URL_PREFIX}/obtenerUsuarioSesionAPI/');
     final headers = <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
     };

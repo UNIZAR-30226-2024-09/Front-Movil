@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'env.dart'; // Suponiendo que aquí tienes la definición de Env.URL_PREFIX
 
 import 'getUserSession.dart';
+import 'perfilAjeno.dart';
 
 class ListaSeguidos extends StatefulWidget {
   @override
@@ -81,10 +82,21 @@ class _ListaSeguidosState extends State<ListaSeguidos> {
           ? ListView.builder(
         itemCount: _listaSeguidos.length,
         itemBuilder: (context, index) {
-          final seguido = _listaSeguidos[index];
+          final usuario = _listaSeguidos[index];
           return ListTile(
-            title: Text(seguido['seguido'], style: TextStyle(color: Colors.white)),
-            // Agrega más contenido según sea necesario
+            title: GestureDetector(
+              onTap: () {
+                // Navegar a la pantalla del perfil del usuario y pasar los datos del usuario
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => PerfilAjeno(usuario: usuario)),
+                );
+              },
+              child: Text(
+                usuario['seguido'],
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
           );
         },
       )
@@ -93,5 +105,6 @@ class _ListaSeguidosState extends State<ListaSeguidos> {
       ),
     );
   }
+
 
 }

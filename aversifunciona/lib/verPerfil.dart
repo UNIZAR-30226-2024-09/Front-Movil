@@ -72,8 +72,6 @@ class _verPerfilState extends State<verPerfil> {
         final Map<String, dynamic> dataSeguidos = jsonDecode(responseSeguidos.body);
         final Map<String, dynamic> dataSeguidores = jsonDecode(responseSeguidores.body);
         setState(() {
-          //_numSeguidos = dataSeguidos['numSeguidos'].toString() ?? '0';
-          //_numSeguidores = dataSeguidores['numSeguidores'].toString() ?? '0';
           _numSeguidos = dataSeguidos['numSeguidos'] != null ? dataSeguidos['numSeguidos'].toString() : '0';
           _numSeguidores = dataSeguidores['numSeguidores'] != null ? (dataSeguidores['numSeguidores']).toString() : '0';
         });
@@ -217,23 +215,6 @@ class _verPerfilState extends State<verPerfil> {
             ),
           ),
           //SizedBox(height: 5),
-          /*Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Alinea los botones horizontalmente
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                  _fetchSeguidos();
-                },
-                child: Text('Seguidos: $_numSeguidos'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  _fetchSeguidores();
-                },
-                child: Text('Seguidores: $_numSeguidores'),
-              ),
-            ],
-          ),*/
           Row(
             mainAxisAlignment: MainAxisAlignment.start, // Alinea los botones horizontalmente
             children: [
@@ -273,31 +254,18 @@ class _verPerfilState extends State<verPerfil> {
               ),
             ],
           ),
-
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start, // Alinea los botones horizontalmente
-            children: [
-              TextButton(
-                onPressed: () {
-                  // Lógica para navegar a la pantalla de seguidos
-                  // Aquí debes añadir la navegación
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => PerfilAjeno()),
-                  );
-                },
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(Colors.black),
-                ),
-                child: Text(
-                  'perfil ajeno',
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-            ],
-          ),
-
           SizedBox(height: 20),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20),
+            child: Text(
+              'Playlists',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
           Expanded(
             child: ListView.builder(
               shrinkWrap: true,
