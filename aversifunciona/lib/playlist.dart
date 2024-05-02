@@ -173,19 +173,14 @@ class _PlaylistState extends State<Playlist> {
                   child: Container(
                     color: Colors.grey.withOpacity(0.5),
                     child: Center(
-                      child: Text(
-                        'Foto de la Playlist',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      child: Image.asset('lib/playlist.jpg'),
                     ),
                   ),
                 ),
               ),
             ),
-          SizedBox(height: 20),
+
+            SizedBox(height: 20),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 20),
               child: Row(

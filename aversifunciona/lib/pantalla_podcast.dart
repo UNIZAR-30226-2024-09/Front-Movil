@@ -1,14 +1,10 @@
 import 'package:aversifunciona/biblioteca.dart';
 import 'package:aversifunciona/buscar.dart';
 import 'package:aversifunciona/pantalla_principal.dart';
-import 'package:aversifunciona/pantalla_podcast.dart';
 import 'package:aversifunciona/salas.dart';
-import 'package:aversifunciona/todo.dart';
 import 'package:flutter/material.dart';
 
-import 'musica.dart';
-
-class pantalla_todo extends StatelessWidget {
+class pantalla_podcast extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,22 +22,71 @@ class pantalla_todo extends StatelessWidget {
           ),
           Spacer(),
           // Botón Todo
-          buildTopButton(context, 'Todo', pantalla_todo()),
+          buildTopButton('Todo'),
 
           // Botón Música
-          buildTopButton(context, 'Música', pantalla_musica()),
+          buildTopButton('Música'),
 
           // Botón Podcast
-          buildTopButton(context, 'Podcast', pantalla_podcast()),
+          buildTopButton('Podcast'),
         ],
       ),
       body: Column(
         children: [
-          Expanded(
+          // Botón con imagen 1
+          ElevatedButton(
+            onPressed: () {
+              // escuchar podcast
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor:Colors.transparent,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+            ),
             child: Container(
-              // Contenido principal (puedes colocar aquí tu imagen o cualquier otro contenido)
+              height: 150,
+              width: 200,
+              child: Image.asset('imagen_podcast', fit: BoxFit.cover),
             ),
           ),
+          Spacer(),
+          // Botón con imagen 2
+          ElevatedButton(
+            onPressed: () {
+              // escuchar podcast
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor:Colors.transparent,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+            ),
+            child: Container(
+              height: 150,
+              width: 200,
+              child: Image.asset('imagen_podcast', fit: BoxFit.cover),
+            ),
+          ),
+          Spacer(),
+          // Botón con imagen 3
+          ElevatedButton(
+            onPressed: () {
+              // escuchar podcast
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor:Colors.transparent,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+            ),
+            child: Container(
+              height: 150,
+              width: 200,
+              child: Image.asset('imagen_podcast', fit: BoxFit.cover),
+            ),
+          ),
+          Spacer(),
           Container(
             decoration: BoxDecoration(
               border: Border(
@@ -49,15 +94,16 @@ class pantalla_todo extends StatelessWidget {
               ),
             ),
             child: Row(
+
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                // Opción 1
+
                 ElevatedButton(
                   onPressed: () {
-                    // Navegar a la pantalla "Inicio"
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => pantalla_principal()),
+                      MaterialPageRoute(
+                          builder: (context) => pantalla_principal()),
                     );
                   },
                   style: ElevatedButton.styleFrom(
@@ -66,19 +112,26 @@ class pantalla_todo extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: Text(
-                    'Inicio',
-                    style: TextStyle(color: Colors.white),
+                  child: const Column(
+
+                      children: [
+                        SizedBox(height: 8),
+                        Icon(Icons.house_outlined, color: Colors.grey, size: 37.0),
+                        Text(
+                          'Inicio',
+                          style: TextStyle(color: Colors.white, fontSize: 12),
+                        ),
+                      ]
                   ),
                 ),
 
-                // Opción 2
+
                 ElevatedButton(
                   onPressed: () {
-                    // Navegar a la pantalla "Buscar"
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => pantalla_buscar()),
+                      MaterialPageRoute(
+                          builder: (context) => pantalla_buscar()),
                     );
                   },
                   style: ElevatedButton.styleFrom(
@@ -87,19 +140,25 @@ class pantalla_todo extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: Text(
-                    'Buscar',
-                    style: TextStyle(color: Colors.white),
+                  child: const Column(
+
+                      children: [
+                        SizedBox(height: 8),
+                        Icon(Icons.question_mark_outlined, color: Colors.grey, size: 37.0),
+                        Text(
+                          'Buscar',
+                          style: TextStyle(color: Colors.white, fontSize: 12),
+                        ),
+                      ]
                   ),
                 ),
 
-                // Opción 3
                 ElevatedButton(
                   onPressed: () {
-                    // Navegar a la pantalla "Biblioteca"
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => pantalla_biblioteca()),
+                      MaterialPageRoute(
+                          builder: (context) => pantalla_biblioteca()),
                     );
                   },
                   style: ElevatedButton.styleFrom(
@@ -108,19 +167,25 @@ class pantalla_todo extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: Text(
-                    'Biblioteca',
-                    style: TextStyle(color: Colors.white),
+                  child: const Column(
+
+                      children: [
+                        SizedBox(height: 8),
+                        Icon(Icons.library_books_rounded, color: Colors.grey, size: 37.0),
+                        Text(
+                          'Biblioteca',
+                          style: TextStyle(color: Colors.white, fontSize: 12),
+                        ),
+                      ]
                   ),
                 ),
 
-                // Opción 4
                 ElevatedButton(
                   onPressed: () {
-                    // Navegar a la pantalla "Salas"
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => pantalla_salas()),
+                      MaterialPageRoute(
+                          builder: (context) => pantalla_salas()),
                     );
                   },
                   style: ElevatedButton.styleFrom(
@@ -129,9 +194,16 @@ class pantalla_todo extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: Text(
-                    'Salas',
-                    style: TextStyle(color: Colors.white),
+                  child: const Column(
+
+                      children: [
+                        SizedBox(height: 8),
+                        Icon(Icons.chat_bubble_rounded, color: Colors.grey, size: 37.0),
+                        Text(
+                          'Salas',
+                          style: TextStyle(color: Colors.white, fontSize: 12),
+                        ),
+                      ]
                   ),
                 ),
               ],
@@ -155,16 +227,12 @@ class pantalla_todo extends StatelessWidget {
     );
   }
 
-  Widget buildTopButton(BuildContext context, String title, Widget screen) {
+  Widget buildTopButton(String title) {
     return Container(
       margin: EdgeInsets.all(8),
       child: ElevatedButton(
         onPressed: () {
-          // Navegar a la pantalla correspondiente
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => screen),
-          );
+          // Acción al presionar el botón (puedes personalizarlo según sea necesario)
         },
         style: ElevatedButton.styleFrom(
           backgroundColor:Colors.grey,
@@ -180,7 +248,6 @@ class pantalla_todo extends StatelessWidget {
     );
   }
 }
-
 
 class SalasScreen extends StatelessWidget {
   @override

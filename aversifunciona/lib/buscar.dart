@@ -10,7 +10,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:aversifunciona/salas.dart';
 import 'package:http/http.dart' as http;
+import 'ciencias.dart';
 import 'clasico.dart';
+import 'cultura.dart';
+import 'ingles.dart';
+import 'psicologia.dart';
 import 'electro.dart';
 import 'rap.dart';
 import 'env.dart';
@@ -380,6 +384,26 @@ class _pantalla_buscarState extends State<pantalla_buscar> {
             ],
           ),
         ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              buildTopButton('Ciencias', Colors.blue.shade400),
+              buildTopButton('Cultura', Colors.red.shade400),
+            ],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              buildTopButton('Inglés', Colors.green.shade400),
+              buildTopButton('Psicología', Colors.deepPurple.shade400),
+            ],
+          ),
+        ),
       ],
     );
   }
@@ -411,10 +435,26 @@ class _pantalla_buscarState extends State<pantalla_buscar> {
             Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => rock()));
-          } else {
+          } else if (title == 'Reggaeton') {
             Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => reggaeton()));
+          } else if (title == 'Ciencias') {
+            Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ciencias()));
+          } else if (title == 'Cultura') {
+            Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => cultura()));
+          } else if (title == 'Inglés') {
+            Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ingles()));
+          } else if (title == 'Psicología') {
+            Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => psicologia()));
           }
           // Acción al presionar el botón
         },

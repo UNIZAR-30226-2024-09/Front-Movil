@@ -127,13 +127,17 @@ class _pantalla_bibliotecaState extends State<pantalla_biblioteca> {
           'Tu biblioteca',
           style: TextStyle(color: Colors.white, fontSize: 20),
         ),
-        actions: [
-
-          const Text(
-            '+  ',
-            style: const TextStyle(color: Colors.white, fontSize: 20),
-          ),
-        ]
+          actions: [
+            TextButton(
+              onPressed: () {
+                // Aquí puedes definir la acción que deseas realizar cuando se presione el botón "+"
+              },
+              child: Text(
+                '+',
+                style: TextStyle(color: Colors.white, fontSize: 20),
+              ),
+            ),
+          ]
       ),
       body: Column(
         children: [

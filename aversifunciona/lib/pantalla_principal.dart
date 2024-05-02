@@ -7,7 +7,7 @@ import 'dart:convert';
 import 'salas.dart';
 import 'musica.dart';
 import 'todo.dart';
-import 'podcast.dart';
+import 'pantalla_podcast.dart';
 import 'biblioteca.dart';
 import 'buscar.dart';
 import 'historial.dart';
