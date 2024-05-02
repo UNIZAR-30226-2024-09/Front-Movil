@@ -14,10 +14,12 @@ class Playlist extends StatefulWidget {
 }
 
 class _PlaylistState extends State<Playlist> {
-  bool isPublic = true; // Estado de la playlist (pública o privada)
+  //bool isPublic = true; // Estado de la playlist (pública o privada)
   late String playlistName = '';
   late String userName = '';
   late String duration = '';
+  late bool playlistPublica = true;
+  late List<Map<String, dynamic>> songs = [];
 
   @override
   void initState() {
@@ -38,12 +40,26 @@ class _PlaylistState extends State<Playlist> {
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
         final playlistData = responseData['playlist'];
+
+        if (playlistData != null) {
+          // Acceder a las propiedades de playlistData
+          playlistName = playlistData['nombre'] ?? ''; // Usar cadena vacía como valor por defecto si 'nombre' es null
+          playlistPublica = playlistData['publica'] ?? false; // Usar false como valor por defecto si 'publica' es null
+          // Otros datos...
+        } else {
+          // Manejar el caso en el que playlistData es null
+          print('playlistData es null');
+        }
+
         setState(() {
           // Actualizar los datos de la playlist con los recibidos de la API
           playlistName = playlistData['nombre'];
-          userName = playlistData['usuario'];
-          duration = playlistData['duracion'];
+          playlistPublica = playlistData['publica'];
+          // Otros datos...
         });
+        print('Playlist: $playlistName');
+        print('Pública: $playlistPublica');
+        _fetchPlaylistSongs();
       } else {
         throw Exception('Error al obtener los datos de la playlist');
       }
@@ -56,6 +72,71 @@ class _PlaylistState extends State<Playlist> {
       );
     }
   }
+
+
+  Future<void> _fetchPlaylistSongs() async {
+    try {
+      final response = await http.post(
+        Uri.parse('${Env.URL_PREFIX}/listarCancionesPlaylist/'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'playlistId': widget.playlistId,
+        }),
+      );
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        final songsData = responseData['canciones'];
+        // Actualizar la lista de canciones con los datos recibidos de la API
+        setState(() {
+          songs = List<Map<String, dynamic>>.from(songsData);
+        });
+        // Iterar sobre la lista de canciones y obtener los artistas de cada una
+        for (var song in songs) {
+          await _fetchSongArtists(song['cancionId']);
+        }
+      } else {
+        throw Exception('Error al obtener las canciones de la playlist');
+      }
+    } catch (e) {
+      print('Error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error al obtener las canciones de la playlist'),
+        ),
+      );
+    }
+  }
+
+  Future<void> _fetchSongArtists(String songId) async {
+    try {
+      final response = await http.post(
+        Uri.parse('${Env.URL_PREFIX}/listarArtistasCancion/'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'cancionId': songId,
+        }),
+      );
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        final artistsData = responseData['artistas'];
+        // Actualizar los artistas de la canción en la lista de canciones
+        setState(() {
+          songs.firstWhere((song) => song['cancionId'] == songId)['artista'] = List<Map<String, dynamic>>.from(artistsData);
+        });
+      } else {
+        throw Exception('Error al obtener los artistas de la canción $songId');
+      }
+    } catch (e) {
+      print('Error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error al obtener los artistas de la canción $songId'),
+        ),
+      );
+    }
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -78,7 +159,7 @@ class _PlaylistState extends State<Playlist> {
             onPressed: () {
               _togglePlaylistPrivacy();
             },
-            child: Text(isPublic ? 'Cambiar a Privada' : 'Cambiar a Pública'),
+            child: Text(playlistPublica ? 'Cambiar a Privada' : 'Cambiar a Pública'),
           ),
           SizedBox(height: 20),
           // Aquí iría la foto de la playlist (cuadrada, en el centro, dentro de un contenedor gris)
@@ -152,14 +233,17 @@ class _PlaylistState extends State<Playlist> {
           SizedBox(height: 20),
           Expanded(
             child: ListView.builder(
-              itemCount: 10, // Número de canciones
+              itemCount: songs.length,
               itemBuilder: (context, index) {
+                final song = songs[index];
+                final artistas = song['artistas'] as List<Map<String, dynamic>>?;
+                final artistasString = artistas != null ? artistas.map((artista) => artista['nombre']).join(', ') : 'Artistas no disponibles';
                 return ListTile(
                   leading: Icon(Icons.music_note),
-                  title: Text('Canción $index', style: TextStyle(color: Colors.white),),
-                  subtitle: Text('Artista $index', style: TextStyle(color: Colors.grey),),
+                  title: Text(song['nombre'] ?? 'Nombre no disponible', style: TextStyle(color: Colors.white)),
+                  subtitle: Text(artistasString, style: TextStyle(color: Colors.grey)),
                 );
-              },
+             },
             ),
           ),
         ],
@@ -174,14 +258,14 @@ class _PlaylistState extends State<Playlist> {
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'playlistId': widget.playlistId,
-          'nombre': 'Playlist de Zineb 2',
-          'publica': !isPublic, // Cambia el estado de publica
+          'nombre': playlistName,
+          'publica': !playlistPublica, // Cambia el estado de publica
         }),
       );
       if (response.statusCode == 200) {
         setState(() {
           // Actualiza el estado local y cambia el texto del botón
-          isPublic = !isPublic;
+          playlistPublica = !playlistPublica;
         });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
