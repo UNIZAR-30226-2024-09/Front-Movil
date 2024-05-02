@@ -5,6 +5,7 @@ import 'package:aversifunciona/pantalla_principal.dart';
 import 'package:aversifunciona/salas.dart';
 import 'package:flutter/material.dart';
 import 'package:aversifunciona/getUserSession.dart';
+import 'crearPlaylist.dart';
 import 'env.dart';
 import 'historial.dart';
 import 'verPerfil.dart';
@@ -112,9 +113,7 @@ class _pantalla_bibliotecaState extends State<pantalla_biblioteca> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-
         backgroundColor: Colors.black,
-
           leading: TextButton(
               child: const CircleAvatar(
                 child: Icon(Icons.person_rounded, color: Colors.white,),
@@ -130,7 +129,10 @@ class _pantalla_bibliotecaState extends State<pantalla_biblioteca> {
           actions: [
             TextButton(
               onPressed: () {
-                // Aquí puedes definir la acción que deseas realizar cuando se presione el botón "+"
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => CrearPlaylist()), // Suponiendo que el nombre de la pantalla sea CrearPlaylist
+                );
               },
               child: Text(
                 '+',
@@ -138,6 +140,7 @@ class _pantalla_bibliotecaState extends State<pantalla_biblioteca> {
               ),
             ),
           ]
+
       ),
       body: Column(
         children: [
