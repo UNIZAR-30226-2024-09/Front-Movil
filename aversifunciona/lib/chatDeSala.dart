@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
-import 'env.dart';
 
 class ChatDeSala extends StatefulWidget {
   final String roomName;
@@ -15,25 +14,26 @@ class ChatDeSala extends StatefulWidget {
 class _ChatDeSalaState extends State<ChatDeSala> {
   TextEditingController _messageController = TextEditingController();
   List<String> _messages = [];
+  @override
+  void initState() {
+    super.initState();
+    _loadMessages(); // Carga los mensajes almacenados cuando se inicia el widget
+  }
 
-  Future<bool> verificarSala(String salaId) async {
-    try {
-      final response = await http.get(
-        Uri.parse("${Env.URL_PREFIX}/verificarSala/$salaId"),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8'
-        },
-      );
+  Future<void> _loadMessages() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _messages = prefs.getStringList('chat_messages_$widget.roomName') ?? [];
+    });
+  }
 
-      if (response.statusCode == 200) {
-        return true;
-      } else {
-        return false;
-      }
-    } catch (e) {
-      print("Error al realizar la solicitud HTTP: $e");
-      return false;
-    }
+  Future<void> _saveMessage(String message) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> updatedMessages = [..._messages, message];
+    await prefs.setStringList('chat_messages_${widget.roomName}', updatedMessages);
+    setState(() {
+      _messages = updatedMessages;
+    });
   }
 
   @override
@@ -121,10 +121,9 @@ class _ChatDeSalaState extends State<ChatDeSala> {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    setState(() {
-                      _messages.insert(0, _messageController.text);
-                      _messageController.clear();
-                    });
+                    String message = _messageController.text;
+                    _saveMessage(message);
+                    _messageController.clear();
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
