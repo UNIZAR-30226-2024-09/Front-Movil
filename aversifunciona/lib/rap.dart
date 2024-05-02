@@ -105,8 +105,9 @@ class _rap_State extends State<rap> {
           ? const Center(child: CircularProgressIndicator()): ListView.builder(
         itemCount: canciones.length,
         itemBuilder: (context, index) {
+          String cancion = canciones[index].foto;
           return ListTile(
-            leading: Image.memory(base64Decode(canciones[index].foto), height: 25, width: 25,),
+            leading: Image.memory(base64Url.decode(('data:image/jpeg;base64,${utf8.decode(base64Decode(cancion.replaceAll(RegExp('/^data:image/[a-z]+;base64,/'), '')))}').split(',').last), height: 50, width: 50,),
             title: TextButton(
               onPressed:() {
                 Navigator.push(

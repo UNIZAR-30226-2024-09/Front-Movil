@@ -44,7 +44,7 @@ class _pop_State extends State<pop> {
   Future<void> filtrarCanciones() async {
     try {
       final response = await http.post(
-        Uri.parse('${Env.URL_PREFIX}filtrarCancionesPorGenero/'),
+        Uri.parse('${Env.URL_PREFIX}/filtrarCancionesPorGenero/'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
@@ -100,8 +100,9 @@ class _pop_State extends State<pop> {
           ? const Center(child: const CircularProgressIndicator()): ListView.builder(
         itemCount: canciones.length,
         itemBuilder: (context, index) {
+          String cancion = canciones[index].foto;
           return ListTile(
-            leading: Image.memory(base64Decode(canciones[index].foto), height: 25, width: 25,),
+            leading: Image.memory(base64Url.decode(('data:image/jpeg;base64,${utf8.decode(base64Decode(cancion.replaceAll(RegExp('/^data:image/[a-z]+;base64,/'), '')))}').split(',').last), height: 50, width: 50,),
             title: TextButton(
               onPressed:() {
                 Navigator.push(

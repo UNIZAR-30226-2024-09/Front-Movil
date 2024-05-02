@@ -240,7 +240,6 @@ class _pantalla_bibliotecaState extends State<pantalla_biblioteca> {
                     ),
                   ),
                   child: const Column(
-
                       children: [
                         SizedBox(height: 8),
                         Icon(Icons.question_mark_outlined, color: Colors.grey, size: 37.0),

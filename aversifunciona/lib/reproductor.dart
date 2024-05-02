@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:base64_audio_source/base64_audio_source.dart';
 import 'package:path_provider/path_provider.dart';
 import 'cancion.dart';
 import 'dart:convert';
@@ -51,27 +52,11 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
       // Decodificar el audio base64 a bytes
       String song = cancion.archivomp3!;
       //song.replaceAll(RegExp('^data:audio\\/mp3;base64,'), '').replaceAll(RegExp('^data:[^;]+;base64,'), '')
-      List<int> bytes = base64Decode(song.replaceAll(RegExp('^data:audio\\/mp3;base64,'), '').replaceAll(RegExp('^data:[^;]+;base64,'), ''));
-      String base64decoded = utf8.decode(bytes);
-      bytes = base64Decode(base64decoded);
-      // Obtener el directorio temporal para guardar el archivo
-      Directory tempDir = await getTemporaryDirectory();
-
-      // Crear un archivo temporal para el audio
-      File tempFile = File('${tempDir.path}/temp_audio.mp3');
-
-      // Escribir los bytes en el archivo temporal en fragmentos
-      final bufferSize = 4096;
-      var buffer = BytesBuilder();
-      for (var i = 0; i < bytes.length; i += bufferSize) {
-        var end = (i + bufferSize < bytes.length) ? i + bufferSize : bytes.length;
-        buffer.add(bytes.sublist(i, end));
-        await tempFile.writeAsBytes(buffer.toBytes(), mode: FileMode.append, flush: true);
-        buffer.clear();
-      }
+      String song2 = ('data:audio/mp3;base64,${(utf8.decode(base64Decode(song.replaceAll(RegExp(r'^data:audio\/mp3;base64,'), '').replaceAll(RegExp(r'^data:[^;]+;base64,'), ''))))}').split(',').last;
 
       // Cargar el archivo temporal en el reproductor de audio
-      await mp3player.setFilePath(tempFile.path);
+      //await mp3player.setFilePath(tempFile.path);
+      await mp3player.setAudioSource(Base64AudioSource(song2, kAudioFormatMP3));
 
       // Cargar el AudioSource en el reproductor de audio
     }
@@ -136,6 +121,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
   void replaySong() {
     setState(() {
       progress = 0.0;
+      cargar_cancion();
       startPlaying();
       isPlaying = true;
     });
@@ -145,6 +131,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
   void dispose() {
     // Asegurarse de cancelar el temporizador cuando se desmonta el widget
     timer?.cancel();
+    mp3player.dispose();
     super.dispose();
   }
 
@@ -157,10 +144,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                const Text(
-                  'Now Playing',
-                  style: TextStyle(fontSize: 24.0),
-                ),
+                Image.memory(base64Url.decode(('data:image/jpeg;base64,${utf8.decode(base64Decode(cancion.foto.replaceAll(RegExp('/^data:image/[a-z]+;base64,/'), '')))}').split(',').last), height: 250, width: 250,),
                 const SizedBox(height: 20.0),
                 // Agregar aquí la imagen de la canción
                 const SizedBox(height: 20.0),

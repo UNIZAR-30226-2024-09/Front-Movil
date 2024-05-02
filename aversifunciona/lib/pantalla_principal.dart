@@ -167,7 +167,7 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
   }
 
   String base64ToImageSrc(String base64) {
-    return base64.replaceAll(RegExp('/^data:image/[a-z]+;base64,/'), '');
+    return 'data:image/jpeg;base64,${utf8.decode(base64Decode(base64.replaceAll(RegExp('/^data:image/[a-z]+;base64,/'), '')))}';
   }
 
   Future<void> conseguirCanciones() async {
@@ -254,9 +254,34 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
                   child: Row(
                     children: [
                       const SizedBox(width: 20,),
-                      Container(height: 75, width: 75, padding: const EdgeInsets.symmetric(horizontal: 8), decoration: const BoxDecoration(color: Colors.grey),
+                      Container(height: 100, width: 100, padding: const EdgeInsets.symmetric(horizontal: 8), 
                         child: FutureBuilder<Uint8List>(
-                          future: Future.microtask(() => base64Decode(canciones[0].foto)),
+                          future: Future.microtask(() => base64Url.decode((base64ToImageSrc(canciones[0].foto)).split(',').last)),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              // Muestra un indicador de carga mientras se decodifica la imagen
+                              return const CircularProgressIndicator();
+                            } else if (snapshot.hasError) {
+                              // Muestra un mensaje de error si ocurre un error durante la decodificación
+                              return Text('Error: ${snapshot.error}', style: const TextStyle(fontSize: 6, color: Colors.black),);
+                            } else {
+                              // Si la decodificación fue exitosa, muestra la imagen
+                              return Image.memory(
+                                height: 75,
+                                width: 75,
+                                snapshot.data!,
+                                fit: BoxFit.cover,
+                              );
+                            }
+                          },
+                        ),
+                      ),
+
+                      const SizedBox(width: 50,),
+
+                      Container(height: 100, width: 100, padding: const EdgeInsets.symmetric(horizontal: 8), 
+                        child: FutureBuilder<Uint8List>(
+                          future: Future.microtask(() => base64Url.decode((base64ToImageSrc(canciones[1].foto)).split(',').last)),
                           builder: (context, snapshot) {
                             if (snapshot.connectionState == ConnectionState.waiting) {
                               // Muestra un indicador de carga mientras se decodifica la imagen
@@ -278,34 +303,9 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
                       ),
 
                       const SizedBox(width: 50,),
-
-                      Container(height: 75, width: 75, padding: const EdgeInsets.symmetric(horizontal: 8), decoration: const BoxDecoration(color: Colors.grey),
+                      Container(height: 100, width: 100, padding: const EdgeInsets.symmetric(horizontal: 8), 
                         child: FutureBuilder<Uint8List>(
-                          future: Future.microtask(() => base64Decode(canciones[1].foto)),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.waiting) {
-                              // Muestra un indicador de carga mientras se decodifica la imagen
-                              return const CircularProgressIndicator();
-                            } else if (snapshot.hasError) {
-                              // Muestra un mensaje de error si ocurre un error durante la decodificación
-                              return Text('Error: ${snapshot.error}');
-                            } else {
-                              // Si la decodificación fue exitosa, muestra la imagen
-                              return Image.memory(
-                                height: 75,
-                                width: 75,
-                                snapshot.data!,
-                                fit: BoxFit.cover,
-                              );
-                            }
-                          },
-                        ),
-                      ),
-
-                      const SizedBox(width: 50,),
-                      Container(height: 75, width: 75, padding: const EdgeInsets.symmetric(horizontal: 8), decoration: const BoxDecoration(color: Colors.grey),
-                        child: FutureBuilder<Uint8List>(
-                          future: Future.microtask(() => base64Decode(canciones[2].foto)),
+                          future: Future.microtask(() => base64Url.decode((base64ToImageSrc(canciones[2].foto)).split(',').last)),
                           builder: (context, snapshot) {
                             if (snapshot.connectionState == ConnectionState.waiting) {
                               // Muestra un indicador de carga mientras se decodifica la imagen
@@ -339,9 +339,9 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
                     child: Row(
                       children: [
                         const SizedBox(width: 20,),
-                        Container(height: 75, width: 75, padding: const EdgeInsets.symmetric(horizontal: 8), decoration: const BoxDecoration(color: Colors.grey),
+                        Container(height: 100, width: 100, padding: const EdgeInsets.symmetric(horizontal: 8), 
                           child: FutureBuilder<Uint8List>(
-                            future: Future.microtask(() => base64Decode(canciones[0].foto)),
+                            future: Future.microtask(() => base64Url.decode((base64ToImageSrc(canciones[0].foto)).split(',').last)),
                             builder: (context, snapshot) {
                               if (snapshot.connectionState == ConnectionState.waiting) {
                                 // Muestra un indicador de carga mientras se decodifica la imagen
@@ -364,9 +364,9 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
 
                         const SizedBox(width: 50,),
 
-                        Container(height: 75, width: 75, padding: const EdgeInsets.symmetric(horizontal: 8), decoration: const BoxDecoration(color: Colors.grey),
+                        Container(height: 100, width: 100, padding: const EdgeInsets.symmetric(horizontal: 8), 
                           child: FutureBuilder<Uint8List>(
-                            future: Future.microtask(() => base64Decode(canciones[1].foto)),
+                            future: Future.microtask(() => base64Url.decode((base64ToImageSrc(canciones[1].foto)).split(',').last)),
                             builder: (context, snapshot) {
                               if (snapshot.connectionState == ConnectionState.waiting) {
                                 // Muestra un indicador de carga mientras se decodifica la imagen
@@ -388,9 +388,9 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
                         ),
 
                         const SizedBox(width: 50,),
-                        Container(height: 75, width: 75, padding: const EdgeInsets.symmetric(horizontal: 8), decoration: const BoxDecoration(color: Colors.grey),
+                        Container(height: 100, width: 100, padding: const EdgeInsets.symmetric(horizontal: 8), 
                           child: FutureBuilder<Uint8List>(
-                            future: Future.microtask(() => base64Decode(canciones[2].foto)),
+                            future: Future.microtask(() => base64Url.decode((base64ToImageSrc(canciones[2].foto)).split(',').last)),
                             builder: (context, snapshot) {
                               if (snapshot.connectionState == ConnectionState.waiting) {
                                 // Muestra un indicador de carga mientras se decodifica la imagen
@@ -424,9 +424,9 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
                   child: Row(
                     children: [
                       const SizedBox(width: 20,),
-                      Container(height: 75, width: 75, padding: const EdgeInsets.symmetric(horizontal: 8), decoration: const BoxDecoration(color: Colors.grey),
+                      Container(height: 100, width: 100, padding: const EdgeInsets.symmetric(horizontal: 8), 
                         child: FutureBuilder<Uint8List>(
-                          future: Future.microtask(() => base64Decode(canciones[0].foto)),
+                          future: Future.microtask(() => base64Url.decode((base64ToImageSrc(canciones[0].foto)).split(',').last)),
                           builder: (context, snapshot) {
                             if (snapshot.connectionState == ConnectionState.waiting) {
                               // Muestra un indicador de carga mientras se decodifica la imagen
@@ -449,9 +449,9 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
 
                       const SizedBox(width: 50,),
 
-                      Container(height: 75, width: 75, padding: const EdgeInsets.symmetric(horizontal: 8), decoration: const BoxDecoration(color: Colors.grey),
+                      Container(height: 100, width: 100, padding: const EdgeInsets.symmetric(horizontal: 8), 
                         child: FutureBuilder<Uint8List>(
-                          future: Future.microtask(() => base64Decode(canciones[1].foto)),
+                          future: Future.microtask(() => base64Url.decode((base64ToImageSrc(canciones[1].foto)).split(',').last)),
                           builder: (context, snapshot) {
                             if (snapshot.connectionState == ConnectionState.waiting) {
                               // Muestra un indicador de carga mientras se decodifica la imagen
@@ -473,9 +473,9 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
                       ),
 
                       const SizedBox(width: 50,),
-                      Container(height: 75, width: 75, padding: const EdgeInsets.symmetric(horizontal: 8), decoration: const BoxDecoration(color: Colors.grey),
+                      Container(height: 100, width: 100, padding: const EdgeInsets.symmetric(horizontal: 8), 
                         child: FutureBuilder<Uint8List>(
-                          future: Future.microtask(() => base64Decode(canciones[2].foto)),
+                          future: Future.microtask(() => base64Url.decode((base64ToImageSrc(canciones[2].foto)).split(',').last)),
                           builder: (context, snapshot) {
                             if (snapshot.connectionState == ConnectionState.waiting) {
                               // Muestra un indicador de carga mientras se decodifica la imagen
@@ -507,9 +507,9 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
                   child: Row(
                     children: [
                       const SizedBox(width: 20,),
-                      Container(height: 75, width: 75, padding: const EdgeInsets.symmetric(horizontal: 8), decoration: const BoxDecoration(color: Colors.grey),
+                      Container(height: 100, width: 100, padding: const EdgeInsets.symmetric(horizontal: 8), 
                         child: FutureBuilder<Uint8List>(
-                          future: Future.microtask(() => base64Decode(canciones[0].foto)),
+                          future: Future.microtask(() => base64Url.decode((base64ToImageSrc(canciones[0].foto)).split(',').last)),
                           builder: (context, snapshot) {
                             if (snapshot.connectionState == ConnectionState.waiting) {
                               // Muestra un indicador de carga mientras se decodifica la imagen
@@ -532,9 +532,9 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
 
                       const SizedBox(width: 50,),
 
-                      Container(height: 75, width: 75, padding: const EdgeInsets.symmetric(horizontal: 8), decoration: const BoxDecoration(color: Colors.grey),
+                      Container(height: 100, width: 100, padding: const EdgeInsets.symmetric(horizontal: 8),
                         child: FutureBuilder<Uint8List>(
-                          future: Future.microtask(() => base64Decode(canciones[1].foto)),
+                          future: Future.microtask(() => base64Url.decode((base64ToImageSrc(canciones[1].foto)).split(',').last)),
                           builder: (context, snapshot) {
                             if (snapshot.connectionState == ConnectionState.waiting) {
                               // Muestra un indicador de carga mientras se decodifica la imagen
@@ -556,9 +556,9 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
                       ),
 
                       const SizedBox(width: 50,),
-                      Container(height: 75, width: 75, padding: const EdgeInsets.symmetric(horizontal: 8), decoration: const BoxDecoration(color: Colors.grey),
+                      Container(height: 100, width: 100, padding: const EdgeInsets.symmetric(horizontal: 8),
                         child: FutureBuilder<Uint8List>(
-                          future: Future.microtask(() => base64Decode(canciones[2].foto)),
+                          future: Future.microtask(() => base64Url.decode((base64ToImageSrc(canciones[2].foto)).split(',').last)),
                           builder: (context, snapshot) {
                             if (snapshot.connectionState == ConnectionState.waiting) {
                               // Muestra un indicador de carga mientras se decodifica la imagen
@@ -572,7 +572,7 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
                                 height: 75,
                                 width: 75,
                                 snapshot.data!,
-                                fit: BoxFit.cover,
+
                               );
                             }
                           },
