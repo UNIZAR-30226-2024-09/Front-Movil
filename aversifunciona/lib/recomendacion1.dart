@@ -49,7 +49,7 @@ class recomendacion1_ extends StatelessWidget {
                 );
               },
               style: ElevatedButton.styleFrom(
-                primary: Colors.grey[800], // Utilizando un tono de gris más oscuro
+                backgroundColor: Colors.grey[800], // Utilizando un tono de gris más oscuro
               ),
               child: Text(
                 'Nueva',
@@ -66,7 +66,7 @@ class recomendacion1_ extends StatelessWidget {
                 );
               },
               style: ElevatedButton.styleFrom(
-                primary: Colors.grey[800], // Utilizando un tono de gris más oscuro
+                backgroundColor: Colors.grey[800], // Utilizando un tono de gris más oscuro
               ),
               child: Text(
                 'Clásica',
@@ -83,7 +83,7 @@ class recomendacion1_ extends StatelessWidget {
                 );
               },
               style: ElevatedButton.styleFrom(
-                primary: Colors.grey[800], // Utilizando un tono de gris más oscuro
+                backgroundColor: Colors.grey[800], // Utilizando un tono de gris más oscuro
               ),
               child: Text(
                 'Ambas',
