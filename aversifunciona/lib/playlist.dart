@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
+import 'pantallaCancion.dart';
 import 'env.dart';
 
 class Playlist extends StatefulWidget {
@@ -93,7 +93,7 @@ class _PlaylistState extends State<Playlist> {
         });
         // Iterar sobre la lista de canciones y obtener los artistas de cada una
         for (var song in songs) {
-          await _fetchSongArtists(song['cancionId']);
+          await _fetchSongArtists(song['id']);
         }
       } else {
         throw Exception('Error al obtener las canciones de la playlist');
@@ -122,7 +122,7 @@ class _PlaylistState extends State<Playlist> {
         final artistsData = responseData['artistas'];
         // Actualizar los artistas de la canción en la lista de canciones
         setState(() {
-          songs.firstWhere((song) => song['cancionId'] == songId)['artista'] = List<Map<String, dynamic>>.from(artistsData);
+          songs.firstWhere((song) => song['id'] == songId)['artista'] = List<Map<String, dynamic>>.from(artistsData);
         });
       } else {
         throw Exception('Error al obtener los artistas de la canción $songId');
@@ -240,14 +240,27 @@ class _PlaylistState extends State<Playlist> {
               itemCount: songs.length,
               itemBuilder: (context, index) {
                 final song = songs[index];
-                final artistas = song['artistas'] as List<Map<String, dynamic>>?;
+                final artistas = song['artista'] as List<Map<String, dynamic>>?;
                 final artistasString = artistas != null ? artistas.map((artista) => artista['nombre']).join(', ') : 'Artistas no disponibles';
-                return ListTile(
-                  leading: Icon(Icons.music_note),
-                  title: Text(song['nombre'] ?? 'Nombre no disponible', style: TextStyle(color: Colors.white)),
-                  subtitle: Text(artistasString, style: TextStyle(color: Colors.grey)),
+                return GestureDetector(
+                  onTap: () {
+                    // Verificar si song['cancionId'] no es nulo antes de pasar a PantallaCancion
+                    if (song['id'] != null) {
+                      // Navegar a la pantalla de detalles de la canción
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => PantallaCancion(songId: song['id'])),
+                      );
+                    }
+                  },
+
+                  child: ListTile(
+                    leading: Icon(Icons.music_note),
+                    title: Text(song['nombre'] ?? 'Nombre no disponible', style: TextStyle(color: Colors.white)),
+                    subtitle: Text(artistasString, style: TextStyle(color: Colors.grey)),
+                  ),
                 );
-             },
+              },
             ),
           ),
         ],
