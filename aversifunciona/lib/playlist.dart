@@ -20,6 +20,7 @@ class _PlaylistState extends State<Playlist> {
   late String duration = '';
   late bool playlistPublica = true;
   late List<Map<String, dynamic>> songs = [];
+  final TextEditingController _emailController = TextEditingController();
 
   @override
   void initState() {
@@ -151,6 +152,14 @@ class _PlaylistState extends State<Playlist> {
           },
         ),
         title: Text('Playlist', style: TextStyle(color: Colors.white)),
+        actions: [
+          IconButton(
+            onPressed: () {
+              _showAddCollaboratorModal(context);
+            },
+            icon: Icon(Icons.person_add, color: Colors.white),
+          ),
+        ],
       ),
       body: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -279,5 +288,67 @@ class _PlaylistState extends State<Playlist> {
       );
     }
   }
+
+  void _showAddCollaboratorModal(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Añadir Colaborador'),
+          content: TextField(
+            controller: _emailController,
+            decoration: InputDecoration(
+              hintText: 'Correo Electrónico',
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancelar'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                _addCollaborator();
+                Navigator.of(context).pop();
+              },
+              child: Text('Añadir Colaborador'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _addCollaborator() async {
+    try {
+      final response = await http.post(
+        Uri.parse('${Env.URL_PREFIX}/agnadirColaboradorAPI/'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'correo': _emailController.text,
+          'playlistId': widget.playlistId,
+        }),
+      );
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Colaborador añadido con éxito'),
+          ),
+        );
+      } else {
+        throw Exception('Error al añadir el colaborador');
+      }
+    } catch (e) {
+      print('Error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error al añadir el colaborador'),
+        ),
+      );
+    }
+  }
 }
+
 
