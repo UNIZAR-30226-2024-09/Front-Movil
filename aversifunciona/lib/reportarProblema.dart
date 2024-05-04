@@ -72,12 +72,14 @@ class _reportarProblema extends State<reportarProblema> {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text('Mensaje del servidor'),
-          content: Text(data['message']), 
+          title: Text('¡Reporte enviado!'),
+          content: Text('Hemos recibido tu reporte. Nos pondremos en contacto contigo para resolver el problema.'),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text('OK'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text('Cerrar'),
             ),
           ],
         ),
@@ -121,10 +123,11 @@ class _reportarProblema extends State<reportarProblema> {
             Text('Reportar problema', style: TextStyle(color: Colors.white)),
           ],
         ),
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.black, // Cambio de color de fondo a negro
         automaticallyImplyLeading: false, // Eliminar el botón de retroceso predeterminado
       ),
-      body: Padding(
+      body: Container( // Cambio a Container para establecer el color de fondo
+        color: Colors.black, // Color de fondo negro
         padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -134,38 +137,46 @@ class _reportarProblema extends State<reportarProblema> {
               style: TextStyle(fontSize: 18, color: Colors.white),
             ),
             SizedBox(height: 10), // Espacio entre el nuevo texto y el campo de texto
-            DropdownButton( // Desplegable para seleccionar el tipo de problema
-              // Aquí puedes definir la lista de opciones y la lógica de selección
-              // Por ahora, solo incluiré un ejemplo básico
-              items: [
-                DropdownMenuItem(
-                  child: Text('Errores técnicos'),
-                  value: 'tecnicos',
-                ),
-                DropdownMenuItem(
-                  child: Text('Violación de términos de servicio'),
-                  value: 'servicio',
-                ),
-                DropdownMenuItem(
-                  child: Text('Problemas de seguridad'),
-                  value: 'seguridad',
-                ),
-                DropdownMenuItem(
-                  child: Text('Errores de contenido'),
-                  value: 'contenido',
-                ),
-                DropdownMenuItem(
-                  child: Text('Otros'),
-                  value: 'otros',
-                ),
+            Row(
+                children: [
+                  Text(
+                    _tipoProblema.isNotEmpty ? _tipoProblema : 'Seleccione un problema', // Mostrar el tipo de problema seleccionado o un texto predeterminado si no se ha seleccionado ninguno
+                    style: TextStyle(fontSize: 16, color: _tipoProblema.isNotEmpty ? Colors.white : Colors.grey[400]), // Cambiar el color del texto si se ha seleccionado un problema
+                  ),
+                  DropdownButton( // Desplegable para seleccionar el tipo de problema
+                    // Aquí puedes definir la lista de opciones y la lógica de selección
+                    // Por ahora, solo incluiré un ejemplo básico
+                    items: [
+                      DropdownMenuItem(
+                        child: Text('Errores técnicos'),
+                        value: 'Técnico',
+                      ),
+                      DropdownMenuItem(
+                        child: Text('Violación de términos de servicio'),
+                        value: 'Servicio',
+                      ),
+                      DropdownMenuItem(
+                        child: Text('Problemas de seguridad'),
+                        value: 'Seguridad',
+                      ),
+                      DropdownMenuItem(
+                        child: Text('Errores de contenido'),
+                        value: 'Contenido',
+                      ),
+                      DropdownMenuItem(
+                        child: Text('Otros'),
+                        value: 'Otros',
+                      ),
 
-              ],
-              onChanged: (value) {
-                setState(() {
-                  _tipoProblema = value ?? '';
-                });
+                    ],
+                    onChanged: (value) {
+                      setState(() {
+                        _tipoProblema = value ?? '';
+                      });
 
-              },
+                    },
+                  ),
+                ]
             ),
             SizedBox(height: 20), // Espacio entre el desplegable y el campo de texto de descripción
             Text(
@@ -192,24 +203,10 @@ class _reportarProblema extends State<reportarProblema> {
                   _descripcion = problemDescription;
                 });
                 _enviarReporte();
-
-                // Mostrar el diálogo de confirmación
-                showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: Text('¡Reporte enviado!'),
-                    content: Text('Hemos recibido tu reporte. Nos pondremos en contacto contigo para resolver el problema.'),
-                    actions: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: Text('Cerrar'),
-                      ),
-                    ],
-                  ),
-                );
               },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue, // Color de fondo del botón
+              ),
               child: Text('Enviar', style: TextStyle(color: Colors.white)),
             ),
 
