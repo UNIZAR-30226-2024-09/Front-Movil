@@ -7,8 +7,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class ChatDeSala extends StatefulWidget {
   final String roomName;
+  final String userName;
 
-  ChatDeSala({required this.roomName});
+  ChatDeSala({required this.roomName, required this.userName});
 
   @override
   _ChatDeSalaState createState() => _ChatDeSalaState();
@@ -16,26 +17,35 @@ class ChatDeSala extends StatefulWidget {
 
 class _ChatDeSalaState extends State<ChatDeSala> {
   TextEditingController _messageController = TextEditingController();
-  List<String> _messages = [];
+  List<Map<String, String>> _messages = [];
+
   @override
   void initState() {
     super.initState();
-    _loadMessages(); // Carga los mensajes almacenados cuando se inicia el widget
+    _loadMessages();
   }
 
   Future<void> _loadMessages() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      _messages = prefs.getStringList('chat_messages_${widget.roomName}') ?? [];
+      _messages = (prefs.getStringList('chat_messages_${widget.roomName}') ?? [])
+          .map((message) => {"text": message, "name": widget.userName})
+          .toList();
+      _messages = _messages.reversed.toList(); // Reverse the list to display recent messages at the bottom
     });
   }
 
   Future<void> _saveMessage(String message) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String> updatedMessages = [..._messages, message];
-    await prefs.setStringList('chat_messages_${widget.roomName}', updatedMessages);
+    List<String> updatedMessages =
+    [..._messages.map((msg) => msg["text"] ?? ""), message];
+    await prefs.setStringList(
+        'chat_messages_${widget.roomName}', updatedMessages);
     setState(() {
-      _messages = updatedMessages;
+      _messages = [
+        {"text": message, "name": widget.userName},
+        ..._messages, // Add new message at the beginning of the list
+      ];
     });
   }
 
@@ -65,30 +75,58 @@ class _ChatDeSalaState extends State<ChatDeSala> {
         ),
       ),
       body: Container(
-        color: Color(0xFF333333), // Gris oscuro
+        color: Color(0xFF333333),
         child: Column(
           children: [
             Expanded(
               child: Container(
                 child: ListView.builder(
-                  reverse: true,
                   itemCount: _messages.length,
                   itemBuilder: (context, index) {
+                    final message = _messages.reversed.toList()[index];
+                    final isCurrentUser = message["name"] == widget.userName;
                     return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: Container(
-                          padding: EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: Colors.blue,
-                            borderRadius: BorderRadius.circular(10),
+                      child: Column(
+                        crossAxisAlignment: isCurrentUser
+                            ? CrossAxisAlignment.end
+                            : CrossAxisAlignment.start,
+                        children: [
+                          if (isCurrentUser)
+                            Text(
+                              "Tú:",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            )
+                          else
+                            Text(
+                              widget.userName + ':',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          Align(
+                            alignment: isCurrentUser
+                                ? Alignment.centerRight
+                                : Alignment.centerLeft,
+                            child: Container(
+                              padding: EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: isCurrentUser ? Colors.blue : Colors.green,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Text(
+                                "${message['text']}",
+                                style: TextStyle(
+                                  color: isCurrentUser ? Colors.white : Colors.black,
+                                ),
+                              ),
+                            ),
                           ),
-                          child: Text(
-                            _messages[index],
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
+                        ],
                       ),
                     );
                   },
@@ -96,7 +134,7 @@ class _ChatDeSalaState extends State<ChatDeSala> {
               ),
             ),
             Container(
-              color: Colors.black, // Fondo negro para la barra de opciones inferior
+              color: Colors.black,
               child: Column(
                 children: [
                   Row(
@@ -106,18 +144,18 @@ class _ChatDeSalaState extends State<ChatDeSala> {
                           padding: const EdgeInsets.all(8.0),
                           child: Container(
                             decoration: BoxDecoration(
-                              color: Colors.white, // Fondo blanco para el recuadro de texto del mensaje
-                              borderRadius: BorderRadius.circular(20), // Bordes redondeados
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20),
                             ),
                             child: Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 16.0),
                               child: TextField(
                                 controller: _messageController,
-                                style: TextStyle(color: Colors.black), // Texto negro para mejor legibilidad
+                                style: TextStyle(color: Colors.black),
                                 decoration: InputDecoration(
                                   hintText: 'Escribe un mensaje...',
                                   hintStyle: TextStyle(color: Colors.grey),
-                                  border: InputBorder.none, // Sin borde para que el BoxDecoration defina el borde
+                                  border: InputBorder.none,
                                 ),
                               ),
                             ),

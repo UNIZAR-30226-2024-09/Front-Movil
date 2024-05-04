@@ -1,11 +1,11 @@
 import 'package:aversifunciona/pantalla_principal.dart';
 import 'package:aversifunciona/podcast.dart';
 import 'package:aversifunciona/reproductor.dart';
+import 'package:aversifunciona/salas.dart';
 import 'package:flutter/material.dart';
 
 import 'biblioteca.dart';
 import 'buscar.dart';
-import 'chatSalaDisponible.dart';
 import 'env.dart';
 
 import 'dart:convert';

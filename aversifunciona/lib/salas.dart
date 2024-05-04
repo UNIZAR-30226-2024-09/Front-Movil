@@ -1,3 +1,4 @@
+import 'package:aversifunciona/getUserSession.dart';
 import 'package:flutter/material.dart';
 import 'package:aversifunciona/pantalla_principal.dart';
 import 'package:aversifunciona/verPerfil.dart';
@@ -26,6 +27,8 @@ Route _createRoute() {
   );
 }
 
+
+
 class pantalla_salas extends StatefulWidget {
   @override
   _PantallaSalasState createState() => _PantallaSalasState();
@@ -34,6 +37,28 @@ class pantalla_salas extends StatefulWidget {
 class _PantallaSalasState extends State<pantalla_salas> {
   List<String> _listaSalas = ['SpainMusic', 'SiaLovers', 'EminemGroup']; // Lista de nombres de salas
   TextEditingController salaController = TextEditingController();
+  //String usuarioActual = '';
+
+  Future<String> getNombreUsuario() async {
+    try {
+      String? token = await getUserSession.getToken(); // Espera a que el token se resuelva
+      print("Token: $token");
+      if (token != null) {
+        // Llama al método AuthService para obtener la información del usuario
+        Map<String, dynamic> userInfo = await getUserSession.getUserInfo(token);
+
+        String usuarioActual = userInfo['nombre'];
+        return usuarioActual;
+
+      } else {
+        print('Token is null');
+        return '';
+      }
+    } catch (e) {
+      print('Error fetching user info: $e');
+      return '';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,12 +94,28 @@ class _PantallaSalasState extends State<pantalla_salas> {
                     Colors.blue,
                     'Únete ahora',
                         () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ChatDeSala(roomName: sala),
-                        ),
-                      );
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) {
+                                return FutureBuilder<String>(
+                                  future: getNombreUsuario(),
+                                  builder: (context, snapshot) {
+                                  if (snapshot.hasError) {
+                                    // Maneja cualquier error que ocurra al obtener el nombre de usuario
+                                    return Text('Error: ${snapshot.error}');
+                                  } else {
+                                    // Construye la pantalla de chat con el nombre de usuario obtenido
+                                    return ChatDeSala(roomName: sala, userName: snapshot.data!);
+                                  }
+                                  },
+                                );
+                              },
+                            ),
+                          );
+
+
+
                     },
                   ),
                 const SizedBox(height: 20),
@@ -278,7 +319,27 @@ class _PantallaSalasState extends State<pantalla_salas> {
                     });
                     // Lógica para crear la sala
                     Navigator.pop(context); // Cerrar el diálogo
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => ChatDeSala(roomName: roomName)));
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return FutureBuilder<String>(
+                            future: getNombreUsuario(),
+                            builder: (context, snapshot) {
+
+                            if (snapshot.hasError) {
+                              // Maneja cualquier error que ocurra al obtener el nombre de usuario
+                              return Text('Error: ${snapshot.error}');
+                            } else {
+                              // Construye la pantalla de chat con el nombre de usuario obtenido
+                              return ChatDeSala(roomName: roomName, userName: snapshot.data!);
+                            }
+
+                            },
+                          );
+                        },
+                      ),
+                    );
                   },
                   child: Text('Aceptar'),
                 ),

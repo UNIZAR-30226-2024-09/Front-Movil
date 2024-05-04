@@ -1,9 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:aversifunciona/getUserSession.dart';
 import 'chatDeSala.dart';
 
 class crearSala extends StatelessWidget {
   TextEditingController salaController = TextEditingController();
+  Future<String> getNombreUsuario() async {
+    try {
+      String? token = await getUserSession.getToken(); // Espera a que el token se resuelva
+      print("Token: $token");
+      if (token != null) {
+        // Llama al método AuthService para obtener la información del usuario
+        Map<String, dynamic> userInfo = await getUserSession.getUserInfo(token);
 
+        String usuarioActual = userInfo['nombre'];
+        return usuarioActual;
+
+      } else {
+        print('Token is null');
+        return '';
+      }
+    } catch (e) {
+      print('Error fetching user info: $e');
+      return '';
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,14 +50,71 @@ class crearSala extends StatelessWidget {
                 _showCreateRoomDialog(context);
               }),
               buildButton('SpainMusic', Colors.blue, 'Únete ahora', () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => ChatDeSala(roomName: 'SpainMusic')));
-              }),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return FutureBuilder<String>(
+                        future: getNombreUsuario(),
+                        builder: (context, snapshot) {
+
+                          if (snapshot.hasError) {
+                            // Maneja cualquier error que ocurra al obtener el nombre de usuario
+                            return Text('Error: ${snapshot.error}');
+                          } else {
+                            // Construye la pantalla de chat con el nombre de usuario obtenido
+                            return ChatDeSala(roomName: 'SpainMusic', userName: snapshot.data!);
+                          }
+
+                        },
+                      );
+                    },
+                  ),
+                );              }),
               buildButton('SiaLovers', Colors.blue, 'Únete ahora', () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => ChatDeSala(roomName: 'SiaLovers')));
-              }),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return FutureBuilder<String>(
+                        future: getNombreUsuario(),
+                        builder: (context, snapshot) {
+
+                          if (snapshot.hasError) {
+                            // Maneja cualquier error que ocurra al obtener el nombre de usuario
+                            return Text('Error: ${snapshot.error}');
+                          } else {
+                            // Construye la pantalla de chat con el nombre de usuario obtenido
+                            return ChatDeSala(roomName: 'SiaLovers', userName: snapshot.data!);
+                          }
+
+                        },
+                      );
+                    },
+                  ),
+                );              }),
               buildButton('EminemGroup', Colors.blue, 'Únete ahora', () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => ChatDeSala(roomName: 'EminemGroup')));
-              }),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return FutureBuilder<String>(
+                        future: getNombreUsuario(),
+                        builder: (context, snapshot) {
+
+                          if (snapshot.hasError) {
+                            // Maneja cualquier error que ocurra al obtener el nombre de usuario
+                            return Text('Error: ${snapshot.error}');
+                          } else {
+                            // Construye la pantalla de chat con el nombre de usuario obtenido
+                            return ChatDeSala(roomName: 'EminemGroup', userName: snapshot.data!);
+                          }
+
+                        },
+                      );
+                    },
+                  ),
+                );              }),
               SizedBox(height: 20),
               Expanded(
                 child: Container(
@@ -122,7 +199,30 @@ class crearSala extends StatelessWidget {
                     String roomName = salaController.text;
                     // Lógica para crear la sala
                     Navigator.pop(context); // Cerrar el diálogo
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => ChatDeSala(roomName: roomName)));
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return FutureBuilder<String>(
+                            future: getNombreUsuario(),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState == ConnectionState.waiting) {
+                                // Muestra un indicador de carga mientras esperas el nombre de usuario
+                                return CircularProgressIndicator();
+                              } else {
+                                if (snapshot.hasError) {
+                                  // Maneja cualquier error que ocurra al obtener el nombre de usuario
+                                  return Text('Error: ${snapshot.error}');
+                                } else {
+                                  // Construye la pantalla de chat con el nombre de usuario obtenido
+                                  return ChatDeSala(roomName: roomName, userName: snapshot.data!);
+                                }
+                              }
+                            },
+                          );
+                        },
+                      ),
+                    );
                   },
                   child: Text('Aceptar'),
                 ),
