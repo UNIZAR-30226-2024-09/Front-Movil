@@ -1,12 +1,14 @@
 import 'dart:convert';
+import 'package:aversifunciona/pantalla_principal.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-
+import 'package:aversifunciona/getUserSession.dart';
 import 'env.dart';
 
 void main() {
   runApp(Recomendacion2());
 }
+
 
 class Recomendacion2 extends StatelessWidget {
   @override
@@ -23,9 +25,10 @@ class Recomendacion2Screen extends StatefulWidget {
 }
 
 class _Recomendacion2ScreenState extends State<Recomendacion2Screen> {
-  List<String> presentadores = [];
-  List<String> generos = [
-  ]; // Agregamos una lista para los géneros de podcasts
+  List<Map<String, dynamic>> presentadores = [];
+  List<Map<String, dynamic>> generos = []; // Agregamos una lista para los géneros de podcasts
+  String? presentadorSeleccionado; // Variable para almacenar el presentador seleccionado
+  String? generoSeleccionado; // Variable para almacenar el género seleccionado
 
   @override
   void initState() {
@@ -39,8 +42,12 @@ class _Recomendacion2ScreenState extends State<Recomendacion2Screen> {
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body) as Map<String, dynamic>;
       final List<dynamic> presentadoresData = data['presentadores'];
-      final List<String> presentadoresList = presentadoresData.map((
-          presentador) => presentador['nombre'] as String).toList();
+      final List<Map<String, dynamic>> presentadoresList = presentadoresData.map((presentador) {
+        return {
+          'id': presentador['id'] as int, // Obtener el ID del presentador
+          'nombre': presentador['nombre'] as String,
+        };
+      }).toList();
       setState(() {
         presentadores = presentadoresList;
       });
@@ -49,15 +56,16 @@ class _Recomendacion2ScreenState extends State<Recomendacion2Screen> {
     }
   }
 
-
   Future<void> _fetchGeneros() async {
-    final response = await http.get(
-        Uri.parse('${Env.URL_PREFIX}/generosPodcasts/'));
+    final response = await http.get(Uri.parse('${Env.URL_PREFIX}/generosPodcasts/'));
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body) as Map<String, dynamic>;
       final List<dynamic> generosData = data['generos'];
-      final List<String> generosList = generosData.map((
-          genero) => genero['nombre'] as String).toList();
+      final List<Map<String, dynamic>> generosList = generosData.map((genero) {
+        return {
+          'nombre': genero['nombre'] as String,
+        };
+      }).toList();
       setState(() {
         generos = generosList;
       });
@@ -66,6 +74,45 @@ class _Recomendacion2ScreenState extends State<Recomendacion2Screen> {
     }
   }
 
+  Future<void> _agnadirPresentadorFavorito(String presentadorId) async {
+    final String correo = ''; // Aquí debes obtener el correo del usuario
+    final Map<String, dynamic> data = {
+      'correo': correo,
+      'presentadorId': presentadorId,
+    };
+    final response = await http.post(
+      Uri.parse('${Env.URL_PREFIX}/agnadirPresentadorFavorito/'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(data),
+    );
+    if (response.statusCode == 200) {
+      // Presentador añadido exitosamente
+    } else {
+      throw Exception('Failed to add presentador favorito');
+    }
+  }
+
+  Future<void> _agnadirGeneroPodcastFavorito(String generoPodcast) async {
+    final String correo = ''; // Aquí debes obtener el correo del usuario
+    final Map<String, dynamic> data = {
+      'correo': correo,
+      'genero': generoPodcast,
+    };
+    final response = await http.post(
+      Uri.parse('${Env.URL_PREFIX}/agnadirGeneroFavorito/'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(data),
+    );
+    if (response.statusCode == 200) {
+      // Género podcast añadido exitosamente
+    } else {
+      throw Exception('Failed to add género podcast favorito');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -92,45 +139,56 @@ class _Recomendacion2ScreenState extends State<Recomendacion2Screen> {
               ),
             ),
             SizedBox(height: 10.0),
+            // Primera fila de presentadores
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: <Widget>[
                   SizedBox(width: 20.0),
-                  // Mostrar botones con las imágenes y nombres de los presentadores
+                  // Mostrar botones con las imágenes y nombres de los presentadores (primera fila)
                   ...presentadores.sublist(0, (presentadores.length / 2).ceil()).map((presentador) {
+                    final bool seleccionado = presentadorSeleccionado == presentador['nombre'];
                     return Padding(
                       padding: EdgeInsets.symmetric(horizontal: 8.0),
                       child: Column(
                         children: [
                           InkWell(
                             onTap: () {
-                              // Acción al presionar un presentador
-                              // Navigator.push(
-                              //   context,
-                              //   MaterialPageRoute(builder: (context) => Recomendacion2(presentador)),
-                              // );
+                              setState(() {
+                                if (seleccionado) {
+                                  presentadorSeleccionado = null; // Deseleccionar el presentador actual
+                                } else {
+                                  presentadorSeleccionado = presentador['nombre']; // Seleccionar el nuevo presentador
+                                  _agnadirPresentadorFavorito(presentador['id'].toString());
+                                }
+                              });
                             },
                             child: CircleAvatar(
-                              backgroundImage: AssetImage('assets/imagen_presentador.jpg'), // Aquí debes colocar la ruta de tu imagen
+                              //backgroundImage: AssetImage('assets/imagen_presentador.jpg'), // Aquí debes colocar la ruta de tu imagen
                               radius: 20.0,
+                              backgroundColor: seleccionado ? Colors.white : null,
                             ),
                           ),
                           SizedBox(height: 8.0),
                           ElevatedButton(
                             onPressed: () {
-                              // Acción al presionar un presentador
-                              // Navigator.push(
-                              //   context,
-                              //   MaterialPageRoute(builder: (context) => Recomendacion2(presentador)),
-                              // );
+                              setState(() {
+                                if (seleccionado) {
+                                  presentadorSeleccionado = null; // Deseleccionar el presentador actual
+                                } else {
+                                  presentadorSeleccionado = presentador['nombre']; // Seleccionar el nuevo presentador
+                                  _agnadirPresentadorFavorito(presentador['id'].toString());
+                                }
+                              });
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.grey[800],
+                              backgroundColor: seleccionado ? Colors.grey[800] : Colors.grey[300],
                             ),
                             child: Text(
-                              presentador,
-                              style: TextStyle(color: Colors.white),
+                              presentador['nombre'],
+                              style: TextStyle(
+                                color: seleccionado ? Colors.white : Colors.black,
+                              ),
                             ),
                           ),
                         ],
@@ -140,46 +198,57 @@ class _Recomendacion2ScreenState extends State<Recomendacion2Screen> {
                 ],
               ),
             ),
-            SizedBox(height: 10.0),
+            SizedBox(height: 20.0),
+            // Segunda fila de presentadores
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: <Widget>[
                   SizedBox(width: 20.0),
-                  // Mostrar botones con las imágenes y nombres de los presentadores
+                  // Mostrar botones con las imágenes y nombres de los presentadores (segunda fila)
                   ...presentadores.sublist((presentadores.length / 2).ceil()).map((presentador) {
+                    final bool seleccionado = presentadorSeleccionado == presentador['nombre'];
                     return Padding(
                       padding: EdgeInsets.symmetric(horizontal: 8.0),
                       child: Column(
                         children: [
                           InkWell(
                             onTap: () {
-                              // Acción al presionar un presentador
-                              // Navigator.push(
-                              //   context,
-                              //   MaterialPageRoute(builder: (context) => Recomendacion2(presentador)),
-                              // );
+                              setState(() {
+                                if (seleccionado) {
+                                  presentadorSeleccionado = null; // Deseleccionar el presentador actual
+                                } else {
+                                  presentadorSeleccionado = presentador['nombre']; // Seleccionar el nuevo presentador
+                                  _agnadirPresentadorFavorito(presentador['id'].toString());
+                                }
+                              });
                             },
                             child: CircleAvatar(
-                              backgroundImage: AssetImage('assets/imagen_presentador.jpg'), // Aquí debes colocar la ruta de tu imagen
+                              //backgroundImage: AssetImage('assets/imagen_presentador.jpg'), // Aquí debes colocar la ruta de tu imagen
                               radius: 20.0,
+                              backgroundColor: seleccionado ? Colors.white : null,
                             ),
                           ),
                           SizedBox(height: 8.0),
                           ElevatedButton(
                             onPressed: () {
-                              // Acción al presionar un presentador
-                              // Navigator.push(
-                              //   context,
-                              //   MaterialPageRoute(builder: (context) => Recomendacion2(presentador)),
-                              // );
+                              setState(() {
+                                if (seleccionado) {
+                                  presentadorSeleccionado = null; // Deseleccionar el presentador actual
+                                } else {
+                                  presentadorSeleccionado = presentador['nombre']; // Seleccionar el nuevo presentador
+                                  _agnadirPresentadorFavorito(presentador['id'].toString());
+                                }
+                              });
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.grey[800],
+                              backgroundColor: seleccionado ? Colors.grey[800] : Colors.grey[300],
                             ),
                             child: Text(
-                              presentador,
-                              style: TextStyle(color: Colors.white),
+                              presentador['nombre'],
+                              style: TextStyle(
+                                color: seleccionado ? Colors.white : Colors.black,
+                              ),
                             ),
                           ),
                         ],
@@ -198,30 +267,34 @@ class _Recomendacion2ScreenState extends State<Recomendacion2Screen> {
               ),
             ),
             SizedBox(height: 10.0),
-            // Mostrar botones con los nombres de los géneros (primera fila)
+            // Primera fila de géneros
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: <Widget>[
                   SizedBox(width: 20.0),
                   // Mostrar botones con los nombres de los géneros (primera fila)
-                  ...generos.sublist(0, (generos.length / 2).ceil()).map((genero) {
+                  ...generos.sublist(0, (generos.length / 2).ceil()).map((generoPodcast) {
+                    final bool seleccionado = generoSeleccionado == generoPodcast['nombre'];
                     return Padding(
                       padding: EdgeInsets.symmetric(horizontal: 8.0),
                       child: ElevatedButton(
                         onPressed: () {
-                          // Acción al presionar un género
-                          // Navigator.push(
-                          //   context,
-                          //   MaterialPageRoute(builder: (context) => Recomendacion2(genero)),
-                          // );
+                          setState(() {
+                            if (seleccionado) {
+                              generoSeleccionado = null; // Deseleccionar el género actual
+                            } else {
+                              generoSeleccionado = generoPodcast['nombre']; // Seleccionar el nuevo género
+                              _agnadirGeneroPodcastFavorito(generoSeleccionado.toString());
+                            }
+                          });
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.grey[800],
+                          backgroundColor: seleccionado ? Colors.grey[800] : Colors.grey[300],
                         ),
                         child: Text(
-                          genero,
-                          style: TextStyle(color: Colors.white),
+                          generoPodcast['nombre'],
+                          style: TextStyle(color: seleccionado ? Colors.white : Colors.black),
                         ),
                       ),
                     );
@@ -230,30 +303,34 @@ class _Recomendacion2ScreenState extends State<Recomendacion2Screen> {
               ),
             ),
             SizedBox(height: 10.0),
-            // Mostrar botones con los nombres de los géneros (segunda fila)
+            // Segunda fila de géneros
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: <Widget>[
                   SizedBox(width: 20.0),
                   // Mostrar botones con los nombres de los géneros (segunda fila)
-                  ...generos.sublist((generos.length / 2).ceil()).map((genero) {
+                  ...generos.sublist((generos.length / 2).ceil()).map((generoPodcast) {
+                    final bool seleccionado = generoSeleccionado == generoPodcast['nombre'];
                     return Padding(
                       padding: EdgeInsets.symmetric(horizontal: 8.0),
                       child: ElevatedButton(
                         onPressed: () {
-                          // Acción al presionar un género
-                          // Navigator.push(
-                          //   context,
-                          //   MaterialPageRoute(builder: (context) => Recomendacion2(genero)),
-                          // );
+                          setState(() {
+                            if (seleccionado) {
+                              generoSeleccionado = null; // Deseleccionar el género actual
+                            } else {
+                              generoSeleccionado = generoPodcast['nombre']; // Seleccionar el nuevo género
+                              _agnadirGeneroPodcastFavorito(generoSeleccionado.toString());
+                            }
+                          });
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.grey[800],
+                          backgroundColor: seleccionado ? Colors.grey[800] : Colors.grey[300],
                         ),
                         child: Text(
-                          genero,
-                          style: TextStyle(color: Colors.white),
+                          generoPodcast['nombre'],
+                          style: TextStyle(color: seleccionado ? Colors.white : Colors.black),
                         ),
                       ),
                     );
@@ -264,9 +341,41 @@ class _Recomendacion2ScreenState extends State<Recomendacion2Screen> {
           ],
         ),
       ),
+      floatingActionButton: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 30.0), // Añade un espacio de 30 puntos a cada lado
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween, // Alinea los botones al principio y al final del Row
+          children: [
+            FloatingActionButton.extended(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => pantalla_principal()),
+                );
+              },
+              label: Text(
+                'Saltar',
+                style: TextStyle(color: Colors.black), // Cambia el color del texto a blanco
+              ),
+              backgroundColor: Colors.grey,
+            ),
+            FloatingActionButton.extended(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => pantalla_principal()),
+                );
+              },
+              label: Text(
+                'Terminar',
+                style: TextStyle(color: Colors.black), // Cambia el color del texto a blanco
+              ),
+              backgroundColor: Colors.grey,
+            ),
+          ],
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
-
-
-
 }
