@@ -3,46 +3,69 @@ import 'dart:convert';
 import 'package:aversifunciona/biblioteca.dart';
 import 'package:aversifunciona/buscar.dart';
 import 'package:aversifunciona/configuracion.dart';
-import 'package:aversifunciona/desplegable.dart';
-import 'package:aversifunciona/getUserSession.dart';
 import 'package:aversifunciona/pantalla_principal.dart';
-import 'package:aversifunciona/pantalla_podcast.dart';
-import 'package:aversifunciona/reproductor.dart';
 import 'package:aversifunciona/salas.dart';
 import 'package:aversifunciona/verPerfil.dart';
-import 'package:aversifunciona/todo.dart';
 import 'package:flutter/material.dart';
 
 import 'package:http/http.dart' as http;
 
 import 'env.dart';
 
-class historial extends StatefulWidget {
+class historialAjeno extends StatefulWidget {
+  final String correoSeguidoS; // Detalles del usuario ajeno
+
+  historialAjeno({required this.correoSeguidoS}); // Constructor actualizado
+
   @override
-  _historialState createState() => _historialState();
+  _historialAjenoState createState() => _historialAjenoState();
 }
 
-class _historialState extends State<historial> {
-  String _correoS = '';
+class _historialAjenoState extends State<historialAjeno> {
   List<dynamic> _historial = [];
+  String _nombreS = '';
+  String _correoSeguidoS = '';
 
   @override
   void initState() {
     super.initState();
     _getListarHistorial();
+    //_devolverUsuario(widget.correoSeguidoS);
+  }
+
+  Future<void> _devolverUsuario(String correo) async {
+    try {
+      print('Correo: $correo');
+      final response = await http.post(
+        Uri.parse('${Env.URL_PREFIX}/devolverUsuario/'),
+        body: jsonEncode({'correo': correo}),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        final Map<String, dynamic>? usuario = responseData['usuario'];
+        setState(() {
+          _nombreS = usuario != null ? usuario['nombre'] : '';
+          _correoSeguidoS = usuario != null ? usuario['correo'] : '';
+        });
+        print('Correo seguido: $_correoSeguidoS');
+        _getListarHistorial();
+      } else if (response.statusCode == 404) {
+        print('Else if: El usuario no existe');
+      } else {
+        print('Error al obtener el usuario: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error en la solicitud HTTP: $e');
+    }
   }
 
   Future<void> _getListarHistorial() async {
     try {
-      String? token = await getUserSession.getToken();
-      if (token != null) {
-        Map<String, dynamic> userInfo = await getUserSession.getUserInfo(token);
-        setState(() {
-          _correoS = userInfo['correo'];
-        });
         final response = await http.post(
           Uri.parse('${Env.URL_PREFIX}/listarHistorial/'), // Reemplaza 'tu_url_de_la_api' por la URL correcta
-          body: json.encode({'correo': _correoS}),
+          body: json.encode({'correo': _correoSeguidoS}),
           headers: {'Content-Type': 'application/json'},
         );
 
@@ -66,9 +89,6 @@ class _historialState extends State<historial> {
         } else {
           throw Exception('Error al obtener el historial: ${response.statusCode}');
         }
-      } else {
-        throw Exception('Error al obtener el historial: ');
-      }
     } catch (e) {
       print('Catch: $e');
     }
@@ -80,56 +100,14 @@ class _historialState extends State<historial> {
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,
-        leading: PopupMenuButton<String>(
-          icon: CircleAvatar(
-            backgroundImage: AssetImage('tu_ruta_de_imagen'),
-          ),
-          onSelected: (value) {
-            // Manejar la selección del desplegable
-            if (value == 'verPerfil') {
-              // Navegar a la pantalla "verPerfil"
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => verPerfil()),
-              );
-            } else if (value == 'historial') {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => historial()),
-              );
-            } else if (value == 'configuracion') {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => configuracion()),
-              );
-            }
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.pop(context);
           },
-          itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-            const PopupMenuItem<String>(
-              value: 'verPerfil',
-              child: ListTile(
-                leading: Icon(Icons.person),
-                title: Text('Ver Perfil'),
-              ),
-            ),
-            const PopupMenuItem<String>(
-              value: 'historial',
-              child: ListTile(
-                leading: Icon(Icons.history),
-                title: Text('Historial'),
-              ),
-            ),
-            const PopupMenuItem<String>(
-              value: 'configuracion',
-              child: ListTile(
-                leading: Icon(Icons.settings),
-                title: Text('Configuración y Privacidad'),
-              ),
-            ),
-          ],
         ),
         title: const Text(
-          'Mi historial',
+          'Historial de ',
           style: TextStyle(color: Colors.white),
         ),
       ),
@@ -309,7 +287,3 @@ class _historialState extends State<historial> {
     );
   }
 }
-
-
-
-

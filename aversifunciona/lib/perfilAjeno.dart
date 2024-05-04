@@ -4,6 +4,8 @@ import 'package:http/http.dart' as http;
 import 'env.dart';
 import 'package:aversifunciona/getUserSession.dart';
 
+import 'historialAjeno.dart';
+
 class PerfilAjeno extends StatefulWidget {
   final Map<String, dynamic> usuario;
 
@@ -358,7 +360,10 @@ class _PerfilAjenoState extends State<PerfilAjeno> {
             Center(
               child: ElevatedButton(
                 onPressed: () {
-                  // Lógica para ver todas las listas
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => historialAjeno(correoSeguidoS: _correoSeguidoS)), // Pasa el usuario al constructor de la pantalla historial.dart
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.black,
@@ -368,7 +373,7 @@ class _PerfilAjenoState extends State<PerfilAjeno> {
                     side: BorderSide(color: Colors.white),
                   ),
                 ),
-                child: Text('Ver todas las listas'),
+                child: Text('Ver historial'),
               ),
             ),
           ],
