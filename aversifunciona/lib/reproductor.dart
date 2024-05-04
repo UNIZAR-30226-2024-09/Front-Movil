@@ -85,11 +85,19 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
 
   void startPlaying() async{
     // Cancelar el temporizador anterior si existe
-    await mp3player.play();
+    mp3player.play();
     timer?.cancel();
     // Aquí podrías iniciar la reproducción de la canción
     // Por ahora solo actualizamos el progreso de forma simulada
-    const progressIncrement = 0.01;
+    double? progressIncrement;
+    if (mp3player.duration?.inSeconds == null){
+      progressIncrement = 0.01;
+    }
+    else{
+      progressIncrement = 1.0 / mp3player.duration!.inSeconds.toDouble();
+    }
+
+    debugPrint(mp3player.duration?.inSeconds.toString());
     const duration = Duration(seconds: 1);
     timer = Timer.periodic(duration, (timer) {
       setState(() {
@@ -97,7 +105,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
           progress = 0.0;
           stopPlaying();
         } else {
-          progress += progressIncrement;
+          progress += progressIncrement!;
         }
       });
     });
@@ -118,12 +126,13 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
     // Aquí iría la lógica para volver a la canción anterior
   }
 
-  void replaySong() {
+  void replaySong() async{
+    await mp3player.stop();
+    await cargar_cancion();
     setState(() {
       progress = 0.0;
-      cargar_cancion();
-      startPlaying();
       isPlaying = true;
+      startPlaying();
     });
   }
 

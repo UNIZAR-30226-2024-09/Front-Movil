@@ -96,8 +96,9 @@ class _rock_State extends State<rock> {
         backgroundColor: Colors.black,
         automaticallyImplyLeading: false, // Eliminar el botón de retroceso predeterminado
       ),
+
       body: canciones.isEmpty
-          ? const Center(child: const CircularProgressIndicator()): ListView.builder(
+          ? const Center(child: CircularProgressIndicator()): ListView.builder(
         itemCount: canciones.length,
         itemBuilder: (context, index) {
           String cancion = canciones[index].foto;
