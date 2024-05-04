@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:aversifunciona/getUserSession.dart';
 
 import 'salas.dart';
 import 'musica.dart';
@@ -63,6 +64,9 @@ class listaCanciones{
 }
 
 class pantalla_opciones extends StatelessWidget {
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -159,18 +163,27 @@ class pantalla_principal extends StatefulWidget {
 class _PantallaPrincipalState extends State<pantalla_principal> {
 
   Uint8List decodeBase64ToImage(String base64String) {
-    try {
+    /*try {
       return base64Decode(base64String);
     } catch (e) {
       throw Exception('Error decoding base64 string: $e');
-    }
+    }*/
+    Uint8List bytes = Uint8List(4);
+
+    // Asignar valores a los elementos
+    bytes[0] = 10;
+    bytes[1] = 20;
+    bytes[2] = 30;
+    bytes[3] = 40;
+
+    return bytes;
   }
 
   String base64ToImageSrc(String base64) {
     return 'data:image/jpeg;base64,${utf8.decode(base64Decode(base64.replaceAll(RegExp('/^data:image/[a-z]+;base64,/'), '')))}';
   }
 
-  Future<void> conseguirCanciones() async {
+  /*Future<void> conseguirCanciones() async {
     try {
       final response = await http
           .post(Uri.parse("${Env.URL_PREFIX}/listarCanciones/"),
@@ -202,13 +215,38 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
     catch(e){
       print("Error: $e");
     }
-  }
+  }*/
+
+
+  String _correoS = '';
 
   @override
   void initState() {
     super.initState();
+    _getUserInfo();
+
+    canciones = [1,2];
     // Llama a la función para obtener canciones cuando la pantalla se inicia
-    conseguirCanciones();
+    //conseguirCanciones();
+  }
+
+  Future<void> _getUserInfo() async {
+    try {
+      String? token = await getUserSession.getToken(); // Espera a que el token se resuelva
+      print("Token: $token");
+      if (token != null) {
+        // Llama al método AuthService para obtener la información del usuario
+        Map<String, dynamic> userInfo = await getUserSession.getUserInfo(token);
+        setState(() {
+          _correoS = userInfo['correo'];
+        });
+        print(_correoS);
+      } else {
+        print('Token is null');
+      }
+    } catch (e) {
+      print('Error fetching user info: $e');
+    }
   }
 
   @override
@@ -246,7 +284,7 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
             child: Column(
               children: [
 
-                const Text('Texto numero 1', style: TextStyle(color: Colors.white),),
+                const Text('Recomendado para ti', style: TextStyle(color: Colors.white),),
                 const SizedBox(height: 8,),
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
@@ -254,7 +292,7 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
                   child: Row(
                     children: [
                       const SizedBox(width: 20,),
-                      Container(height: 100, width: 100, padding: const EdgeInsets.symmetric(horizontal: 8), 
+                      Container(height: 100, width: 100, padding: const EdgeInsets.symmetric(horizontal: 8),
                         child: FutureBuilder<Uint8List>(
                           future: Future.microtask(() => base64Url.decode((base64ToImageSrc(canciones[0].foto)).split(',').last)),
                           builder: (context, snapshot) {
@@ -279,7 +317,7 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
 
                       const SizedBox(width: 50,),
 
-                      Container(height: 100, width: 100, padding: const EdgeInsets.symmetric(horizontal: 8), 
+                      Container(height: 100, width: 100, padding: const EdgeInsets.symmetric(horizontal: 8),
                         child: FutureBuilder<Uint8List>(
                           future: Future.microtask(() => base64Url.decode((base64ToImageSrc(canciones[1].foto)).split(',').last)),
                           builder: (context, snapshot) {
@@ -303,7 +341,7 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
                       ),
 
                       const SizedBox(width: 50,),
-                      Container(height: 100, width: 100, padding: const EdgeInsets.symmetric(horizontal: 8), 
+                      Container(height: 100, width: 100, padding: const EdgeInsets.symmetric(horizontal: 8),
                         child: FutureBuilder<Uint8List>(
                           future: Future.microtask(() => base64Url.decode((base64ToImageSrc(canciones[2].foto)).split(',').last)),
                           builder: (context, snapshot) {
@@ -339,7 +377,7 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
                     child: Row(
                       children: [
                         const SizedBox(width: 20,),
-                        Container(height: 100, width: 100, padding: const EdgeInsets.symmetric(horizontal: 8), 
+                        Container(height: 100, width: 100, padding: const EdgeInsets.symmetric(horizontal: 8),
                           child: FutureBuilder<Uint8List>(
                             future: Future.microtask(() => base64Url.decode((base64ToImageSrc(canciones[0].foto)).split(',').last)),
                             builder: (context, snapshot) {
@@ -364,7 +402,7 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
 
                         const SizedBox(width: 50,),
 
-                        Container(height: 100, width: 100, padding: const EdgeInsets.symmetric(horizontal: 8), 
+                        Container(height: 100, width: 100, padding: const EdgeInsets.symmetric(horizontal: 8),
                           child: FutureBuilder<Uint8List>(
                             future: Future.microtask(() => base64Url.decode((base64ToImageSrc(canciones[1].foto)).split(',').last)),
                             builder: (context, snapshot) {
@@ -388,7 +426,7 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
                         ),
 
                         const SizedBox(width: 50,),
-                        Container(height: 100, width: 100, padding: const EdgeInsets.symmetric(horizontal: 8), 
+                        Container(height: 100, width: 100, padding: const EdgeInsets.symmetric(horizontal: 8),
                           child: FutureBuilder<Uint8List>(
                             future: Future.microtask(() => base64Url.decode((base64ToImageSrc(canciones[2].foto)).split(',').last)),
                             builder: (context, snapshot) {
@@ -424,7 +462,7 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
                   child: Row(
                     children: [
                       const SizedBox(width: 20,),
-                      Container(height: 100, width: 100, padding: const EdgeInsets.symmetric(horizontal: 8), 
+                      Container(height: 100, width: 100, padding: const EdgeInsets.symmetric(horizontal: 8),
                         child: FutureBuilder<Uint8List>(
                           future: Future.microtask(() => base64Url.decode((base64ToImageSrc(canciones[0].foto)).split(',').last)),
                           builder: (context, snapshot) {
@@ -449,7 +487,7 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
 
                       const SizedBox(width: 50,),
 
-                      Container(height: 100, width: 100, padding: const EdgeInsets.symmetric(horizontal: 8), 
+                      Container(height: 100, width: 100, padding: const EdgeInsets.symmetric(horizontal: 8),
                         child: FutureBuilder<Uint8List>(
                           future: Future.microtask(() => base64Url.decode((base64ToImageSrc(canciones[1].foto)).split(',').last)),
                           builder: (context, snapshot) {
@@ -473,7 +511,7 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
                       ),
 
                       const SizedBox(width: 50,),
-                      Container(height: 100, width: 100, padding: const EdgeInsets.symmetric(horizontal: 8), 
+                      Container(height: 100, width: 100, padding: const EdgeInsets.symmetric(horizontal: 8),
                         child: FutureBuilder<Uint8List>(
                           future: Future.microtask(() => base64Url.decode((base64ToImageSrc(canciones[2].foto)).split(',').last)),
                           builder: (context, snapshot) {
@@ -507,7 +545,7 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
                   child: Row(
                     children: [
                       const SizedBox(width: 20,),
-                      Container(height: 100, width: 100, padding: const EdgeInsets.symmetric(horizontal: 8), 
+                      Container(height: 100, width: 100, padding: const EdgeInsets.symmetric(horizontal: 8),
                         child: FutureBuilder<Uint8List>(
                           future: Future.microtask(() => base64Url.decode((base64ToImageSrc(canciones[0].foto)).split(',').last)),
                           builder: (context, snapshot) {

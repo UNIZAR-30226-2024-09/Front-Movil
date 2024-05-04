@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:aversifunciona/pantalla_principal.dart';
-//import 'package:aversifunciona/recomendacion1.dart';
+//import 'package:aversifunciona/pantalla_principal.dart';
+import 'package:aversifunciona/recomendacion1.dart';
 import 'package:flutter/material.dart';
 import 'package:aversifunciona/getUserSession.dart';
 import 'env.dart';
@@ -226,8 +226,8 @@ class _Registro_finState extends State<Registro_fin> {
                       // Si el registro es exitoso, puedes navegar a la siguiente pantalla
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => pantalla_principal()),
-                        //MaterialPageRoute(builder: (context) => Recomendacion1()),
+                        //MaterialPageRoute(builder: (context) => pantalla_principal()),
+                        MaterialPageRoute(builder: (context) => Recomendacion1()),
                       );
                     }else {
                       // Si el registro no es exitoso, puedes mostrar un mensaje de error o manejarlo de otra manera

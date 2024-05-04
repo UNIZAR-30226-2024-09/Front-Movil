@@ -29,12 +29,33 @@ class _Recomendacion2ScreenState extends State<Recomendacion2Screen> {
   List<Map<String, dynamic>> generos = []; // Agregamos una lista para los géneros de podcasts
   String? presentadorSeleccionado; // Variable para almacenar el presentador seleccionado
   String? generoSeleccionado; // Variable para almacenar el género seleccionado
+  String _correoS = '';
 
   @override
   void initState() {
     super.initState();
+    _getUserInfo();
     _fetchPresentadores(); // Llamar a la función para obtener los presentadores al inicializar la pantalla
     _fetchGeneros(); // Llamar a la función para obtener los géneros de podcasts
+  }
+
+  Future<void> _getUserInfo() async {
+    try {
+      String? token = await getUserSession.getToken(); // Espera a que el token se resuelva
+      print("Token: $token");
+      if (token != null) {
+        // Llama al método AuthService para obtener la información del usuario
+        Map<String, dynamic> userInfo = await getUserSession.getUserInfo(token);
+        setState(() {
+          _correoS = userInfo['correo'];
+        });
+        print(_correoS);
+      } else {
+        print('Token is null');
+      }
+    } catch (e) {
+      print('Error fetching user info: $e');
+    }
   }
 
   Future<void> _fetchPresentadores() async {
@@ -75,9 +96,9 @@ class _Recomendacion2ScreenState extends State<Recomendacion2Screen> {
   }
 
   Future<void> _agnadirPresentadorFavorito(String presentadorId) async {
-    final String correo = ''; // Aquí debes obtener el correo del usuario
+    //final String correo = ''; // Aquí debes obtener el correo del usuario
     final Map<String, dynamic> data = {
-      'correo': correo,
+      'correo': _correoS,
       'presentadorId': presentadorId,
     };
     final response = await http.post(
@@ -95,9 +116,9 @@ class _Recomendacion2ScreenState extends State<Recomendacion2Screen> {
   }
 
   Future<void> _agnadirGeneroPodcastFavorito(String generoPodcast) async {
-    final String correo = ''; // Aquí debes obtener el correo del usuario
+    //final String correo = ''; // Aquí debes obtener el correo del usuario
     final Map<String, dynamic> data = {
-      'correo': correo,
+      'correo': _correoS,
       'genero': generoPodcast,
     };
     final response = await http.post(
