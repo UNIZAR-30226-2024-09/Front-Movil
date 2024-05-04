@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:aversifunciona/biblioteca.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:aversifunciona/getUserSession.dart';
@@ -58,7 +59,10 @@ class _CrearPlaylistState extends State<CrearPlaylist> {
           // La playlist se creó con éxito
           // Puedes agregar aquí la navegación a otra pantalla si lo deseas
           print('La playlist se creó con éxito');
-          Navigator.pop(context);
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => pantalla_biblioteca()), // Suponiendo que el nombre de la pantalla sea CrearPlaylist
+          );
         } else {
           // Ocurrió un error al crear la playlist
           print('Error al crear la playlist: ${response.statusCode}');

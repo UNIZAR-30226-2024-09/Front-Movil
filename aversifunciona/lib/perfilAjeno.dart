@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'env.dart';
+import 'package:aversifunciona/getUserSession.dart';
 
 class PerfilAjeno extends StatefulWidget {
   final Map<String, dynamic> usuario;
@@ -14,11 +15,12 @@ class PerfilAjeno extends StatefulWidget {
 
 class _PerfilAjenoState extends State<PerfilAjeno> {
   String _nombreS = '';
-  String _correoS = '';
+  String _correoSeguidoS = '';
   List<String> _playlists = [];
   String _numSeguidos = '0';
   String _numSeguidores = '0';
   bool isFollowing = false;
+  String _correoS = '';
 
   @override
   void initState() {
@@ -30,6 +32,74 @@ class _PerfilAjenoState extends State<PerfilAjeno> {
     setState(() {
       isFollowing = !isFollowing;
     });
+    if (isFollowing) {
+      _seguirUsuario(); // Llama a la función para seguir al usuario
+    } else {
+      _dejarDeSeguirUsuario(); // Llama a la función para dejar de seguir al usuario
+    }
+  }
+
+  void _seguirUsuario() async {
+    try {
+      final response = await http.post(
+        Uri.parse('${Env.URL_PREFIX}/seguir/'),
+        body: jsonEncode({
+          'correo': _correoS, // Correo del usuario actual
+          'seguido': widget.usuario['seguido'], // Correo del usuario del perfil
+        }),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        print('Usuario seguido con éxito');
+      } else {
+        print('Error al seguir al usuario: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error en la solicitud HTTP: $e');
+    }
+  }
+
+  void _dejarDeSeguirUsuario() async {
+    try {
+      final response = await http.post(
+        Uri.parse('${Env.URL_PREFIX}/dejarDeSeguir/'),
+        body: jsonEncode({
+          'correo': _correoS, // Correo del usuario actual
+          'seguido': widget.usuario['seguido'], // Correo del usuario del perfil
+        }),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        print('Usuario dejado de seguir con éxito');
+      } else {
+        print('Error al dejar de seguir al usuario: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error en la solicitud HTTP: $e');
+    }
+  }
+
+
+  Future<void> _getUserInfo() async {
+    try {
+      String? token = await getUserSession.getToken(); // Espera a que el token se resuelva
+      print("Token: $token");
+      if (token != null) {
+        // Llama al método AuthService para obtener la información del usuario
+        Map<String, dynamic> userInfo = await getUserSession.getUserInfo(token);
+        setState(() {
+          _correoS = userInfo['correo'];
+        });
+        print(_correoS);
+        _comprobarSiguiendo();
+      } else {
+        print('Token is null');
+      }
+    } catch (e) {
+      print('Error fetching user info: $e');
+    }
   }
 
   Future<void> _devolverUsuario(String correo) async {
@@ -46,10 +116,11 @@ class _PerfilAjenoState extends State<PerfilAjeno> {
         final Map<String, dynamic>? usuario = responseData['usuario'];
         setState(() {
           _nombreS = usuario!['nombre'];
-          _correoS = usuario['correo'];
+          _correoSeguidoS = usuario['correo'];
         });
         _fetchSeguidosSeguidores();
         _getUserPlaylists();
+        _getUserInfo();
       } else if (response.statusCode == 404) {
         print('Else if: El usuario no existe');
       } else {
@@ -64,13 +135,13 @@ class _PerfilAjenoState extends State<PerfilAjeno> {
     try {
       final responseSeguidos = await http.post(
         Uri.parse('${Env.URL_PREFIX}/listarSeguidos/'),
-        body: jsonEncode({'correo': _correoS}),
+        body: jsonEncode({'correo': _correoSeguidoS}),
         headers: {'Content-Type': 'application/json'},
       );
 
       final responseSeguidores = await http.post(
         Uri.parse('${Env.URL_PREFIX}/listarSeguidores/'),
-        body: jsonEncode({'correo': _correoS}),
+        body: jsonEncode({'correo': _correoSeguidoS}),
         headers: {'Content-Type': 'application/json'},
       );
 
@@ -96,7 +167,7 @@ class _PerfilAjenoState extends State<PerfilAjeno> {
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
-        body: jsonEncode({'correo': _correoS}),
+        body: jsonEncode({'correo': _correoSeguidoS}),
       );
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
@@ -116,6 +187,33 @@ class _PerfilAjenoState extends State<PerfilAjeno> {
       }
     } catch (e) {
       print('Catch: Error fetching user playlists: $e');
+    }
+  }
+
+  Future<void> _comprobarSiguiendo() async {
+    try {
+      print('Correo usuario: $_correoS - Correo seguido: $_correoSeguidoS');
+      final response = await http.post(
+        Uri.parse('${Env.URL_PREFIX}/siguiendo/'),
+        body: jsonEncode({
+          'correo': _correoS, // Correo del usuario actual
+          'esSeguido': _correoSeguidoS, // Correo del usuario del perfil
+        }),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        final bool siguiendo = responseData['siguiendo'];
+        setState(() {
+          isFollowing = siguiendo; // Actualizar el estado de isFollowing
+        });
+        print('Siguiendo: $siguiendo');
+      } else {
+        print('Error al comprobar si sigue al usuario: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error en la solicitud HTTP: $e');
     }
   }
 
@@ -204,27 +302,27 @@ class _PerfilAjenoState extends State<PerfilAjeno> {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 20),
               child: isFollowing
-                  ? ElevatedButton(
-                onPressed: toggleFollow,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                ),
-                child: Text(
-                  'Siguiendo',
-                  style: TextStyle(
-                    color: Colors.white,
-                  ),
-                ),
-              )
-                  : OutlinedButton(
+                  ? OutlinedButton(
                 onPressed: toggleFollow,
                 style: OutlinedButton.styleFrom(
                   side: BorderSide(color: Colors.white),
                 ),
+                   child: Text(
+                    'Siguiendo',
+                    style: TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
+              )
+                  : ElevatedButton(
+                onPressed: toggleFollow,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                ),
                 child: Text(
                   'Seguir',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Colors.black,
                   ),
                 ),
               ),
