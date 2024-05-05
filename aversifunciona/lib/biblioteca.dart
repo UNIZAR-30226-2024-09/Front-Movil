@@ -38,7 +38,7 @@ class pantalla_biblioteca extends StatefulWidget {
 }
 
 class _pantalla_bibliotecaState extends State<pantalla_biblioteca> {
-  int playlistId = 31;
+  //int playlistId = 31;
   String _correoS = '';
   List<String> _playlists = [];
   Map<String, int> _playlistsIds = {};
