@@ -170,7 +170,6 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
     }*/
     Uint8List bytes = Uint8List(4);
 
-    // Asignar valores a los elementos
     bytes[0] = 10;
     bytes[1] = 20;
     bytes[2] = 30;
@@ -219,11 +218,14 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
 
 
   String _correoS = '';
+  List<Map<String, dynamic>> cancionesRecomendadas = [];
+  List<Map<String, dynamic>> podcastsRecomendados = [];
 
   @override
   void initState() {
     super.initState();
     _getUserInfo();
+    //_recomendar();
 
     canciones = [1,2];
     // Llama a la función para obtener canciones cuando la pantalla se inicia
@@ -240,12 +242,62 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
         setState(() {
           _correoS = userInfo['correo'];
         });
+        _recomendar();
         print(_correoS);
       } else {
         print('Token is null');
       }
     } catch (e) {
       print('Error fetching user info: $e');
+    }
+  }
+
+  Future<void> _recomendar() async {
+    final Map<String, dynamic> data = {
+      'correo': _correoS,
+    };
+    final response = await http.post(
+      Uri.parse('${Env.URL_PREFIX}/recomendar/'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(data),
+    );
+    if (response.statusCode == 200) {
+      // Recomendacion exitosa
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+      final Map<String, dynamic> recomendaciones = data['recomendaciones'];
+
+      // Obtener lista de canciones recomendadas
+      final List<dynamic> cancionesData = recomendaciones['canciones'];
+      final List<Map<String, dynamic>> cancionesRecomendadasAux = cancionesData.map((cancionRecomendada) {
+        return {
+          'id': cancionRecomendada['id'] as int,
+          'nombre': cancionRecomendada['nombre'] as String,
+          'miAlbum': cancionRecomendada['miAlbum'] as int,
+          'puntuacion': cancionRecomendada['puntuacion'] as int,
+          //archivoMp3: cancionRecomendada['archivoMp3'] as String?,
+          'foto': cancionRecomendada['foto'] as String,
+        };
+      }).toList();
+
+      // Obtener lista de podcasts recomendados
+      final List<dynamic> podcastsData = recomendaciones['podcasts'];
+      final List<Map<String, dynamic>> podcastsRecomendadosAux = podcastsData.map((podcastRecomendado) {
+        return {
+          'id': podcastRecomendado['id'] as int,
+          'nombre': podcastRecomendado['nombre'] as String,
+          'foto': podcastRecomendado['foto'] as String,
+        };
+      }).toList();
+
+      // Actualizar el estado del widget con las recomendaciones
+      setState(() {
+        cancionesRecomendadas = cancionesRecomendadasAux;
+        podcastsRecomendados = podcastsRecomendadosAux;
+      });
+    } else {
+      throw Exception('Failed to get recommendation');
     }
   }
 
@@ -284,7 +336,7 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
             child: Column(
               children: [
 
-                const Text('Recomendado para ti', style: TextStyle(color: Colors.white),),
+                const Text('Texto numero 1', style: TextStyle(color: Colors.white),),
                 const SizedBox(height: 8,),
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
@@ -369,90 +421,108 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
                 ),
 
                 const SizedBox(height: 20,),
-                const Text('Texto numero 2', style:  TextStyle(color: Colors.white),),
+                const Text('Recomendado para ti', style: TextStyle(color: Colors.white),),
                 const SizedBox(height: 8,),
                 SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: Row(
-                      children: [
-                        const SizedBox(width: 20,),
-                        Container(height: 100, width: 100, padding: const EdgeInsets.symmetric(horizontal: 8),
-                          child: FutureBuilder<Uint8List>(
-                            future: Future.microtask(() => base64Url.decode((base64ToImageSrc(canciones[0].foto)).split(',').last)),
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState == ConnectionState.waiting) {
-                                // Muestra un indicador de carga mientras se decodifica la imagen
-                                return const CircularProgressIndicator();
-                              } else if (snapshot.hasError) {
-                                // Muestra un mensaje de error si ocurre un error durante la decodificación
-                                return Text('Error: ${snapshot.error}');
-                              } else {
-                                // Si la decodificación fue exitosa, muestra la imagen
-                                return Image.memory(
-                                  height: 75,
-                                  width: 75,
-                                  snapshot.data!,
-                                  fit: BoxFit.cover,
-                                );
-                              }
-                            },
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Row(
+                    children: [
+                      const SizedBox(width: 20,),
+                      // Mostrar canciones recomendadas
+                      for (final cancionRecomendada in cancionesRecomendadas)
+                        GestureDetector(
+                          onTap: () {
+                            // Navegar a la canción correspondiente
+                            // Aquí puedes implementar la lógica para navegar a la página de la canción
+                          },
+                          child: Container(
+                            width: 100, // Ancho de la imagen
+                            child: Column(
+                              children: [
+                                Container(
+                                  height: 100,
+                                  width: 100,
+                                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                                  child: FutureBuilder<Uint8List>(
+                                    future: Future.microtask(() => base64Url.decode((base64ToImageSrc(cancionRecomendada['foto'])).split(',').last)),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState == ConnectionState.waiting) {
+                                        // Muestra un indicador de carga mientras se decodifica la imagen
+                                        return const CircularProgressIndicator();
+                                      } else if (snapshot.hasError) {
+                                        // Muestra un mensaje de error si ocurre un error durante la decodificación
+                                        return Text('Error: ${snapshot.error}');
+                                      } else {
+                                        // Si la decodificación fue exitosa, muestra la imagen
+                                        return Image.memory(
+                                          snapshot.data!,
+                                          height: 75,
+                                          width: 75,
+                                          fit: BoxFit.cover,
+                                        );
+                                      }
+                                    },
+                                  ),
+                                ),
+                                const SizedBox(height: 4), // Espacio entre la imagen y el nombre
+                                Text(
+                                  cancionRecomendada['nombre'],
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-
-                        const SizedBox(width: 50,),
-
-                        Container(height: 100, width: 100, padding: const EdgeInsets.symmetric(horizontal: 8),
-                          child: FutureBuilder<Uint8List>(
-                            future: Future.microtask(() => base64Url.decode((base64ToImageSrc(canciones[1].foto)).split(',').last)),
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState == ConnectionState.waiting) {
-                                // Muestra un indicador de carga mientras se decodifica la imagen
-                                return const CircularProgressIndicator();
-                              } else if (snapshot.hasError) {
-                                // Muestra un mensaje de error si ocurre un error durante la decodificación
-                                return Text('Error: ${snapshot.error}');
-                              } else {
-                                // Si la decodificación fue exitosa, muestra la imagen
-                                return Image.memory(
-                                  height: 75,
-                                  width: 75,
-                                  snapshot.data!,
-                                  fit: BoxFit.cover,
-                                );
-                              }
-                            },
+                      // Mostrar podcasts recomendados
+                      for (final podcastRecomendado in podcastsRecomendados)
+                        GestureDetector(
+                          onTap: () {
+                            // Navegar al podcast correspondiente
+                            // Aquí puedes implementar la lógica para navegar a la página del podcast
+                          },
+                          child: Container(
+                            width: 100, // Ancho de la imagen
+                            child: Column(
+                              children: [
+                                Container(
+                                  height: 100,
+                                  width: 100,
+                                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                                  child: FutureBuilder<Uint8List>(
+                                    future: Future.microtask(() => base64Url.decode((base64ToImageSrc(podcastRecomendado['foto'])).split(',').last)),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState == ConnectionState.waiting) {
+                                        // Muestra un indicador de carga mientras se decodifica la imagen
+                                        return const CircularProgressIndicator();
+                                      } else if (snapshot.hasError) {
+                                        // Muestra un mensaje de error si ocurre un error durante la decodificación
+                                        return Text('Error: ${snapshot.error}');
+                                      } else {
+                                        // Si la decodificación fue exitosa, muestra la imagen
+                                        return Image.memory(
+                                          snapshot.data!,
+                                          height: 75,
+                                          width: 75,
+                                          fit: BoxFit.cover,
+                                        );
+                                      }
+                                    },
+                                  ),
+                                ),
+                                const SizedBox(height: 4), // Espacio entre la imagen y el nombre
+                                Text(
+                                  podcastRecomendado['nombre'],
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-
-                        const SizedBox(width: 50,),
-                        Container(height: 100, width: 100, padding: const EdgeInsets.symmetric(horizontal: 8),
-                          child: FutureBuilder<Uint8List>(
-                            future: Future.microtask(() => base64Url.decode((base64ToImageSrc(canciones[2].foto)).split(',').last)),
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState == ConnectionState.waiting) {
-                                // Muestra un indicador de carga mientras se decodifica la imagen
-                                return const CircularProgressIndicator();
-                              } else if (snapshot.hasError) {
-                                // Muestra un mensaje de error si ocurre un error durante la decodificación
-                                return Text('Error: ${snapshot.error}');
-                              } else {
-                                // Si la decodificación fue exitosa, muestra la imagen
-                                return Image.memory(
-                                  height: 75,
-                                  width: 75,
-                                  snapshot.data!,
-                                  fit: BoxFit.cover,
-                                );
-                              }
-                            },
-                          ),
-                        ),
-                        const SizedBox(width: 50,),
-                      ],
-                    ),
+                      const SizedBox(width: 50,),
+                    ],
                   ),
-
+                ),
                 const SizedBox(height: 20,),
                 const Text('Texto numero 3', style: TextStyle(color: Colors.white),),
                 const SizedBox(height: 8,),
