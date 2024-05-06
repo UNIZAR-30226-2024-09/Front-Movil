@@ -151,7 +151,7 @@ void handleTap(BuildContext context, Cancion cancion) {
   // Aquí puedes manejar la acción de tap con la canción específica
   Navigator.push(
     context,
-    MaterialPageRoute(builder: (context) => reproductor(cancion: cancion,)), // cancion: cancion dentro de reproductor cuando esto funcione
+    MaterialPageRoute(builder: (context) => reproductor(cancion: cancion, ids: [])), // cancion: cancion dentro de reproductor cuando esto funcione
   );
 }
 

@@ -98,7 +98,7 @@ class _clasico_State extends State<clasico> {
         automaticallyImplyLeading: false, // Eliminar el botón de retroceso predeterminado
       ),
       body: canciones.isEmpty
-          ? const Center(child: const CircularProgressIndicator()): ListView.builder(
+          ? const Center(child: CircularProgressIndicator()): ListView.builder(
         itemCount: canciones.length,
         itemBuilder: (context, index) {
           String cancion = canciones[index].foto;
@@ -109,7 +109,7 @@ class _clasico_State extends State<clasico> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => reproductor(cancion: canciones[index])
+                      builder: (context) => reproductor(cancion: canciones[index], ids: [])
                   ),
                 );
               },

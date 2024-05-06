@@ -109,7 +109,7 @@ class _rock_State extends State<rock> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => reproductor(cancion: canciones[index])
+                      builder: (context) => reproductor(cancion: canciones[index], ids: [])
                   ),
                 );
               },

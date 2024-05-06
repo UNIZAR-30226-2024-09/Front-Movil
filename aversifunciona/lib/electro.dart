@@ -109,7 +109,7 @@ class _electro_State extends State<electro> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => reproductor(cancion: canciones[index])
+                      builder: (context) => reproductor(cancion: canciones[index], ids: [])
                   ),
                 );
               },

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:base64_audio_source/base64_audio_source.dart';
@@ -8,10 +9,14 @@ import 'package:path_provider/path_provider.dart';
 import 'cancion.dart';
 import 'dart:convert';
 
+import 'env.dart';
+
 class reproductor extends StatelessWidget {
-  final Cancion cancion; // Agregar el parámetro cancion
+  var cancion; // Agregar el parámetro cancion
+  List<int> ids;
+
                     // Create a player
-  reproductor({required this.cancion});
+  reproductor({required this.cancion, required this.ids});
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -21,45 +26,105 @@ class reproductor extends StatelessWidget {
         primaryColor: Colors.white,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MusicPlayerScreen(cancion: cancion),
+      home: MusicPlayerScreen(cancion: cancion, ids: ids,),
     );
   }
 }
 
 class MusicPlayerScreen extends StatefulWidget {
-  final Cancion cancion; // Agregar el parámetro cancion
-  MusicPlayerScreen({required this.cancion});
+  var cancion; // Agregar el parámetro cancion
+  List<int> ids;
+  MusicPlayerScreen({required this.cancion, required this.ids});
   final player = AudioPlayer();
 
   @override
-  _MusicPlayerScreenState createState() => _MusicPlayerScreenState(cancion, player);
+  _MusicPlayerScreenState createState() => _MusicPlayerScreenState(cancion, player, ids);
 }
 
 class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
   bool isPlaying = false;
   double progress = 0.0; // Representa la posición de reproducción de la canción
   Timer? timer;
-  Cancion cancion = const Cancion(id: 0, nombre: '', miAlbum: 0, puntuacion: 0, archivomp3: '', foto: '');
+  var cancion;
+  int index = 0;
   AudioPlayer mp3player = AudioPlayer();
+  List<int> ids = [];
 
-  _MusicPlayerScreenState(Cancion song, AudioPlayer player){
+  _MusicPlayerScreenState(var song, AudioPlayer player, List<int> index_){
     cancion = song;
     mp3player = player;
+    ids = index_;
   }
 
-  Future<void> cargar_cancion() async{
+  Future<void> sig_cancion(List<int> ids, int index) async{
+    if (ids.isNotEmpty) {
+      final response = await http.post(
+        Uri.parse('${Env.URL_PREFIX}/devolverCancion/'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'cancionId': ids[index],
+        }),
+      );
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        final utilData = responseData['cancion'];
+        debugPrint(responseData.toString());
+        Cancion song_ = Cancion.fromJson(utilData);
+
+        setState(() {
+          cancion = song_;
+        });
+
+        try {
+          // Decodificar el audio base64 a bytes
+
+          String song = cancion.archivomp3!;
+          //song.replaceAll(RegExp('^data:audio\\/mp3;base64,'), '').replaceAll(RegExp('^data:[^;]+;base64,'), '')
+          String song2 = ('data:audio/mp3;base64,${(utf8.decode(base64Decode(
+              song.replaceAll(RegExp(r'^data:audio\/mp3;base64,'), '')
+                  .replaceAll(
+                  RegExp(r'^data:[^;]+;base64,'), ''))))}')
+              .split(',')
+              .last;
+
+          // Cargar el archivo temporal en el reproductor de audio
+          //await mp3player.setFilePath(tempFile.path);
+          await mp3player.setAudioSource(
+              Base64AudioSource(song2, kAudioFormatMP3));
+
+          // Cargar el AudioSource en el reproductor de audio
+        }
+
+        catch (e) {
+          print("Error cargando audio base64: $e");
+        }
+
+      }
+    }
+  }
+
+  Future<void> cargar_cancion(var object, List<int> ids, int index) async{
     try {
       // Decodificar el audio base64 a bytes
-      String song = cancion.archivomp3!;
-      //song.replaceAll(RegExp('^data:audio\\/mp3;base64,'), '').replaceAll(RegExp('^data:[^;]+;base64,'), '')
-      String song2 = ('data:audio/mp3;base64,${(utf8.decode(base64Decode(song.replaceAll(RegExp(r'^data:audio\/mp3;base64,'), '').replaceAll(RegExp(r'^data:[^;]+;base64,'), ''))))}').split(',').last;
 
-      // Cargar el archivo temporal en el reproductor de audio
-      //await mp3player.setFilePath(tempFile.path);
-      await mp3player.setAudioSource(Base64AudioSource(song2, kAudioFormatMP3));
+        String song = cancion.archivomp3!;
+        //song.replaceAll(RegExp('^data:audio\\/mp3;base64,'), '').replaceAll(RegExp('^data:[^;]+;base64,'), '')
+        String song2 = ('data:audio/mp3;base64,${(utf8.decode(base64Decode(
+            song.replaceAll(RegExp(r'^data:audio\/mp3;base64,'), '')
+                .replaceAll(
+                RegExp(r'^data:[^;]+;base64,'), ''))))}')
+            .split(',')
+            .last;
 
-      // Cargar el AudioSource en el reproductor de audio
-    }
+        // Cargar el archivo temporal en el reproductor de audio
+        //await mp3player.setFilePath(tempFile.path);
+        await mp3player.setAudioSource(
+            Base64AudioSource(song2, kAudioFormatMP3));
+
+        // Cargar el AudioSource en el reproductor de audio
+      }
+
+
     catch (e) {
       print("Error cargando audio base64: $e");
     }
@@ -68,7 +133,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
   @override
   void initState(){
     super.initState();
-    cargar_cancion();
+    cargar_cancion(cancion, ids, 0);
   }
   void togglePlay() {
 
@@ -118,17 +183,59 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
     isPlaying = false;
   }
 
-  void nextSong() {
+  void nextSong() async{
     // Aquí iría la lógica para avanzar a la siguiente canción
+    timer?.cancel();
+    bool comienzo = false;
+    await mp3player.stop();
+    debugPrint(index.toString());
+    if (index >= ids.length - 1){
+      index = 0;
+      comienzo = true;
+    }
+    else{
+      index++;
+    }
+    await sig_cancion(ids, index);
+
+    setState(() {
+      progress = 0.0;
+      if(comienzo){
+        isPlaying = false;
+        timer?.cancel();
+      }
+      else{
+        isPlaying = true;
+        startPlaying();
+      }
+
+    });
   }
 
-  void previousSong() {
+  void previousSong() async{
     // Aquí iría la lógica para volver a la canción anterior
+    timer?.cancel();
+    if (index <= 0){
+      index = 0;
+      await mp3player.seek(const Duration(minutes: 0 ,seconds: 0));
+    }
+    else{
+      index--;
+      await mp3player.stop();
+      await sig_cancion(ids, index);
+    }
+    setState(() {
+      progress = 0.0;
+      isPlaying = true;
+      startPlaying();
+    });
   }
 
   void replaySong() async{
+    timer?.cancel();
     await mp3player.stop();
-    await cargar_cancion();
+    await mp3player.seek(const Duration(minutes: 0 ,seconds: 0));
+
     setState(() {
       progress = 0.0;
       isPlaying = true;

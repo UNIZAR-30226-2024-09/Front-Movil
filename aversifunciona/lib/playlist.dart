@@ -1,6 +1,8 @@
+import 'package:aversifunciona/reproductor.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'cancion.dart';
 import 'pantallaCancion.dart';
 import 'env.dart';
 
@@ -21,6 +23,8 @@ class _PlaylistState extends State<Playlist> {
   late bool playlistPublica = true;
   late List<Map<String, dynamic>> songs = [];
   final TextEditingController _emailController = TextEditingController();
+  List<int> ids = [];
+  List<Cancion> canciones= [];
 
   @override
   void initState() {
@@ -67,7 +71,7 @@ class _PlaylistState extends State<Playlist> {
     } catch (e) {
       print('Error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('Error al obtener los datos de la playlist'),
         ),
       );
@@ -76,6 +80,7 @@ class _PlaylistState extends State<Playlist> {
 
 
   Future<void> _fetchPlaylistSongs() async {
+    List<Cancion> canciones_ = [];
     try {
       final response = await http.post(
         Uri.parse('${Env.URL_PREFIX}/listarCancionesPlaylist/'),
@@ -87,13 +92,22 @@ class _PlaylistState extends State<Playlist> {
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
         final songsData = responseData['canciones'];
+
+        for (var i = 0; i < songsData.length; i++) {
+          Cancion cancion = Cancion.fromJson(songsData[i]);
+          canciones_.add(cancion);
+          ids.add(canciones_[i].id!);
+        }
+
         // Actualizar la lista de canciones con los datos recibidos de la API
         setState(() {
           songs = List<Map<String, dynamic>>.from(songsData);
+          canciones = canciones_;
         });
         // Iterar sobre la lista de canciones y obtener los artistas de cada una
         for (var song in songs) {
           await _fetchSongArtists(song['id']);
+
         }
       } else {
         throw Exception('Error al obtener las canciones de la playlist');
@@ -101,7 +115,7 @@ class _PlaylistState extends State<Playlist> {
     } catch (e) {
       print('Error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('Error al obtener las canciones de la playlist'),
         ),
       );
@@ -151,13 +165,13 @@ class _PlaylistState extends State<Playlist> {
             Navigator.pop(context);
           },
         ),
-        title: Text('Playlist', style: TextStyle(color: Colors.white)),
+        title: const Text('Playlist', style: TextStyle(color: Colors.white)),
         actions: [
           IconButton(
             onPressed: () {
               _showAddCollaboratorModal(context);
             },
-            icon: Icon(Icons.person_add, color: Colors.white),
+            icon: const Icon(Icons.person_add, color: Colors.white),
           ),
         ],
       ),
@@ -170,11 +184,11 @@ class _PlaylistState extends State<Playlist> {
             },
             child: Text(playlistPublica ? 'Cambiar a Privada' : 'Cambiar a Pública'),
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           // Aquí iría la foto de la playlist (cuadrada, en el centro, dentro de un contenedor gris)
             Container(
               color: Colors.black,
-              padding: EdgeInsets.all(20),
+              padding: const EdgeInsets.all(20),
               child: Center(
                 child: SizedBox(
                   width: 200,
@@ -189,9 +203,9 @@ class _PlaylistState extends State<Playlist> {
               ),
             ),
 
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -200,24 +214,24 @@ class _PlaylistState extends State<Playlist> {
                     children: [
                       Text(
                         playlistName,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
                       ),
-                      SizedBox(height: 5),
+                      const SizedBox(height: 5),
                       Text(
                         userName,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 16,
                           color: Colors.grey,
                         ),
                       ),
-                      SizedBox(height: 5),
+                      const SizedBox(height: 5),
                       Text(
                         'Duración: $duration',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 16,
                           color: Colors.grey,
                         ),
@@ -227,14 +241,18 @@ class _PlaylistState extends State<Playlist> {
                   ElevatedButton.icon(
                     onPressed: () {
                       // Lógica para reproducir la playlist
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => reproductor(cancion: canciones[0], ids: ids)), // cancion: cancion dentro de reproductor cuando esto funcione
+                      );
                     },
-                    icon: Icon(Icons.play_arrow),
-                    label: Text('Play'),
+                    icon: const Icon(Icons.play_arrow),
+                    label: const Text('Play'),
                   ),
                 ],
               ),
             ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           Expanded(
             child: ListView.builder(
               itemCount: songs.length,
@@ -255,9 +273,9 @@ class _PlaylistState extends State<Playlist> {
                   },
 
                   child: ListTile(
-                    leading: Icon(Icons.music_note),
-                    title: Text(song['nombre'] ?? 'Nombre no disponible', style: TextStyle(color: Colors.white)),
-                    subtitle: Text(artistasString, style: TextStyle(color: Colors.grey)),
+                    leading: const Icon(Icons.music_note),
+                    title: Text(song['nombre'] ?? 'Nombre no disponible', style: const TextStyle(color: Colors.white)),
+                    subtitle: Text(artistasString, style: const TextStyle(color: Colors.grey)),
                   ),
                 );
               },
@@ -285,7 +303,7 @@ class _PlaylistState extends State<Playlist> {
           playlistPublica = !playlistPublica;
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text('La playlist ha sido actualizada con éxito'),
           ),
         );
@@ -295,7 +313,7 @@ class _PlaylistState extends State<Playlist> {
     } catch (e) {
       print('Error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('Error al cambiar la privacidad de la playlist'),
         ),
       );
@@ -307,10 +325,10 @@ class _PlaylistState extends State<Playlist> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Añadir Colaborador'),
+          title: const Text('Añadir Colaborador'),
           content: TextField(
             controller: _emailController,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               hintText: 'Correo Electrónico',
             ),
           ),
@@ -319,14 +337,14 @@ class _PlaylistState extends State<Playlist> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('Cancelar'),
+              child: const Text('Cancelar'),
             ),
             ElevatedButton(
               onPressed: () {
                 _addCollaborator();
                 Navigator.of(context).pop();
               },
-              child: Text('Añadir Colaborador'),
+              child: const Text('Añadir Colaborador'),
             ),
           ],
         );
@@ -346,7 +364,7 @@ class _PlaylistState extends State<Playlist> {
       );
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text('Colaborador añadido con éxito'),
           ),
         );
@@ -356,7 +374,7 @@ class _PlaylistState extends State<Playlist> {
     } catch (e) {
       print('Error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('Error al añadir el colaborador'),
         ),
       );

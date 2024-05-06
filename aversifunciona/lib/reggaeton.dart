@@ -109,7 +109,7 @@ class _reggaeton_State extends State<reggaeton> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => reproductor(cancion: canciones[index])
+                      builder: (context) => reproductor(cancion: canciones[index], ids: [])
                   ),
                 );
               },

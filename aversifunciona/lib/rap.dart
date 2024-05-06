@@ -113,7 +113,7 @@ class _rap_State extends State<rap> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => reproductor(cancion: canciones[index])
+                      builder: (context) => reproductor(cancion: canciones[index], ids: [])
                   ),
                 );
               },
