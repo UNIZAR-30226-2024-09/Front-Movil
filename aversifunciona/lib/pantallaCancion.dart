@@ -99,31 +99,6 @@ class _PantallaCancionState extends State<PantallaCancion> {
     }
   }
 
-  /*Future<void> _fetchUserPlaylists() async {
-    try {
-        final response = await http.post(
-        Uri.parse('${Env.URL_PREFIX}/listarPlaylistsUsuario/'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'correo': _correoS, // Reemplazar con el correo del usuario
-        }),
-      );
-      if (response.statusCode == 200) {
-        final responseData = jsonDecode(response.body);
-        final userPlaylists = responseData['playlists'];
-        setState(() {
-          playlists = List<String>.from(userPlaylists); // Actualizar la lista de playlists del usuario
-        });
-        _showPlaylistModal(context);
-      } else {
-        throw Exception('Error al obtener las playlists del usuario');
-      }
-    } catch (e) {
-      print('Error: $e');
-      // Manejar el error aquí
-    }
-  }*/
-
   Future<void> _fetchUserPlaylists() async {
     try {
       final response = await http.post(
@@ -164,9 +139,52 @@ class _PantallaCancionState extends State<PantallaCancion> {
   }
 
   Future<void> _addToPlaylist(String playlistName) async {
-    // Lógica para añadir la canción a la playlist seleccionada
-    print('Añadir canción a la playlist: $playlistName');
+    try {
+      final playlistId = _playlistsIds[playlistName];
+      if (playlistId != null) {
+        final response = await http.post(
+          Uri.parse('${Env.URL_PREFIX}/agnadirCancionPlaylist/'), // Reemplaza con la URL de tu API
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({
+            'playlistId': playlistId,
+            'cancionId': widget.songId,
+          }),
+        );
+        if (response.statusCode == 200) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Canción añadida a la playlist con éxito'),
+            ),
+          );
+        } else if (response.statusCode == 400) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('La canción ya está en la playlist'),
+            ),
+          );
+          throw Exception('La canción ya está en la playlist');
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error al añadir la canción a la playlist'),
+            ),
+          );
+          throw Exception('Error al añadir la canción a la playlist');
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('No se encontró la playlist correspondiente'),
+          ),
+        );
+        throw Exception('No se encontró la playlist correspondiente');
+      }
+    } catch (e) {
+      print('Error: $e');
+      // Manejar el error aquí
+    }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -297,27 +315,8 @@ class _PantallaCancionState extends State<PantallaCancion> {
                     final playlistName = _playlists[index];
                     return GestureDetector(
                       onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) {
-                            final playlistId = _playlistsIds[playlistName];
-                            if (playlistId != null) {
-                              //return Playlist(playlistId: playlistId);
-                              return Scaffold(
-                                body: Center(
-                                  child: Text('Se encontró la playlist correspondiente.'),
-                                ),
-                              );
-                            } else {
-                              // Manejar el caso en que el ID de la playlist sea nulo
-                              return Scaffold(
-                                body: Center(
-                                  child: Text('No se encontró la playlist correspondiente.'),
-                                ),
-                              );
-                            }
-                          }),
-                        );
+                        _addToPlaylist(playlistName); // Llamada a _addToPlaylist aquí
+                        Navigator.pop(context); // Cerrar el modal al seleccionar una playlist
                       },
                       child: ListTile(
                         title: Text(
