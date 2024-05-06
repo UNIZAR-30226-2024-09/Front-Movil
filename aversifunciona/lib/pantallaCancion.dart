@@ -16,6 +16,8 @@ class PantallaCancion extends StatefulWidget {
 class _PantallaCancionState extends State<PantallaCancion> {
   late String nombre = '';
   late int album = 0;
+  late String albumName = '';
+  late String artistName = '';
   late String artista = '';
   late String duracion = '';
   String _correoS = '';
@@ -46,8 +48,64 @@ class _PantallaCancionState extends State<PantallaCancion> {
           nombre = songData['nombre'];
           album = songData['miAlbum'];
         });
+        await _fetchAlbumName(album);
+        await _fetchArtistName(album);
       } else {
         throw Exception('Error al obtener los datos de la canción');
+      }
+    } catch (e) {
+      print('Error: $e');
+      // Manejar el error aquí
+    }
+  }
+
+  Future<void> _fetchAlbumName(int albumId) async {
+    try {
+      final response = await http.post(
+        Uri.parse('${Env.URL_PREFIX}/devolverAlbum/'), // Reemplaza con la URL de tu API
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'albumId': albumId,
+        }),
+      );
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        final albumData = responseData['album'];
+        final albumName = albumData['nombre']; // Suponiendo que 'nombre' es el campo que contiene el nombre del álbum
+        setState(() {
+          // Actualizar el estado con el nombre del álbum
+          // Aquí puedes asignar el nombre del álbum a una variable en el estado si es necesario
+          this.albumName = albumName;
+        });
+      } else {
+        throw Exception('Error al obtener el nombre del álbum');
+      }
+    } catch (e) {
+      print('Error: $e');
+      // Manejar el error aquí
+    }
+  }
+
+  Future<void> _fetchArtistName(int albumId) async {
+    try {
+      final response = await http.post(
+        Uri.parse('${Env.URL_PREFIX}/listarArtistasCancion/'), // Reemplaza con la URL de tu API
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'albumId': albumId,
+        }),
+      );
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        final artistData = responseData['artistas'];
+        final artistName = artistData['nombre']; // Suponiendo que 'nombre' es el campo que contiene el nombre del álbum
+        setState(() {
+          // Actualizar el estado con el nombre del álbum
+          // Aquí puedes asignar el nombre del álbum a una variable en el estado si es necesario
+          this.artistName = artistName;
+        });
+      } else {
+        throw Exception('Error al obtener el nombre del artista');
       }
     } catch (e) {
       print('Error: $e');
@@ -259,7 +317,7 @@ class _PantallaCancionState extends State<PantallaCancion> {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Text(
-                  '$album - $artista',
+                  '$albumName - $artistName',
                   style: TextStyle(fontSize: 16, color: Colors.grey),
                 ),
               ],

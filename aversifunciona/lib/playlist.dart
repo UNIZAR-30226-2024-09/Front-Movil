@@ -151,7 +151,39 @@ class _PlaylistState extends State<Playlist> {
     }
   }
 
-
+  void _deleteSongFromPlaylist(int songId) async {
+    try {
+      final response = await http.post(
+        Uri.parse('${Env.URL_PREFIX}/eliminarCancionPlaylist/'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'playlistId': widget.playlistId,
+          'cancionId': songId,
+        }),
+      );
+      if (response.statusCode == 200) {
+        // Eliminación exitosa
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Canción eliminada de la playlist'),
+          ),
+        );
+        // Actualizar la lista de canciones después de eliminar la canción
+        setState(() {
+          songs.removeWhere((song) => song['id'] == songId);
+        });
+      } else {
+        throw Exception('Error al eliminar la canción de la playlist');
+      }
+    } catch (e) {
+      print('Error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Error al eliminar la canción de la playlist'),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -253,34 +285,49 @@ class _PlaylistState extends State<Playlist> {
               ),
             ),
           const SizedBox(height: 20),
-          Expanded(
-            child: ListView.builder(
-              itemCount: songs.length,
-              itemBuilder: (context, index) {
-                final song = songs[index];
-                final artistas = song['artista'] as List<Map<String, dynamic>>?;
-                final artistasString = artistas != null ? artistas.map((artista) => artista['nombre']).join(', ') : 'Artistas no disponibles';
-                return GestureDetector(
-                  onTap: () {
-                    // Verificar si song['cancionId'] no es nulo antes de pasar a PantallaCancion
-                    if (song['id'] != null) {
-                      // Navegar a la pantalla de detalles de la canción
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => PantallaCancion(songId: song['id'])),
-                      );
-                    }
-                  },
-
-                  child: ListTile(
-                    leading: const Icon(Icons.music_note),
-                    title: Text(song['nombre'] ?? 'Nombre no disponible', style: const TextStyle(color: Colors.white)),
-                    subtitle: Text(artistasString, style: const TextStyle(color: Colors.grey)),
-                  ),
-                );
-              },
+            Expanded(
+              child: ListView.builder(
+                itemCount: songs.length,
+                itemBuilder: (context, index) {
+                  final song = songs[index];
+                  final artistas = song['artista'] as List<Map<String, dynamic>>?;
+                  final artistasString =
+                  artistas != null ? artistas.map((artista) => artista['nombre']).join(', ') : 'Artistas no disponibles';
+                  return Dismissible(
+                    key: UniqueKey(),
+                    direction: DismissDirection.endToStart,
+                    onDismissed: (direction) {
+                      _deleteSongFromPlaylist(song['id']); // Eliminar la canción de la playlist
+                    },
+                    background: Container(
+                      alignment: Alignment.centerRight,
+                      color: Colors.red,
+                      child: Padding(
+                        padding: EdgeInsets.only(right: 10),
+                        child: Icon(Icons.delete, color: Colors.white),
+                      ),
+                    ),
+                    child: GestureDetector(
+                      onTap: () {
+                        // Verificar si song['cancionId'] no es nulo antes de pasar a PantallaCancion
+                        if (song['id'] != null) {
+                          // Navegar a la pantalla de detalles de la canción
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => PantallaCancion(songId: song['id'])),
+                          );
+                        }
+                      },
+                      child: ListTile(
+                        leading: const Icon(Icons.music_note),
+                        title: Text(song['nombre'] ?? 'Nombre no disponible', style: const TextStyle(color: Colors.white)),
+                        subtitle: Text(artistasString, style: const TextStyle(color: Colors.grey)),
+                      ),
+                    ),
+                  );
+                },
+              ),
             ),
-          ),
         ],
       ),
     );

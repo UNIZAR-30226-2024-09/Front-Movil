@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'biblioteca.dart';
 import 'buscar.dart';
 import 'env.dart';
+import 'pantallaCancion.dart';
 
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -113,7 +114,8 @@ class _rap_State extends State<rap> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => reproductor(cancion: canciones[index], ids: [])
+                      //builder: (context) => reproductor(cancion: canciones[index], ids: [])
+                      builder: (context) => PantallaCancion(songId: canciones[index].id)
                   ),
                 );
               },

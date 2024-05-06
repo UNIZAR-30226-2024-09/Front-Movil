@@ -3,6 +3,7 @@ import 'package:aversifunciona/pantalla_principal.dart';
 import 'package:aversifunciona/salas.dart';
 import 'package:flutter/material.dart';
 import 'package:aversifunciona/reproductor.dart';
+import 'PantallaCancion.dart';
 import 'biblioteca.dart';
 import 'buscar.dart';
 import 'env.dart';
@@ -109,7 +110,8 @@ class _reggaeton_State extends State<reggaeton> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => reproductor(cancion: canciones[index], ids: [])
+                      //builder: (context) => reproductor(cancion: canciones[index], ids: [])
+                      builder: (context) => PantallaCancion(songId: canciones[index].id)
                   ),
                 );
               },
