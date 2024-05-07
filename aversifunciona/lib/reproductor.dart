@@ -8,6 +8,7 @@ import 'package:base64_audio_source/base64_audio_source.dart';
 import 'package:path_provider/path_provider.dart';
 import 'cancion.dart';
 import 'dart:convert';
+import 'capitulo.dart';
 
 import 'env.dart';
 
@@ -45,15 +46,109 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
   bool isPlaying = false;
   double progress = 0.0; // Representa la posición de reproducción de la canción
   Timer? timer;
+  var posible_podcast;
   var cancion;
+  bool podcast = false;
+  List<dynamic> capitulos = [];
   int index = 0;
   AudioPlayer mp3player = AudioPlayer();
   List<int> ids = [];
 
   _MusicPlayerScreenState(var song, AudioPlayer player, List<int> index_){
+    posible_podcast = song;
     cancion = song;
     mp3player = player;
-    ids = index_;
+    if(index_[0] == -33){
+      ids = [];
+      podcast = true;
+    }
+    else{
+      ids = index_;
+    }
+  }
+
+  Future<void> sig_capitulo(int index) async{
+
+      try {
+        // Decodificar el audio base64 a bytes
+
+        String song = capitulos[index].archivomp3!;
+        //song.replaceAll(RegExp('^data:audio\\/mp3;base64,'), '').replaceAll(RegExp('^data:[^;]+;base64,'), '')
+        String song2 = ('data:audio/mp3;base64,${(utf8.decode(base64Decode(
+            song.replaceAll(RegExp(r'^data:audio\/mp3;base64,'), '')
+                .replaceAll(
+                RegExp(r'^data:[^;]+;base64,'), ''))))}')
+            .split(',')
+            .last;
+
+        // Cargar el archivo temporal en el reproductor de audio
+        //await mp3player.setFilePath(tempFile.path);
+        await mp3player.setAudioSource(
+            Base64AudioSource(song2, kAudioFormatMP3));
+
+        // Cargar el AudioSource en el reproductor de audio
+      }
+
+      catch (e) {
+        print("Error cargando audio base64: $e");
+      }
+
+  }
+
+  Future<void> cargar_capitulos() async{
+    try {
+      // Decodificar el audio base64 a bytes
+
+      final response = await http.post(
+        Uri.parse('${Env.URL_PREFIX}/listarCapitulosPodcast/'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode({'nombrePodcast': cancion.nombre}),
+      );
+
+      if (response.statusCode == 200) {
+        Map<String, dynamic> data = jsonDecode(response.body);
+        dynamic capitulosData = data['capitulos'];
+
+        List<dynamic> nuevosCapitulos = [];
+
+        for (var i = 0; i < capitulosData.length; i++) {
+          Capitulo capitulo = Capitulo.fromJson(capitulosData[i]);
+          nuevosCapitulos.add(capitulo);
+          debugPrint(capitulo.toString());
+        }
+
+        setState(() {
+          capitulos = nuevosCapitulos;
+        });
+
+      } else {
+        // Handle error or unexpected status code
+        throw Exception('Failed to load chapters');
+      }
+
+      String song = capitulos[0].archivomp3!;
+      //song.replaceAll(RegExp('^data:audio\\/mp3;base64,'), '').replaceAll(RegExp('^data:[^;]+;base64,'), '')
+      String song2 = ('data:audio/mp3;base64,${(utf8.decode(base64Decode(
+          song.replaceAll(RegExp(r'^data:audio\/mp3;base64,'), '')
+              .replaceAll(
+              RegExp(r'^data:[^;]+;base64,'), ''))))}')
+          .split(',')
+          .last;
+
+      // Cargar el archivo temporal en el reproductor de audio
+      //await mp3player.setFilePath(tempFile.path);
+      await mp3player.setAudioSource(
+          Base64AudioSource(song2, kAudioFormatMP3));
+
+      // Cargar el AudioSource en el reproductor de audio
+    }
+
+
+    catch (e) {
+      print("Error cargando audio base64: $e");
+    }
   }
 
   Future<void> sig_cancion(List<int> ids, int index) async{
@@ -133,7 +228,15 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
   @override
   void initState(){
     super.initState();
-    cargar_cancion(cancion, ids, 0);
+
+    if(podcast){
+      ids = [];
+      cargar_capitulos();
+    }
+    else{
+      cargar_cancion(cancion, ids, 0);
+    }
+
   }
   void togglePlay() {
 
@@ -189,14 +292,28 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
     bool comienzo = false;
     await mp3player.stop();
     debugPrint(index.toString());
-    if (index >= ids.length - 1){
-      index = 0;
-      comienzo = true;
+
+    if(!podcast){
+      if (index >= ids.length - 1){
+        index = 0;
+        comienzo = true;
+      }
+      else{
+        index++;
+      }
+      await sig_cancion(ids, index);
+
     }
     else{
-      index++;
+      if (index >= capitulos.length - 1){
+        index = 0;
+        comienzo = true;
+      }
+      else{
+        index++;
+      }
+      await sig_capitulo(index);
     }
-    await sig_cancion(ids, index);
 
     setState(() {
       progress = 0.0;
@@ -222,7 +339,12 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
     else{
       index--;
       await mp3player.stop();
-      await sig_cancion(ids, index);
+      if(!podcast){
+        await sig_cancion(ids, index);
+      }
+      else{
+        await sig_capitulo(index);
+      }
     }
     setState(() {
       progress = 0.0;

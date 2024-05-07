@@ -110,12 +110,12 @@ class _ingles_State extends State<ingles> {
             leading: Image.memory(base64Url.decode(('data:image/jpeg;base64,${utf8.decode(base64Decode(podcast.replaceAll(RegExp('/^data:image/[a-z]+;base64,/'), '')))}').split(',').last), height: 50, width: 50,),
             title: TextButton(
               onPressed:() {
-                /*Navigator.push(
+                Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => reproductor(cancion: canciones[index])
+                      builder: (context) => reproductor(cancion: podcasts[index], ids: [-33],)
                   ),
-                );*/
+                );
               },
               child: Row(
                   children: [
