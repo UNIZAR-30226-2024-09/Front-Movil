@@ -177,12 +177,15 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
 
     return bytes;
   }
-
-  String base64ToImageSrc(String base64) {
+  String base64ToImageSrc(Uint8List bytes) {
+    String base64String = base64Encode(bytes);
+    return 'data:image/jpeg;base64,$base64String';
+  }
+  /*String base64ToImageSrc(String base64) {
     return 'data:image/jpeg;base64,${utf8.decode(base64Decode(base64.replaceAll(RegExp('/^data:image/[a-z]+;base64,/'), '')))}';
   }
 
-  /*Future<void> conseguirCanciones() async {
+  Future<void> conseguirCanciones() async {
     try {
       final response = await http
           .post(Uri.parse("${Env.URL_PREFIX}/listarCanciones/"),
@@ -307,7 +310,7 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
 
   Future<void> _listarPodcasts() async {
     final response = await http.post(
-      Uri.parse('${Env.URL_PREFIX}/listarPodcasts/'),
+      Uri.parse('${Env.URL_PREFIX}/listarPocosPodcasts/'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -341,7 +344,7 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
 
   Future<void> _listarCanciones() async {
     final response = await http.post(
-      Uri.parse('${Env.URL_PREFIX}/listarPodcasts/'),
+      Uri.parse('${Env.URL_PREFIX}/listarPocasCanciones/'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -370,6 +373,17 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
       });
     } else {
       throw Exception('Failed to get recommendation');
+    }
+  }
+
+  Future<Uint8List> _fetchImageFromUrl(String imageUrl) async {
+    final response = await http.get(Uri.parse(imageUrl));
+    if (response.statusCode == 200) {
+      // Devuelve los bytes de la imagen
+      return response.bodyBytes;
+    } else {
+      // Si la solicitud falla, lanza un error
+      throw Exception('Failed to load image from $imageUrl');
     }
   }
 
@@ -430,7 +444,7 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
                               children: [
                                 Expanded(
                                   child: FutureBuilder<Uint8List>(
-                                    future: Future.microtask(() => base64Url.decode((base64ToImageSrc(cancionRecomendada['foto'])).split(',').last)),
+                                    future: _fetchImageFromUrl('${Env.URL_PREFIX}/imagenCancion/${cancionRecomendada['id']}/'),
                                     builder: (context, snapshot) {
                                       if (snapshot.connectionState == ConnectionState.waiting) {
                                         // Muestra un indicador de carga mientras se decodifica la imagen
@@ -475,7 +489,7 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
                               children: [
                                 Expanded(
                                   child: FutureBuilder<Uint8List>(
-                                    future: Future.microtask(() => base64Url.decode((base64ToImageSrc(podcastRecomendado['foto'])).split(',').last)),
+                                    future: _fetchImageFromUrl('${Env.URL_PREFIX}/imagenPodcast/${podcastRecomendado['id']}/'),
                                     builder: (context, snapshot) {
                                       if (snapshot.connectionState == ConnectionState.waiting) {
                                         // Muestra un indicador de carga mientras se decodifica la imagen
@@ -498,63 +512,6 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
                                 SizedBox(height: 4),
                                 Text(
                                   podcastRecomendado['nombre'],
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 20,),
-                const Text('Podcasts', style: TextStyle(color: Colors.white),),
-                const SizedBox(height: 8,),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: Row(
-                    children: [
-                      const SizedBox(width: 20,),
-                      // Mostrar podcasts
-                      for (final podcast in podcasts)
-                        GestureDetector(
-                          onTap: () {
-                            // Aquí puedes definir la lógica para la navegación al detalle del podcast
-                          },
-                          child: Container(
-                            height: 150,
-                            width: 100,
-                            padding: const EdgeInsets.symmetric(horizontal: 8),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Expanded(
-                                  child: FutureBuilder<Uint8List>(
-                                    future: Future.microtask(() => base64Url.decode((base64ToImageSrc(podcast['foto'])).split(',').last)),
-                                    builder: (context, snapshot) {
-                                      if (snapshot.connectionState == ConnectionState.waiting) {
-                                        // Muestra un indicador de carga mientras se decodifica la imagen
-                                        return const CircularProgressIndicator();
-                                      } else if (snapshot.hasError) {
-                                        // Muestra un mensaje de error si ocurre un error durante la decodificación
-                                        return Text('Error: ${snapshot.error}');
-                                      } else {
-                                        // Si la decodificación fue exitosa, muestra la imagen
-                                        return Image.memory(
-                                          snapshot.data!,
-                                          height: 100, // Tamaño fijo para la imagen
-                                          width: 100, // Tamaño fijo para la imagen
-                                          fit: BoxFit.cover,
-                                        );
-                                      }
-                                    },
-                                  ),
-                                ),
-                                SizedBox(height: 4),
-                                Text(
-                                  podcast['nombre'],
                                   style: TextStyle(color: Colors.white),
                                 ),
                               ],
@@ -589,16 +546,16 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
                               children: [
                                 Expanded(
                                   child: FutureBuilder<Uint8List>(
-                                    future: Future.microtask(() => base64Url.decode((base64ToImageSrc(cancion['foto'])).split(',').last)),
+                                    future: _fetchImageFromUrl('${Env.URL_PREFIX}/imagenCancion/${cancion['id']}/'),
                                     builder: (context, snapshot) {
                                       if (snapshot.connectionState == ConnectionState.waiting) {
-                                        // Muestra un indicador de carga mientras se decodifica la imagen
+                                        // Muestra un indicador de carga mientras se carga la imagen
                                         return const CircularProgressIndicator();
                                       } else if (snapshot.hasError) {
-                                        // Muestra un mensaje de error si ocurre un error durante la decodificación
+                                        // Muestra un mensaje de error si ocurre un error durante la carga de la imagen
                                         return Text('Error: ${snapshot.error}');
                                       } else {
-                                        // Si la decodificación fue exitosa, muestra la imagen
+                                        // Si la carga de la imagen fue exitosa, muestra la imagen
                                         return Image.memory(
                                           snapshot.data!,
                                           height: 100, // Tamaño fijo para la imagen
@@ -622,89 +579,62 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
                   ),
                 ),
                 const SizedBox(height: 20,),
-                const Text('Texto numero 4', style: TextStyle(color: Colors.white),),
+                const Text('Podcasts', style: TextStyle(color: Colors.white),),
+                const SizedBox(height: 8,),
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.symmetric(horizontal: 8),
                   child: Row(
                     children: [
                       const SizedBox(width: 20,),
-                      Container(height: 100, width: 100, padding: const EdgeInsets.symmetric(horizontal: 8),
-                        child: FutureBuilder<Uint8List>(
-                          future: Future.microtask(() => base64Url.decode((base64ToImageSrc(canciones[0].foto)).split(',').last)),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.waiting) {
-                              // Muestra un indicador de carga mientras se decodifica la imagen
-                              return const CircularProgressIndicator();
-                            } else if (snapshot.hasError) {
-                              // Muestra un mensaje de error si ocurre un error durante la decodificación
-                              return Text('Error: ${snapshot.error}');
-                            } else {
-                              // Si la decodificación fue exitosa, muestra la imagen
-                              return Image.memory(
-                                height: 75,
-                                width: 75,
-                                snapshot.data!,
-                                fit: BoxFit.cover,
-                              );
-                            }
+                      // Mostrar podcasts
+                      for (final podcast in podcasts)
+                        GestureDetector(
+                          onTap: () {
+                            // Aquí puedes definir la lógica para la navegación al detalle del podcast
                           },
+                          child: Container(
+                            height: 150,
+                            width: 100,
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Expanded(
+                                  child: FutureBuilder<Uint8List>(
+                                    future: _fetchImageFromUrl('${Env.URL_PREFIX}/imagenPodcast/${podcast['id']}/'),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState == ConnectionState.waiting) {
+                                        // Muestra un indicador de carga mientras se decodifica la imagen
+                                        return const CircularProgressIndicator();
+                                      } else if (snapshot.hasError) {
+                                        // Muestra un mensaje de error si ocurre un error durante la decodificación
+                                        return Text('Error: ${snapshot.error}');
+                                      } else {
+                                        // Si la decodificación fue exitosa, muestra la imagen
+                                        return Image.memory(
+                                          snapshot.data!,
+                                          height: 100, // Tamaño fijo para la imagen
+                                          width: 100, // Tamaño fijo para la imagen
+                                          fit: BoxFit.cover,
+                                        );
+                                      }
+                                    },
+                                  ),
+                                ),
+                                SizedBox(height: 4),
+                                Text(
+                                  podcast['nombre'],
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
-                      ),
-
-                      const SizedBox(width: 50,),
-
-                      Container(height: 100, width: 100, padding: const EdgeInsets.symmetric(horizontal: 8),
-                        child: FutureBuilder<Uint8List>(
-                          future: Future.microtask(() => base64Url.decode((base64ToImageSrc(canciones[1].foto)).split(',').last)),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.waiting) {
-                              // Muestra un indicador de carga mientras se decodifica la imagen
-                              return const CircularProgressIndicator();
-                            } else if (snapshot.hasError) {
-                              // Muestra un mensaje de error si ocurre un error durante la decodificación
-                              return Text('Error: ${snapshot.error}');
-                            } else {
-                              // Si la decodificación fue exitosa, muestra la imagen
-                              return Image.memory(
-                                height: 75,
-                                width: 75,
-                                snapshot.data!,
-                                fit: BoxFit.cover,
-                              );
-                            }
-                          },
-                        ),
-                      ),
-
-                      const SizedBox(width: 50,),
-                      Container(height: 100, width: 100, padding: const EdgeInsets.symmetric(horizontal: 8),
-                        child: FutureBuilder<Uint8List>(
-                          future: Future.microtask(() => base64Url.decode((base64ToImageSrc(canciones[2].foto)).split(',').last)),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.waiting) {
-                              // Muestra un indicador de carga mientras se decodifica la imagen
-                              return const CircularProgressIndicator();
-                            } else if (snapshot.hasError) {
-                              // Muestra un mensaje de error si ocurre un error durante la decodificación
-                              return Text('Error: ${snapshot.error}');
-                            } else {
-                              // Si la decodificación fue exitosa, muestra la imagen
-                              return Image.memory(
-                                height: 75,
-                                width: 75,
-                                snapshot.data!,
-
-                              );
-                            }
-                          },
-                        ),
-                      ),
-                      const SizedBox(width: 50,),
                     ],
                   ),
                 ),
-                const SizedBox(height: 8,),
 
               ],
             )
