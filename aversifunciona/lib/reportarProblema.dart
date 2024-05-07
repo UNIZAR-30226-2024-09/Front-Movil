@@ -69,22 +69,42 @@ class _reportarProblema extends State<reportarProblema> {
       );
       final data = jsonDecode(response.body);
       print('Mensaje del servidor');
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text('¡Reporte enviado!'),
-          content: Text('Hemos recibido tu reporte. Nos pondremos en contacto contigo para resolver el problema.'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: Text('Cerrar'),
-            ),
-          ],
-        ),
-      );
-      print('Mensaje del servidor hecho');
+      if (response.statusCode == 200) {
+        // El servidor respondió con un código de estado 200 (OK)
+        // Mostrar un cuadro de diálogo confirmando al usuario que el reporte se envió correctamente
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('¡Reporte enviado!'),
+            content: Text('Hemos recibido tu reporte. Nos pondremos en contacto contigo para resolver el problema.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text('Cerrar'),
+              ),
+            ],
+          ),
+        );
+      } else {
+        // El servidor respondió con un código de estado diferente de 200
+        // Mostrar un cuadro de diálogo indicando que ocurrió un error al enviar el reporte
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Error'),
+            content: Text('Error al enviar el reporte.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('OK'),
+              ),
+            ],
+          ),
+        );
+      }
+      print('Mensaje del servidor recibido');
     } catch (error) {
       print('Error al enviar el reporte: $error');
       showDialog(

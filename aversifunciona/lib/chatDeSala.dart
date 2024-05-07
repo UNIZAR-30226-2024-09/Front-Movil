@@ -4,7 +4,7 @@ import 'package:aversifunciona/pantalla_principal.dart';
 import 'package:aversifunciona/salas.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:web_socket_channel/io.dart';
 
 
 class ChatDeSala extends StatefulWidget {
@@ -20,47 +20,31 @@ class ChatDeSala extends StatefulWidget {
 class _ChatDeSalaState extends State<ChatDeSala> {
   TextEditingController _messageController = TextEditingController();
   List<Map<String, String>> _messages = [];
-  late IO.Socket socket;
+  late IOWebSocketChannel _channel;
 
   @override
   void initState() {
     super.initState();
-    initSocket();
-    _loadMessages();
-  }
-
-  void initSocket() {
-    // Establece la conexión del socket
-    socket = IO.io('http://tu-servidor-de-sockets.com', <String, dynamic>{
-      'transports': ['websocket'],
-      'autoConnect': false, // Deshabilita la conexión automática
-    });
-
-    // Maneja los eventos de conexión
-    socket.onConnect((_) {
-      print('Conectado');
-    });
-
-    // Maneja los eventos de desconexión
-    socket.onDisconnect((_) {
-      print('Desconectado');
-    });
-
-    // Escucha los eventos de mensajes
-    socket.on('mensaje', (data) {
+    _channel = IOWebSocketChannel.connect('ws://localhost:8000/ws');
+    _loadMessages(); // Cargar mensajes al iniciar la pantalla del chat
+    _channel.stream.listen((message) {
       setState(() {
-        _messages.add({"text": data['mensaje'], "name": data['nombre']}); // El texto del mensaje y el nombre de la persona que lo envía
+        _messages.add(message);
+        _saveMessage(message); // Guardar el nuevo mensaje recibido
       });
     });
+  }
 
-    // Conecta al servidor
-    socket.connect();
+  void _sendMessage(String message) {
+    _channel.sink.add(message);
+    _messageController.clear();
+    _saveMessage(message); // Guardar el mensaje enviado por el usuario
   }
 
   @override
   void dispose() {
-    // Cierra la conexión del socket cuando la pantalla se destruye
-    socket.dispose();
+    // Cierra la conexión cuando la pantalla se destruye
+    _channel.sink.close();
     super.dispose();
   }
 
@@ -87,8 +71,7 @@ class _ChatDeSalaState extends State<ChatDeSala> {
         ..._messages, // Add new message at the beginning of the list
       ];
     });
-    // Envia el mensaje al servidor a través del socket
-    socket.emit('enviarMensaje', {'mensaje': message, 'nombre': widget.userName});
+
   }
 
   @override
@@ -208,6 +191,7 @@ class _ChatDeSalaState extends State<ChatDeSala> {
                         onPressed: () {
                           String message = _messageController.text;
                           _saveMessage(message);
+                          _sendMessage(_messageController.text);
                           _messageController.clear();
                         },
                         style: ElevatedButton.styleFrom(
