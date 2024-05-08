@@ -18,12 +18,12 @@ import 'package:http/http.dart' as http;
 import 'env.dart';
 import 'historial.dart';
 
-class cola extends StatefulWidget {
+class Cola extends StatefulWidget {
   @override
-  _colaState createState() => _colaState();
+  _ColaState createState() => _ColaState();
 }
 
-class _colaState extends State<cola> {
+class _ColaState extends State<Cola> {
   String _correoS = '';
   List<dynamic> _cola = [];
 

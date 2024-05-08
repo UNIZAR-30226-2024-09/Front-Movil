@@ -12,6 +12,7 @@ import 'verPerfil.dart';
 import 'configuracion.dart';
 import 'buscar.dart';
 import 'playlist.dart';
+import 'cola.dart';
 import 'package:http/http.dart' as http;
 
 Route _createRoute() {
@@ -313,10 +314,29 @@ class _pantalla_bibliotecaState extends State<pantalla_biblioteca> {
                 ),
               ],
             ),
-
           ),
         ],
       ),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 80), // Ajusta el valor según sea necesario para la posición deseada
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            FloatingActionButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Cola()), // Suponiendo que Cola sea la pantalla a la que quieres navegar
+                );
+              },
+              child: Icon(Icons.queue_music),
+            ),
+            SizedBox(width: 16), // Espacio entre los botones flotantes
+            // Otros botones flotantes, si es necesario
+          ],
+        ),
+      ),
+
     );
   }
 
