@@ -42,6 +42,7 @@ class _pantalla_bibliotecaState extends State<pantalla_biblioteca> {
   String _correoS = '';
   List<String> _playlists = [];
   Map<String, int> _playlistsIds = {};
+  bool cargado = false;
 
   @override
   void initState() {
@@ -95,6 +96,7 @@ class _pantalla_bibliotecaState extends State<pantalla_biblioteca> {
           setState(() {
             _playlists = playlists;
             _playlistsIds = playlistIds; // Guardar el mapa de IDs de playlist
+            cargado = true;
           });
         } else {
           print('No se encontraron listas de reproducción para este usuario.');
@@ -134,7 +136,7 @@ class _pantalla_bibliotecaState extends State<pantalla_biblioteca> {
                   MaterialPageRoute(builder: (context) => CrearPlaylist()), // Suponiendo que el nombre de la pantalla sea CrearPlaylist
                 );
               },
-              child: Text(
+              child: const Text(
                 '+',
                 style: TextStyle(color: Colors.white, fontSize: 20),
               ),
@@ -147,10 +149,10 @@ class _pantalla_bibliotecaState extends State<pantalla_biblioteca> {
           // Sección 1
 
           Expanded(
-            child: Container(
+            child: !cargado ? const Center(child: CircularProgressIndicator()): Container(
               child: ListView(
                 children: [
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                   Expanded(
                     child: ListView.builder(
                       shrinkWrap: true,
@@ -164,10 +166,10 @@ class _pantalla_bibliotecaState extends State<pantalla_biblioteca> {
                               MaterialPageRoute(builder: (context) {
                                 final playlistId = _playlistsIds[playlistName];
                                 if (playlistId != null) {
-                                  return Playlist(playlistId: playlistId);
+                                  return Playlist(playlistId: playlistId, playlistName: playlistName,);
                                 } else {
                                   // Manejar el caso en que el ID de la playlist sea nulo
-                                  return Scaffold(
+                                  return const Scaffold(
                                     body: Center(
                                       child: Text('No se encontró la playlist correspondiente.'),
                                     ),
@@ -180,7 +182,7 @@ class _pantalla_bibliotecaState extends State<pantalla_biblioteca> {
                           child: ListTile(
                             title: Text(
                               playlistName,
-                              style: TextStyle(color: Colors.white),
+                              style: const TextStyle(color: Colors.white),
                             ),
                           ),
                         );
@@ -327,7 +329,7 @@ class _pantalla_bibliotecaState extends State<pantalla_biblioteca> {
         // Aquí puedes agregar tu propio widget de imagen si es necesario
         Text(
           title,
-          style: TextStyle(color: Colors.white, fontSize: 18),
+          style: const TextStyle(color: Colors.white, fontSize: 18),
         ),
       ],
     );
@@ -335,7 +337,7 @@ class _pantalla_bibliotecaState extends State<pantalla_biblioteca> {
 
   Widget buildTopButton(String title) {
     return Container(
-      margin: EdgeInsets.all(8),
+      margin: const EdgeInsets.all(8),
       child: ElevatedButton(
         onPressed: () {
           // Acción al presionar el botón (puedes personalizarlo según sea necesario)
@@ -348,7 +350,7 @@ class _pantalla_bibliotecaState extends State<pantalla_biblioteca> {
         ),
         child: Text(
           title,
-          style: TextStyle(color: Colors.white),
+          style: const TextStyle(color: Colors.white),
         ),
       ),
     );

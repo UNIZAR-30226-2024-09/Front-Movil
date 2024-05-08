@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
@@ -322,6 +323,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
         timer?.cancel();
       }
       else{
+
         isPlaying = true;
         startPlaying();
       }
@@ -392,14 +394,30 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
                   style: const TextStyle(fontSize: 20.0, color: Colors.white),
                 ),
                 const SizedBox(height: 20.0),
-                Slider(
-                  value: progress,
-                  onChanged: (newValue) {
-                    setState(() {
-                      progress = newValue;
-                    });
-                  },
-                ),
+
+                    
+                          Row(
+                            children: [
+
+                              const Padding(padding: EdgeInsets.symmetric(horizontal: 2), child: Text('x:xx', textAlign: TextAlign.right, style: TextStyle(color: Colors.white),)),
+                              Expanded(
+                                child: Slider(
+                                  activeColor: Colors.white,
+                                  inactiveColor: Colors.grey,
+                                  value: progress,
+                                  onChanged: (newValue) {
+                                    setState(() {
+                                      progress = newValue;
+                                    });
+                                  },
+                                ),
+                              ),
+                              const Padding(padding: EdgeInsets.symmetric(horizontal: 2) , child: Text('x:xx', textAlign: TextAlign.left, style: TextStyle(color: Colors.white),)),
+
+                            ],
+                          ),
+
+
                 const SizedBox(height: 20.0),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,

@@ -8,23 +8,29 @@ import 'env.dart';
 
 class Playlist extends StatefulWidget {
   final int playlistId;
+  final String playlistName;
 
-  const Playlist({Key? key, required this.playlistId}) : super(key: key);
+  const Playlist({Key? key, required this.playlistId, required this.playlistName}) : super(key: key);
 
   @override
-  _PlaylistState createState() => _PlaylistState();
+  _PlaylistState createState() => _PlaylistState(playlistName);
 }
 
 class _PlaylistState extends State<Playlist> {
   //bool isPublic = true; // Estado de la playlist (pública o privada)
-  late String playlistName = '';
+  String playlistName = '';
   late String userName = '';
   late String duration = '';
   late bool playlistPublica = true;
   late List<Map<String, dynamic>> songs = [];
   final TextEditingController _emailController = TextEditingController();
+  bool cargado = false;
   List<int> ids = [];
   List<Cancion> canciones= [];
+
+  _PlaylistState(String name){
+    playlistName = name;
+  }
 
   @override
   void initState() {
@@ -48,7 +54,6 @@ class _PlaylistState extends State<Playlist> {
 
         if (playlistData != null) {
           // Acceder a las propiedades de playlistData
-          playlistName = playlistData['nombre'] ?? ''; // Usar cadena vacía como valor por defecto si 'nombre' es null
           playlistPublica = playlistData['publica'] ?? false; // Usar false como valor por defecto si 'publica' es null
           // Otros datos...
         } else {
@@ -58,7 +63,6 @@ class _PlaylistState extends State<Playlist> {
 
         setState(() {
           // Actualizar los datos de la playlist con los recibidos de la API
-          playlistName = playlistData['nombre'];
           playlistPublica = playlistData['publica'];
           // Otros datos...
         });
@@ -103,6 +107,7 @@ class _PlaylistState extends State<Playlist> {
         setState(() {
           songs = List<Map<String, dynamic>>.from(songsData);
           canciones = canciones_;
+          cargado = true;
         });
         // Iterar sobre la lista de canciones y obtener los artistas de cada una
         for (var song in songs) {
@@ -270,22 +275,47 @@ class _PlaylistState extends State<Playlist> {
                       ),
                     ],
                   ),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      // Lógica para reproducir la playlist
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => reproductor(cancion: canciones[0], ids: ids)), // cancion: cancion dentro de reproductor cuando esto funcione
-                      );
-                    },
-                    icon: const Icon(Icons.play_arrow),
-                    label: const Text('Play'),
-                  ),
+                  Row(
+                    children: [
+                      ElevatedButton(
+                        child: const Icon(Icons.shuffle, color: Colors.green),
+                        style: ButtonStyle(backgroundColor: MaterialStateProperty.all<Color>(Colors.white), ),
+                        onPressed: () async{
+                          // Lógica para reproducir la playlist
+                          ids.shuffle();
+                          Cancion? song;
+                          for (var cancion in canciones){
+                            if(ids[0] == cancion.id){
+                              song = cancion;
+                            }
+                          }
+
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => reproductor(cancion: song, ids: ids)), // cancion: cancion dentro de reproductor cuando esto funcione
+                          );
+                        },
+                      ),
+                      const SizedBox(width: 10,),
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          // Lógica para reproducir la playlist
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => reproductor(cancion: canciones[0], ids: ids)), // cancion: cancion dentro de reproductor cuando esto funcione
+                          );
+                        },
+                        icon: const Icon(Icons.play_arrow),
+                        label: const Text('Play'),
+                      ),
+                    ],
+                  )
+
                 ],
               ),
             ),
           const SizedBox(height: 20),
-            Expanded(
+            !cargado ? const CircularProgressIndicator(): Expanded(
               child: ListView.builder(
                 itemCount: songs.length,
                 itemBuilder: (context, index) {
@@ -302,7 +332,7 @@ class _PlaylistState extends State<Playlist> {
                     background: Container(
                       alignment: Alignment.centerRight,
                       color: Colors.red,
-                      child: Padding(
+                      child: const Padding(
                         padding: EdgeInsets.only(right: 10),
                         child: Icon(Icons.delete, color: Colors.white),
                       ),
