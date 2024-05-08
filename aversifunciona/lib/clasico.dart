@@ -9,6 +9,7 @@ import 'PantallaCancion.dart';
 import 'env.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'cola.dart';
 
 Route _createRoute() {
   return PageRouteBuilder(
@@ -123,6 +124,18 @@ class _clasico_State extends State<clasico> {
               ),
             ),);
         },
+      ),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(top: 10), // Ajusta el valor según sea necesario para la posición deseada
+        child: FloatingActionButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => Cola()), // Suponiendo que Cola sea la pantalla a la que quieres navegar
+            );
+          },
+          child: Icon(Icons.queue_music),
+        ),
       ),
       bottomNavigationBar: Container(
         height: 70,

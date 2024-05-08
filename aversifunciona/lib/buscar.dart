@@ -18,10 +18,8 @@ import 'psicologia.dart';
 import 'electro.dart';
 import 'rap.dart';
 import 'env.dart';
+import 'cola.dart';
 
-import 'historial.dart';
-import 'verPerfil.dart';
-import 'configuracion.dart';
 
 Route _createRoute() {
   return PageRouteBuilder(
@@ -197,6 +195,19 @@ class _pantalla_buscarState extends State<pantalla_buscar> {
 
               _buildContent(),
           ],
+        ),
+      ),
+
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(top: 10), // Ajusta el valor según sea necesario para la posición deseada
+        child: FloatingActionButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => Cola()), // Suponiendo que Cola sea la pantalla a la que quieres navegar
+            );
+          },
+          child: Icon(Icons.queue_music),
         ),
       ),
       bottomNavigationBar: Container(

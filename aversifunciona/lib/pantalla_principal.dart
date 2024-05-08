@@ -17,6 +17,7 @@ import 'configuracion.dart';
 import 'cancion.dart';
 import 'env.dart';
 import 'reproductor.dart';
+import 'cola.dart';
 
 List<dynamic> canciones = [];
 
@@ -642,6 +643,19 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
           )
       ),
 
+
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(top: 10), // Ajusta el valor según sea necesario para la posición deseada
+        child: FloatingActionButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => Cola()), // Suponiendo que Cola sea la pantalla a la que quieres navegar
+            );
+          },
+          child: Icon(Icons.queue_music),
+        ),
+      ),
 
       bottomNavigationBar: Container(
         height: 70,

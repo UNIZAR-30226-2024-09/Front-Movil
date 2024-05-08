@@ -10,6 +10,7 @@ import 'env.dart';
 
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'cola.dart';
 
 Route _createRoute() {
   return PageRouteBuilder(
@@ -86,13 +87,11 @@ class _ciencias_State extends State<ciencias> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        leading: TextButton(
-            child: const CircleAvatar(
-              child: Icon(Icons.person_rounded, color: Colors.white,),
-            ),
-            onPressed: () {
-              Navigator.of(context).push(_createRoute());
-            }
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
         title: const Row(
           children: [
@@ -127,6 +126,18 @@ class _ciencias_State extends State<ciencias> {
             ),
           );
         },
+      ),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(top: 10), // Ajusta el valor según sea necesario para la posición deseada
+        child: FloatingActionButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => Cola()), // Suponiendo que Cola sea la pantalla a la que quieres navegar
+            );
+          },
+          child: Icon(Icons.queue_music),
+        ),
       ),
       bottomNavigationBar: Container(
         height: 70,

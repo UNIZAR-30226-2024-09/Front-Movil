@@ -195,6 +195,7 @@ class _pantalla_bibliotecaState extends State<pantalla_biblioteca> {
 
             ),
           ),
+
           Container(
             height: 70,
             decoration: const BoxDecoration(
@@ -319,26 +320,19 @@ class _pantalla_bibliotecaState extends State<pantalla_biblioteca> {
           ),
         ],
       ),
+
       floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 80), // Ajusta el valor según sea necesario para la posición deseada
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            FloatingActionButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => Cola()), // Suponiendo que Cola sea la pantalla a la que quieres navegar
-                );
-              },
-              child: Icon(Icons.queue_music),
-            ),
-            SizedBox(width: 16), // Espacio entre los botones flotantes
-            // Otros botones flotantes, si es necesario
-          ],
+        padding: const EdgeInsets.only(top: 10), // Ajusta el valor según sea necesario para la posición deseada
+        child: FloatingActionButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => Cola()), // Suponiendo que Cola sea la pantalla a la que quieres navegar
+            );
+          },
+          child: Icon(Icons.queue_music),
         ),
       ),
-
     );
   }
 

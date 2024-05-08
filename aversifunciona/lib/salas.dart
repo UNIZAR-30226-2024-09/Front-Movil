@@ -8,6 +8,7 @@ import 'historial.dart';
 import 'biblioteca.dart';
 import 'buscar.dart';
 import 'chatDeSala.dart';
+import 'cola.dart';
 
 Route _createRoute() {
   return PageRouteBuilder(
@@ -113,9 +114,6 @@ class _PantallaSalasState extends State<pantalla_salas> {
                               },
                             ),
                           );
-
-
-
                     },
                   ),
                 const SizedBox(height: 20),
@@ -240,6 +238,18 @@ class _PantallaSalasState extends State<pantalla_salas> {
             ),
           ),
         ],
+      ),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(top: 10), // Ajusta el valor según sea necesario para la posición deseada
+        child: FloatingActionButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => Cola()), // Suponiendo que Cola sea la pantalla a la que quieres navegar
+            );
+          },
+          child: Icon(Icons.queue_music),
+        ),
       ),
     );
   }
