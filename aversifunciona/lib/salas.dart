@@ -1,14 +1,13 @@
+import 'dart:convert';
 import 'package:aversifunciona/getUserSession.dart';
 import 'package:flutter/material.dart';
 import 'package:aversifunciona/pantalla_principal.dart';
-import 'package:aversifunciona/verPerfil.dart';
-
-import 'configuracion.dart';
-import 'historial.dart';
+import 'package:http/http.dart' as http;
 import 'biblioteca.dart';
 import 'buscar.dart';
 import 'chatDeSala.dart';
 import 'cola.dart';
+import 'env.dart';
 
 Route _createRoute() {
   return PageRouteBuilder(
@@ -28,6 +27,20 @@ Route _createRoute() {
   );
 }
 
+class Sala {
+  final int id;
+  final String nombre;
+
+  Sala({required this.id, required this.nombre});
+
+  factory Sala.fromJson(Map<String, dynamic> json) {
+    return Sala(
+      id: json['id'],
+      nombre: json['nombre'],
+    );
+  }
+
+}
 
 
 class pantalla_salas extends StatefulWidget {
@@ -36,31 +49,55 @@ class pantalla_salas extends StatefulWidget {
 }
 
 class _PantallaSalasState extends State<pantalla_salas> {
-  List<String> _listaSalas = ['SpainMusic', 'SiaLovers', 'EminemGroup']; // Lista de nombres de salas
+  List<Sala> _listaSalas = []; // Lista de nombres de salas
   TextEditingController salaController = TextEditingController();
-  //String usuarioActual = '';
 
-  Future<String> getNombreUsuario() async {
+  Future<void> listarSalas() async {
     try {
-      String? token = await getUserSession.getToken(); // Espera a que el token se resuelva
-      print("Token: $token");
-      if (token != null) {
-        // Llama al método AuthService para obtener la información del usuario
-        Map<String, dynamic> userInfo = await getUserSession.getUserInfo(token);
+    var url = Uri.parse('${Env.URL_PREFIX}/ListarSalasAPI/');
+    var response = await http.get(url);
 
-        String usuarioActual = userInfo['nombre'];
-        return usuarioActual;
+    if (response.statusCode == 200) {
+      // Decodificar la respuesta JSON
+      Map<String, dynamic> data = jsonDecode(response.body);
+      List<dynamic> salasData = data['salas'];
 
-      } else {
-        print('Token is null');
-        return '';
+      // Mapear los datos de las salas a objetos Sala
+      _listaSalas = salasData.map((salaData) {
+      return Sala.fromJson(salaData);
+      }).toList();
+
+    } else {
+        // Manejar otros códigos de estado
+        print('Error al listar las salas: ${response.statusCode}');
       }
-    } catch (e) {
-      print('Error fetching user info: $e');
-      return '';
+    } catch (error) {
+      // Manejar errores de red u otros errores
+      print('Error: $error');
     }
   }
 
+  Future<void> crearNuevaSala(String nombreSala) async {
+    try {
+      var url = Uri.parse('${Env.URL_PREFIX}/CrearSalaAPI/');
+      var response = await http.post(
+        url,
+        body: jsonEncode({'nombre': nombreSala}),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        // La sala se creó exitosamente
+        print('Sala creada exitosamente');
+      } else {
+        // Manejar otros códigos de estado
+        print('Error al crear la sala: ${response.statusCode}');
+      }
+    } catch (error) {
+      // Manejar errores de red u otros errores
+      print('Error: $error');
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -89,30 +126,11 @@ class _PantallaSalasState extends State<pantalla_salas> {
                 buildButton('+', Colors.grey, 'Crear sala', () {
                   _showCreateRoomDialog(context);
                 }),
-                for (String sala in _listaSalas)
-                  buildButton(
-                    sala,
-                    Colors.blue,
-                    'Únete ahora',
-                        () {
+                for (Sala sala in _listaSalas)
+                  buildButton(sala.nombre, Colors.blue, 'Únete ahora', () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(
-                              builder: (context) {
-                                return FutureBuilder<String>(
-                                  future: getNombreUsuario(),
-                                  builder: (context, snapshot) {
-                                  if (snapshot.hasError) {
-                                    // Maneja cualquier error que ocurra al obtener el nombre de usuario
-                                    return Text('Error: ${snapshot.error}');
-                                  } else {
-                                    // Construye la pantalla de chat con el nombre de usuario obtenido
-                                    return ChatDeSala(roomName: sala, userName: snapshot.data!);
-                                  }
-                                  },
-                                );
-                              },
-                            ),
+                            MaterialPageRoute(builder: (context) => ChatDeSala(idDeLaSala: sala.id)),
                           );
                     },
                   ),
@@ -324,32 +342,8 @@ class _PantallaSalasState extends State<pantalla_salas> {
                     // Agrega aquí la lógica para crear la sala con el nombre proporcionado
                     String roomName = salaController.text;
                     // Agregar la nueva sala a la lista
-                    setState(() {
-                      _listaSalas.add(roomName);
-                    });
-                    // Lógica para crear la sala
+                    crearNuevaSala(roomName);
                     Navigator.pop(context); // Cerrar el diálogo
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) {
-                          return FutureBuilder<String>(
-                            future: getNombreUsuario(),
-                            builder: (context, snapshot) {
-
-                            if (snapshot.hasError) {
-                              // Maneja cualquier error que ocurra al obtener el nombre de usuario
-                              return Text('Error: ${snapshot.error}');
-                            } else {
-                              // Construye la pantalla de chat con el nombre de usuario obtenido
-                              return ChatDeSala(roomName: roomName, userName: snapshot.data!);
-                            }
-
-                            },
-                          );
-                        },
-                      ),
-                    );
                   },
                   child: Text('Aceptar'),
                 ),

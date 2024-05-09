@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:aversifunciona/biblioteca.dart';
 import 'package:aversifunciona/buscar.dart';
 import 'package:aversifunciona/pantalla_principal.dart';
@@ -5,13 +6,26 @@ import 'package:aversifunciona/salas.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:web_socket_channel/io.dart';
+import 'package:http/http.dart' as http;
+import 'package:aversifunciona/getUserSession.dart';
+import 'env.dart';
+
+class Sala {
+  final int id;
+  final String nombre;
+
+  Sala({
+    required this.id,
+    required this.nombre,
+  });
+}
+
 
 
 class ChatDeSala extends StatefulWidget {
-  final String roomName;
-  final String userName;
+  final int idDeLaSala;
 
-  ChatDeSala({required this.roomName, required this.userName});
+  ChatDeSala({required this.idDeLaSala});
 
   @override
   _ChatDeSalaState createState() => _ChatDeSalaState();
@@ -19,7 +33,10 @@ class ChatDeSala extends StatefulWidget {
 
 class _ChatDeSalaState extends State<ChatDeSala> {
   TextEditingController _messageController = TextEditingController();
-  List<Map<String, String>> _messages = [];
+  List<Map<String, dynamic>> _messages = [];
+  Sala _sala = Sala(id: -1, nombre: "");
+  String userId = '-1';
+  String _correo = '';
   late IOWebSocketChannel _channel;
 
   @override
@@ -35,9 +52,55 @@ class _ChatDeSalaState extends State<ChatDeSala> {
     });
   }
 
+  Future<void> obtenerUsuario(String correo) async {
+    try {
+      var url = Uri.parse('${Env.URL_PREFIX}/DevolverUsuarioAPI/');
+      var response = await http.post(
+        url,
+        body: jsonEncode({'correo': correo}),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        // Decodificar la respuesta JSON
+        Map<String, dynamic> data = jsonDecode(response.body);
+        userId = data['usuario'];
+      } else if (response.statusCode == 404) {
+        // El usuario no existe
+        print('El usuario no existe');
+      } else {
+        // Manejar otros códigos de estado
+        print('Error al obtener el usuario: ${response.statusCode}');
+      }
+    } catch (error) {
+      // Manejar errores de red u otros errores
+      print('Error: $error');
+    }
+  }
+
+  Future<void> _getUserInfo() async {
+    try {
+      String? token = await getUserSession.getToken(); // Espera a que el token se resuelva
+      print("Token: $token");
+      if (token != null) {
+        // Llama al método AuthService para obtener la información del usuario
+        Map<String, dynamic> userInfo = await getUserSession.getUserInfo(token);
+        setState(() {
+          _correo = userInfo['correo'];
+        });
+      } else {
+        print('Token is null');
+      }
+    } catch (e) {
+      print('Error fetching user info: $e');
+    }
+  }
+
   void _sendMessage(String message) {
     _channel.sink.add(message);
     _messageController.clear();
+    _getUserInfo();
+    obtenerUsuario(_correo);
     _saveMessage(message); // Guardar el mensaje enviado por el usuario
   }
 
@@ -50,29 +113,87 @@ class _ChatDeSalaState extends State<ChatDeSala> {
 
 
   Future<void> _loadMessages() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _messages = (prefs.getStringList('chat_messages_${widget.roomName}') ?? [])
-          .map((message) => {"text": message, "name": widget.userName})
-          .toList();
-      _messages = _messages.reversed.toList(); // Reverse the list to display recent messages at the bottom
-    });
+    try {
+      var url = Uri.parse('${Env.URL_PREFIX}/CargarMensajesAPI/');
+      var response = await http.post(
+        url,
+        body: jsonEncode({'salaid': widget.idDeLaSala}), // Reemplaza 'idDeLaSala' con el ID real de la sala
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        // Decodificar la respuesta JSON
+        final Map<String, dynamic> data = jsonDecode(response.body);
+
+        // Obtener información sobre la sala
+        Map<String, dynamic> salaData = data['miSala'];
+        Sala sala = Sala(
+          id: salaData['id'],
+          nombre: salaData['nombre'],
+        );
+
+        // Obtener mensajes
+        List<dynamic> mensajesData = data['mensajes'];
+        List<Map<String, dynamic>> mensajes = mensajesData.map((message) {
+          return {
+            "texto": message['texto'], // Obtener el texto del mensaje
+            "autor": message['miUsuario'], // Obtener el autor del mensaje
+          };
+        }).toList();
+
+        // Actualizar el estado
+        setState(() {
+          _sala = sala;
+          _messages = mensajes;
+          _messages = _messages.reversed.toList(); // Invertir la lista para mostrar los mensajes más recientes al final
+        });
+
+      } else if (response.statusCode == 404) {
+        // Mostrar un mensaje si la sala no existe
+        print('La sala no existe');
+      } else {
+        // Manejar otros códigos de estado
+        print('Error al cargar los mensajes: ${response.statusCode}');
+      }
+    } catch (error) {
+      // Manejar errores de red u otros errores
+      print('Error: $error');
+    }
   }
+
+
 
   Future<void> _saveMessage(String message) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String> updatedMessages =
-    [..._messages.map((msg) => msg["text"] ?? ""), message];
-    await prefs.setStringList(
-        'chat_messages_${widget.roomName}', updatedMessages);
-    setState(() {
-      _messages = [
-        {"text": message, "name": widget.userName},
-        ..._messages, // Add new message at the beginning of the list
-      ];
-    });
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      int idDeLaSala = widget.idDeLaSala;
+      String emisorId = userId;
 
+      var url = Uri.parse('${Env.URL_PREFIX}/RegistrarMensajeAPI/');
+      var response = await http.post(
+        url,
+        body: jsonEncode({
+          'salaid': idDeLaSala,
+          'emisorid': emisorId,
+          'mensaje': message,
+        }),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        print('Mensaje registrado con éxito');
+      }else if (response.statusCode == 404) {
+        print('El emisor o la sala no existen.');
+      } else {
+        // Manejar otros códigos de estado
+        print('Error al guardar el mensaje: ${response.statusCode}');
+      }
+    } catch (error) {
+      // Manejar errores de red u otros errores
+      print('Error: $error');
+    }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -95,7 +216,7 @@ class _ChatDeSalaState extends State<ChatDeSala> {
           ),
         ],
         title: Text(
-          widget.roomName,
+          _sala.nombre,
           style: TextStyle(color: Colors.white),
         ),
       ),
@@ -109,7 +230,7 @@ class _ChatDeSalaState extends State<ChatDeSala> {
                   itemCount: _messages.length,
                   itemBuilder: (context, index) {
                     final message = _messages.reversed.toList()[index];
-                    final isCurrentUser = message["name"] == widget.userName;
+                    final isCurrentUser = message['miUsuario'] == userId; // comparamos el propietario de un mensaje con el usuario actual
                     return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: Column(
@@ -127,7 +248,7 @@ class _ChatDeSalaState extends State<ChatDeSala> {
                             )
                           else
                             Text(
-                              widget.userName + ':',
+                              message['miUsuario'] + ':',
                               style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
@@ -190,7 +311,6 @@ class _ChatDeSalaState extends State<ChatDeSala> {
                       ElevatedButton(
                         onPressed: () {
                           String message = _messageController.text;
-                          _saveMessage(message);
                           _sendMessage(_messageController.text);
                           _messageController.clear();
                         },

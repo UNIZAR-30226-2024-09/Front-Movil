@@ -1,6 +1,11 @@
+/*import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:aversifunciona/getUserSession.dart';
 import 'chatDeSala.dart';
+import 'package:http/http.dart' as http;
+
+import 'env.dart';
+
 
 class crearSala extends StatelessWidget {
   TextEditingController salaController = TextEditingController();
@@ -22,6 +27,28 @@ class crearSala extends StatelessWidget {
     } catch (e) {
       print('Error fetching user info: $e');
       return '';
+    }
+  }
+
+  Future<void> crearNuevaSala(String nombreSala) async {
+    try {
+      var url = Uri.parse('${Env.URL_PREFIX}/CrearSalaAPI/');
+      var response = await http.post(
+        url,
+        body: jsonEncode({'nombre': nombreSala}),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        // La sala se creó exitosamente
+        print('Sala creada exitosamente');
+      } else {
+        // Manejar otros códigos de estado
+        print('Error al crear la sala: ${response.statusCode}');
+      }
+    } catch (error) {
+      // Manejar errores de red u otros errores
+      print('Error: $error');
     }
   }
   @override
@@ -63,7 +90,7 @@ class crearSala extends StatelessWidget {
                             return Text('Error: ${snapshot.error}');
                           } else {
                             // Construye la pantalla de chat con el nombre de usuario obtenido
-                            return ChatDeSala(roomName: 'SpainMusic', userName: snapshot.data!);
+                            return ChatDeSala(idDeLaSala: 3);
                           }
 
                         },
@@ -85,7 +112,7 @@ class crearSala extends StatelessWidget {
                             return Text('Error: ${snapshot.error}');
                           } else {
                             // Construye la pantalla de chat con el nombre de usuario obtenido
-                            return ChatDeSala(roomName: 'SiaLovers', userName: snapshot.data!);
+                            return ChatDeSala(idDeLaSala: 3);
                           }
 
                         },
@@ -96,24 +123,7 @@ class crearSala extends StatelessWidget {
               buildButton('EminemGroup', Colors.blue, 'Únete ahora', () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) {
-                      return FutureBuilder<String>(
-                        future: getNombreUsuario(),
-                        builder: (context, snapshot) {
-
-                          if (snapshot.hasError) {
-                            // Maneja cualquier error que ocurra al obtener el nombre de usuario
-                            return Text('Error: ${snapshot.error}');
-                          } else {
-                            // Construye la pantalla de chat con el nombre de usuario obtenido
-                            return ChatDeSala(roomName: 'EminemGroup', userName: snapshot.data!);
-                          }
-
-                        },
-                      );
-                    },
-                  ),
+                  MaterialPageRoute(builder: (context) => ChatDeSala(idDeLaSala: 1)),
                 );              }),
               SizedBox(height: 20),
               Expanded(
@@ -197,32 +207,8 @@ class crearSala extends StatelessWidget {
                     // Puedes acceder al nombre de la sala usando salaController.text
                     // Agrega aquí la lógica para crear la sala con el nombre proporcionado
                     String roomName = salaController.text;
-                    // Lógica para crear la sala
+                    crearNuevaSala(roomName);
                     Navigator.pop(context); // Cerrar el diálogo
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) {
-                          return FutureBuilder<String>(
-                            future: getNombreUsuario(),
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState == ConnectionState.waiting) {
-                                // Muestra un indicador de carga mientras esperas el nombre de usuario
-                                return CircularProgressIndicator();
-                              } else {
-                                if (snapshot.hasError) {
-                                  // Maneja cualquier error que ocurra al obtener el nombre de usuario
-                                  return Text('Error: ${snapshot.error}');
-                                } else {
-                                  // Construye la pantalla de chat con el nombre de usuario obtenido
-                                  return ChatDeSala(roomName: roomName, userName: snapshot.data!);
-                                }
-                              }
-                            },
-                          );
-                        },
-                      ),
-                    );
                   },
                   child: Text('Aceptar'),
                 ),
@@ -233,4 +219,4 @@ class crearSala extends StatelessWidget {
       },
     );
   }
-}
+}*/
