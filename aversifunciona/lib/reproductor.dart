@@ -46,6 +46,7 @@ class MusicPlayerScreen extends StatefulWidget {
 class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
   bool isPlaying = false;
   double progress = 0.0; // Representa la posición de reproducción de la canción
+  double volume = 1.0;
   Timer? timer;
   var posible_podcast;
   var cancion;
@@ -384,7 +385,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Image.memory(base64Url.decode(('data:image/jpeg;base64,${utf8.decode(base64Decode(cancion.foto.replaceAll(RegExp('/^data:image/[a-z]+;base64,/'), '')))}').split(',').last), height: 250, width: 250,),
+                Image.memory(base64Url.decode(('data:image/jpeg;base64,${utf8.decode(base64Decode(cancion.foto.replaceAll(RegExp('/^data:image/[a-z]+;base64,/'), '')))}').split(',').last), height: 200, width: 200,),
                 const SizedBox(height: 20.0),
                 // Agregar aquí la imagen de la canción
                 const SizedBox(height: 20.0),
@@ -416,7 +417,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
 
                             ],
                           ),
-
+                            
 
                 const SizedBox(height: 20.0),
                 Row(
@@ -444,6 +445,31 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
                     ),
                   ],
                 ),
+                const SizedBox(height: 20,),
+                Center(
+                  child: Row(
+                    children: [
+
+                    const Padding(padding: EdgeInsets.symmetric(horizontal: 2), child: Icon(Icons.volume_mute, color: Colors.white,),),
+
+                      Slider(
+                        activeColor: Colors.green,
+                        inactiveColor: Colors.grey.shade600,
+                        thumbColor: Colors.white,
+                        value: volume,
+                        onChanged: (newValue) {
+                          setState(() {
+                            volume = newValue;
+                            mp3player.setVolume(volume);
+                          });
+                        },
+                      ),
+
+                    const Padding(padding: EdgeInsets.symmetric(horizontal: 2) , child: Icon(Icons.volume_up, color: Colors.white,),),
+
+                  ],
+                ),
+              ),
               ],
             ),
           ),
