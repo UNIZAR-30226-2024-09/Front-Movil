@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:aversifunciona/getUserSession.dart';
 
+import 'PantallaCancion.dart';
 import 'salas.dart';
 import 'musica.dart';
 import 'todo.dart';
@@ -19,7 +20,7 @@ import 'env.dart';
 import 'reproductor.dart';
 import 'cola.dart';
 
-List<dynamic> canciones = [];
+//List<dynamic> canciones = [];
 
 Route _createRoute() {
   return PageRouteBuilder(
@@ -39,7 +40,7 @@ Route _createRoute() {
   );
 }
 
-class listaCanciones{
+/*class listaCanciones{
   final List<dynamic> canciones;
 
   const listaCanciones({
@@ -62,7 +63,7 @@ class listaCanciones{
   }
 
 
-}
+}*/
 
 class pantalla_opciones extends StatelessWidget {
 
@@ -225,6 +226,7 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
   List<Map<String, dynamic>> cancionesRecomendadas = [];
   List<Map<String, dynamic>> podcastsRecomendados = [];
   List<Map<String, dynamic>> podcasts = [];
+  List<Map<String, dynamic>> canciones = [];
 
 
   @override
@@ -285,7 +287,7 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
           'miAlbum': cancionRecomendada['miAlbum'] as int,
           'puntuacion': cancionRecomendada['puntuacion'] as int,
           //archivoMp3: cancionRecomendada['archivoMp3'] as String?,
-          'foto': cancionRecomendada['foto'] as String,
+          //'foto': cancionRecomendada['foto'] as String,
         };
       }).toList();
 
@@ -295,7 +297,7 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
         return {
           'id': podcastRecomendado['id'] as int,
           'nombre': podcastRecomendado['nombre'] as String,
-          'foto': podcastRecomendado['foto'] as String,
+          //'foto': podcastRecomendado['foto'] as String,
         };
       }).toList();
 
@@ -327,7 +329,7 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
         return {
           'id': podcast['id'] as int,
           'nombre': podcast['nombre'] as String,
-          'foto': podcast['foto'] as String,
+          //'foto': podcast['foto'] as String,
         };
       }).toList();
 
@@ -361,7 +363,7 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
         return {
           'id': cancion['id'] as int,
           'nombre': cancion['nombre'] as String,
-          'foto': cancion['foto'] as String,
+          //'foto': cancion['foto'] as String,
         };
       }).toList();
 
@@ -433,7 +435,13 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
                       for (final cancionRecomendada in cancionesRecomendadas)
                         GestureDetector(
                           onTap: () {
-                            // Aquí puedes definir la lógica para la navegación al detalle de la canción
+                            if (cancionRecomendada['id'] != null) {
+                              // Navegar a la pantalla de detalles de la canción
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => PantallaCancion(songId: cancionRecomendada['id'])),
+                              );
+                            }
                           },
                           child: Container(
                             height: 150,
@@ -478,7 +486,14 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
                       for (final podcastRecomendado in podcastsRecomendados)
                         GestureDetector(
                           onTap: () {
-                            // Aquí puedes definir la lógica para la navegación al detalle del podcast
+                            /*if (podcastRecomendado['id'] != null) {
+                              // Navegar a la pantalla de detalles de la canción
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => pantalla_podcast(),
+                                )
+                              );
+                            }*/
                           },
                           child: Container(
                             height: 150,
@@ -535,7 +550,13 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
                       for (final cancion in canciones)
                         GestureDetector(
                           onTap: () {
-                            // Aquí puedes definir la lógica para la navegación al detalle de la canción
+                            if (cancion['id'] != null) {
+                              // Navegar a la pantalla de detalles de la canción
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => PantallaCancion(songId: cancion['id'])),
+                              );
+                            }
                           },
                           child: Container(
                             height: 150,

@@ -13,6 +13,7 @@ import 'package:http/http.dart' as http;
 import 'ciencias.dart';
 import 'clasico.dart';
 import 'cultura.dart';
+import 'enElCoche.dart';
 import 'ingles.dart';
 import 'psicologia.dart';
 import 'electro.dart';
@@ -410,8 +411,27 @@ class _pantalla_buscarState extends State<pantalla_buscar> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              buildTopButton('Inglés', Colors.green.shade400),
-              buildTopButton('Psicología', Colors.deepPurple.shade400),
+              buildTopButton('Ingles', Colors.green.shade400),
+              buildTopButton('Psicologia', Colors.deepPurple.shade400),
+            ],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              buildTopButton('En el coche', Colors.green.shade900),
+              buildTopButton('Ejercicio', Colors.yellow.shade400),
+            ],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              buildTopButton('Relax', Colors.blue.shade400),
             ],
           ),
         ),
@@ -458,15 +478,28 @@ class _pantalla_buscarState extends State<pantalla_buscar> {
             Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => cultura()));
-          } else if (title == 'Inglés') {
+          } else if (title == 'Ingles') {
             Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => ingles()));
-          } else if (title == 'Psicología') {
+          } else if (title == 'Psicologia') {
             Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => psicologia()));
-          }
+          } else if (title == 'En el coche') {
+            Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => enElCoche()));
+          } /*else if (title == 'Ejercicio') {
+            Navigator.push(
+                context,
+                //MaterialPageRoute(builder: (context) => ejercicio()));
+          } else if (title == 'Relax') {
+            Navigator.push(
+                context,
+                //MaterialPageRoute(builder: (context) => relax()));
+          }*/
+
           // Acción al presionar el botón
         },
         style: ElevatedButton.styleFrom(
