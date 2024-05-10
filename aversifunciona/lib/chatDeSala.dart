@@ -36,20 +36,32 @@ class _ChatDeSalaState extends State<ChatDeSala> {
   List<Map<String, dynamic>> _messages = [];
   Sala _sala = Sala(id: -1, nombre: "");
   String userId = '-1';
-  String _correo = '';
+  // String _correo = '';
   late IOWebSocketChannel _channel;
 
   @override
   void initState() {
     super.initState();
     _getUserInfo();
-    _channel = IOWebSocketChannel.connect('ws://localhost:8000/ws');
+    _channel = IOWebSocketChannel.connect('ws://localhost:8000/ws/chat/${widget.idDeLaSala}/'); // Conectamos el webSocket a la URL específica de la sala.
     _loadMessages(); // Cargar mensajes al iniciar la pantalla del chat
+
+    // Escuchar mensajes entrantes a través del WebSocket
     _channel.stream.listen((message) {
-      setState(() {
-        _messages.add(message);
-        _saveMessage(message); // Guardar el nuevo mensaje recibido
-      });
+      // Procesar y manejar el mensaje recibido aquí
+      // Extraer el texto del mensaje y el remitente
+      String text = message['cuerpo']['mensaje'];
+      String senderId = message['cuerpo']['emisorid'];
+      int salaid = message['cuerpo']['salaid'];
+      //if(salaid == _sala.id){ // Si el mensaje que se recibe pertenece a la sala en la que no encontramos (esto no se si es necesario hacerlo)
+        // Actualizar la interfaz de usuario, agregando el mensaje a la lista de mensajes
+        setState(() {
+          _messages.add({
+            'texto': text,
+            'miUsuario': senderId,
+          });
+        });
+        //}
     });
   }
 
@@ -100,9 +112,16 @@ class _ChatDeSalaState extends State<ChatDeSala> {
   }
 
   void _sendMessage(String message) {
-    _channel.sink.add(message);
-    _messageController.clear();
-    _saveMessage(message); // Guardar el mensaje enviado por el usuario
+    Map<String, dynamic> messageData = {
+      'cuerpo': {
+        'mensaje': message,
+        'emisorid': userId,
+        'salaid': widget.idDeLaSala,
+      }
+    };
+    String messageToSend = jsonEncode(messageData);
+    _channel.sink.add(messageToSend); // Guardar el mensaje enviado por el usuario en el canal para que les llegue al resto de usuarios en el momento actual
+    _saveMessage(message); // Guardar el mensaje enviado por el usuario en la base de datos
   }
 
   @override
@@ -138,7 +157,7 @@ class _ChatDeSalaState extends State<ChatDeSala> {
         List<Map<String, dynamic>> mensajes = mensajesData.map((message) {
           return {
             "texto": message['texto'], // Obtener el texto del mensaje
-            "autor": message['miUsuario'], // Obtener el autor del mensaje
+            "miUsuario": message['miUsuario'], // Obtener el autor del mensaje
           };
         }).toList();
 
@@ -166,7 +185,7 @@ class _ChatDeSalaState extends State<ChatDeSala> {
 
   Future<void> _saveMessage(String message) async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
+      // SharedPreferences prefs = await SharedPreferences.getInstance();
       int idDeLaSala = widget.idDeLaSala;
       String emisorId = userId;
 
@@ -231,7 +250,7 @@ class _ChatDeSalaState extends State<ChatDeSala> {
                   itemCount: _messages.length,
                   itemBuilder: (context, index) {
                     final message = _messages.reversed.toList()[index];
-                    final isCurrentUser = message['miUsuario'] == userId; // comparamos el propietario de un mensaje con el usuario actual
+                    final isCurrentUser = message['miUsuario'] == userId; // comparamos el propietario del mensaje que estamos tratando con el usuario actual
                     return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: Column(
@@ -266,7 +285,7 @@ class _ChatDeSalaState extends State<ChatDeSala> {
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: Text(
-                                "${message['text']}",
+                                "${message['texto']}",
                                 style: TextStyle(
                                   color: isCurrentUser ? Colors.white : Colors.black,
                                 ),
@@ -312,7 +331,7 @@ class _ChatDeSalaState extends State<ChatDeSala> {
                       ElevatedButton(
                         onPressed: () {
                           String message = _messageController.text;
-                          _sendMessage(_messageController.text);
+                          _sendMessage(message);
                           _messageController.clear();
                         },
                         style: ElevatedButton.styleFrom(
