@@ -11,27 +11,41 @@ class reportarProblema extends StatefulWidget {
 class _reportarProblema extends State<reportarProblema> {
   String _tipoProblema = '';
   String _descripcion = '';
-  Map<String, dynamic> _user = {};
+  String correo = '';
 
   final TextEditingController _problemController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _fetchUserDetails();
+    _getUserInfo();
   }
 
 
-  Future<void> _fetchUserDetails() async {
-    print('Solicitamos el token');
-    final token = getUserSession.getToken();
-    _user = getUserSession.getUserInfo(token as String) as Map<String, dynamic>;
+  Future<void> _getUserInfo() async {
+    try {
+      print('Solicitamos el token');
+      String? token = await getUserSession.getToken(); // Espera a que el token se resuelva
+      print("Token: $token");
+      if (token != null) {
+        // Llama al método AuthService para obtener la información del usuario
+        Map<String, dynamic> userInfo = await getUserSession.getUserInfo(token);
+        setState(() {
+          correo = userInfo['correo'];
+        });
+        print(correo);
+      } else {
+        print('Token is null');
+      }
+    } catch (e) {
+      print('Error fetching user info: $e');
+    }
   }
 
 
   Future<void> _enviarReporte() async {
     print("Llamada a _enviarReporte");
-    if (_user['correo'] == null) {
+    if (correo == null) {
       print("El usuario no está identificado ");
       showDialog(
         context: context,
@@ -52,7 +66,7 @@ class _reportarProblema extends State<reportarProblema> {
     print("El usuario está identificado ");
     final url = 'http://localhost:8000/reporteAPI/';
     final body = jsonEncode({
-      'correo': _user['correo'],
+      'correo': correo,
       'mensaje': 'Tipo de problema: $_tipoProblema, Descripción: $_descripcion',
     });
     print('Tipo de problema: $_tipoProblema');
