@@ -13,6 +13,7 @@ import 'package:http/http.dart' as http;
 import 'ciencias.dart';
 import 'clasico.dart';
 import 'cultura.dart';
+import 'ejercicio.dart';
 import 'enElCoche.dart';
 import 'ingles.dart';
 import 'psicologia.dart';
@@ -20,6 +21,7 @@ import 'electro.dart';
 import 'rap.dart';
 import 'env.dart';
 import 'cola.dart';
+import 'relax.dart';
 
 
 Route _createRoute() {
@@ -490,15 +492,15 @@ class _pantalla_buscarState extends State<pantalla_buscar> {
             Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => enElCoche()));
-          } /*else if (title == 'Ejercicio') {
+          } else if (title == 'Ejercicio') {
             Navigator.push(
                 context,
-                //MaterialPageRoute(builder: (context) => ejercicio()));
+                MaterialPageRoute(builder: (context) => ejercicio()));
           } else if (title == 'Relax') {
             Navigator.push(
                 context,
-                //MaterialPageRoute(builder: (context) => relax()));
-          }*/
+                MaterialPageRoute(builder: (context) => relax()));
+          }
 
           // Acción al presionar el botón
         },

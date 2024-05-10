@@ -9,7 +9,7 @@ import 'PantallaCancion.dart';
 import 'salas.dart';
 import 'musica.dart';
 import 'todo.dart';
-import 'pantalla_podcast.dart';
+import 'pantallaPodcast.dart';
 import 'biblioteca.dart';
 import 'buscar.dart';
 import 'historial.dart';
@@ -486,14 +486,14 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
                       for (final podcastRecomendado in podcastsRecomendados)
                         GestureDetector(
                           onTap: () {
-                            /*if (podcastRecomendado['id'] != null) {
+                            if (podcastRecomendado['id'] != null) {
                               // Navegar a la pantalla de detalles de la canción
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => pantalla_podcast(),
+                                MaterialPageRoute(builder: (context) => PantallaPodcast(podcastId: podcastRecomendado['id'], podcastName: podcastRecomendado['nombre']),
                                 )
                               );
-                            }*/
+                            }
                           },
                           child: Container(
                             height: 150,
@@ -613,7 +613,13 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
                       for (final podcast in podcasts)
                         GestureDetector(
                           onTap: () {
-                            // Aquí puedes definir la lógica para la navegación al detalle del podcast
+                            if (podcast['id'] != null) {
+                              // Navegar a la pantalla de detalles de la canción
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => PantallaPodcast(podcastId: podcast['id'], podcastName: podcast['nombre'])),
+                              );
+                            }
                           },
                           child: Container(
                             height: 150,

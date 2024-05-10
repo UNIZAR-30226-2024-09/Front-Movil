@@ -6,7 +6,7 @@ import 'package:aversifunciona/configuracion.dart';
 import 'package:aversifunciona/desplegable.dart';
 import 'package:aversifunciona/getUserSession.dart';
 import 'package:aversifunciona/pantalla_principal.dart';
-import 'package:aversifunciona/pantalla_podcast.dart';
+import 'package:aversifunciona/pantallaPodcast.dart';
 import 'package:aversifunciona/reproductor.dart';
 import 'package:aversifunciona/salas.dart';
 import 'package:aversifunciona/verPerfil.dart';
@@ -15,6 +15,7 @@ import 'package:flutter/material.dart';
 
 import 'package:http/http.dart' as http;
 
+import 'cola.dart';
 import 'env.dart';
 
 class historial extends StatefulWidget {
@@ -80,53 +81,11 @@ class _historialState extends State<historial> {
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,
-        leading: PopupMenuButton<String>(
-          icon: CircleAvatar(
-            backgroundImage: AssetImage('tu_ruta_de_imagen'),
-          ),
-          onSelected: (value) {
-            // Manejar la selección del desplegable
-            if (value == 'verPerfil') {
-              // Navegar a la pantalla "verPerfil"
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => verPerfil()),
-              );
-            } else if (value == 'historial') {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => historial()),
-              );
-            } else if (value == 'configuracion') {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => configuracion()),
-              );
-            }
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.pop(context);
           },
-          itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-            const PopupMenuItem<String>(
-              value: 'verPerfil',
-              child: ListTile(
-                leading: Icon(Icons.person),
-                title: Text('Ver Perfil'),
-              ),
-            ),
-            const PopupMenuItem<String>(
-              value: 'historial',
-              child: ListTile(
-                leading: Icon(Icons.history),
-                title: Text('Historial'),
-              ),
-            ),
-            const PopupMenuItem<String>(
-              value: 'configuracion',
-              child: ListTile(
-                leading: Icon(Icons.settings),
-                title: Text('Configuración y Privacidad'),
-              ),
-            ),
-          ],
         ),
         title: const Text(
           'Mi historial',
@@ -153,10 +112,23 @@ class _historialState extends State<historial> {
               },
             ),
           ),
+        ], ),
+          floatingActionButton: Padding(
+            padding: const EdgeInsets.only(top: 10), // Ajusta el valor según sea necesario para la posición deseada
+            child: FloatingActionButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Cola()), // Suponiendo que Cola sea la pantalla a la que quieres navegar
+                );
+              },
+              child: Icon(Icons.queue_music),
+            ),
+          ),
 
-          Container(
+          bottomNavigationBar: Container(
             height: 70,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               border: Border(
                 top: BorderSide(width: 1.0, color: Colors.white),
               ),
@@ -172,12 +144,12 @@ class _historialState extends State<historial> {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:Colors.transparent,
+                    backgroundColor: Colors.transparent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: Column(
+                  child: const Column(
                     children: [
                       SizedBox(height: 8),
                       Icon(Icons.house_outlined, color: Colors.grey, size: 37.0),
@@ -188,7 +160,6 @@ class _historialState extends State<historial> {
                     ],
                   ),
                 ),
-
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(
@@ -197,12 +168,12 @@ class _historialState extends State<historial> {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:Colors.transparent,
+                    backgroundColor: Colors.transparent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: Column(
+                  child: const Column(
                     children: [
                       SizedBox(height: 8),
                       Icon(Icons.question_mark_outlined, color: Colors.grey, size: 37.0),
@@ -213,7 +184,6 @@ class _historialState extends State<historial> {
                     ],
                   ),
                 ),
-
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(
@@ -222,12 +192,12 @@ class _historialState extends State<historial> {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:Colors.transparent,
+                    backgroundColor: Colors.transparent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: Column(
+                  child: const Column(
                     children: [
                       SizedBox(height: 8),
                       Icon(Icons.library_books_rounded, color: Colors.grey, size: 37.0),
@@ -238,7 +208,6 @@ class _historialState extends State<historial> {
                     ],
                   ),
                 ),
-
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(
@@ -247,12 +216,12 @@ class _historialState extends State<historial> {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:Colors.transparent,
+                    backgroundColor: Colors.transparent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: Column(
+                  child: const Column(
                     children: [
                       SizedBox(height: 8),
                       Icon(Icons.chat_bubble_rounded, color: Colors.grey, size: 37.0),
@@ -266,9 +235,7 @@ class _historialState extends State<historial> {
               ],
             ),
           ),
-        ],
-      ),
-    );
+        );
   }
 
   Widget buildOption(String title) {

@@ -4,10 +4,15 @@ import 'package:aversifunciona/editarPerfil.dart';
 import 'package:aversifunciona/getUserSession.dart';
 import 'package:aversifunciona/listaSeguidos.dart';
 import 'package:aversifunciona/listaSeguidores.dart';
+import 'package:aversifunciona/pantalla_principal.dart';
 import 'package:aversifunciona/perfilAjeno.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+import 'biblioteca.dart';
+import 'buscar.dart';
+import 'chatSalaDisponible.dart';
+import 'cola.dart';
 import 'env.dart';
 
 class verPerfil extends StatefulWidget {
@@ -244,7 +249,128 @@ class _verPerfilState extends State<verPerfil> {
           ),
         ],
       ),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(top: 10), // Ajusta el valor según sea necesario para la posición deseada
+        child: FloatingActionButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => Cola()), // Suponiendo que Cola sea la pantalla a la que quieres navegar
+            );
+          },
+          child: Icon(Icons.queue_music),
+        ),
+      ),
 
+      bottomNavigationBar: Container(
+        height: 70,
+        decoration: const BoxDecoration(
+          border: Border(
+            top: BorderSide(width: 1.0, color: Colors.white),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => pantalla_principal()),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
+              child: const Column(
+                children: [
+                  SizedBox(height: 8),
+                  Icon(Icons.house_outlined, color: Colors.grey, size: 37.0),
+                  Text(
+                    'Inicio',
+                    style: TextStyle(color: Colors.white, fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => pantalla_buscar()),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
+              child: const Column(
+                children: [
+                  SizedBox(height: 8),
+                  Icon(Icons.question_mark_outlined, color: Colors.grey, size: 37.0),
+                  Text(
+                    'Buscar',
+                    style: TextStyle(color: Colors.white, fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => pantalla_biblioteca()),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
+              child: const Column(
+                children: [
+                  SizedBox(height: 8),
+                  Icon(Icons.library_books_rounded, color: Colors.grey, size: 37.0),
+                  Text(
+                    'Biblioteca',
+                    style: TextStyle(color: Colors.white, fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => pantalla_salas()),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
+              child: const Column(
+                children: [
+                  SizedBox(height: 8),
+                  Icon(Icons.chat_bubble_rounded, color: Colors.grey, size: 37.0),
+                  Text(
+                    'Salas',
+                    style: TextStyle(color: Colors.white, fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

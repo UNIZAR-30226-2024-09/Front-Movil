@@ -13,6 +13,7 @@ import 'buscar.dart';
 
 import 'package:http/http.dart' as http;
 
+import 'cola.dart';
 import 'env.dart';
 
 class configuracion extends StatelessWidget {
@@ -138,8 +139,21 @@ class configuracion extends StatelessWidget {
               ],
             ),
           ),
-          SizedBox(height: 20),
-          Container(
+        ],),
+          floatingActionButton: Padding(
+            padding: const EdgeInsets.only(top: 10), // Ajusta el valor según sea necesario para la posición deseada
+            child: FloatingActionButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Cola()), // Suponiendo que Cola sea la pantalla a la que quieres navegar
+                );
+              },
+              child: Icon(Icons.queue_music),
+            ),
+          ),
+
+          bottomNavigationBar: Container(
             height: 70,
             decoration: const BoxDecoration(
               border: Border(
@@ -248,9 +262,7 @@ class configuracion extends StatelessWidget {
               ],
             ),
           ),
-        ],
-      ),
-    );
+      );
   }
 
   Widget buildOption(BuildContext context, String title, Widget trailingIcon) {

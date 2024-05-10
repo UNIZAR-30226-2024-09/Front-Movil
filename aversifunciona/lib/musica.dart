@@ -1,7 +1,7 @@
 import 'package:aversifunciona/biblioteca.dart';
 import 'package:aversifunciona/buscar.dart';
 import 'package:aversifunciona/pantalla_principal.dart';
-import 'package:aversifunciona/pantalla_podcast.dart';
+import 'package:aversifunciona/pantallaPodcast.dart';
 import 'package:aversifunciona/salas.dart';
 import 'package:aversifunciona/todo.dart';
 import 'package:flutter/material.dart';
@@ -31,7 +31,7 @@ class pantalla_musica extends StatelessWidget {
           buildTopButton(context, 'Música', pantalla_musica()),
 
           // Botón Podcast
-          buildTopButton(context, 'Podcast', pantalla_podcast()),
+          //buildTopButton(context, 'Podcast', PantallaPodcast()),
         ],
       ),
       body: Column(

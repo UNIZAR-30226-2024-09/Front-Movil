@@ -195,8 +195,20 @@ class _pantalla_bibliotecaState extends State<pantalla_biblioteca> {
 
             ),
           ),
-
-          Container(
+        ],),
+          floatingActionButton: Padding(
+            padding: const EdgeInsets.only(top: 10), // Ajusta el valor según sea necesario para la posición deseada
+            child: FloatingActionButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Cola()), // Suponiendo que Cola sea la pantalla a la que quieres navegar
+                );
+              },
+              child: Icon(Icons.queue_music),
+            ),
+          ),
+          bottomNavigationBar: Container(
             height: 70,
             decoration: const BoxDecoration(
               border: Border(
@@ -204,38 +216,32 @@ class _pantalla_bibliotecaState extends State<pantalla_biblioteca> {
               ),
             ),
             child: Row(
-
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                           builder: (context) => pantalla_principal()),
-                    );
-                  },
+                    );              },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:Colors.transparent,
+                    backgroundColor: Colors.transparent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
                   child: const Column(
-
-                      children: [
-                        SizedBox(height: 8),
-                        Icon(Icons.house_outlined, color: Colors.grey, size: 37.0),
-                        Text(
-                          'Inicio',
-                          style: TextStyle(color: Colors.white, fontSize: 12),
-                        ),
-                      ]
+                    children: [
+                      SizedBox(height: 8),
+                      Icon(Icons.house_outlined, color: Colors.grey, size: 37.0),
+                      Text(
+                        'Inicio',
+                        style: TextStyle(color: Colors.white, fontSize: 12),
+                      ),
+                    ],
                   ),
                 ),
-
-
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(
@@ -245,23 +251,22 @@ class _pantalla_bibliotecaState extends State<pantalla_biblioteca> {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:Colors.transparent,
+                    backgroundColor: Colors.transparent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
                   child: const Column(
-                      children: [
-                        SizedBox(height: 8),
-                        Icon(Icons.question_mark_outlined, color: Colors.grey, size: 37.0),
-                        Text(
-                          'Buscar',
-                          style: TextStyle(color: Colors.white, fontSize: 12),
-                        ),
-                      ]
+                    children: [
+                      SizedBox(height: 8),
+                      Icon(Icons.question_mark_outlined, color: Colors.grey, size: 37.0),
+                      Text(
+                        'Buscar',
+                        style: TextStyle(color: Colors.white, fontSize: 12),
+                      ),
+                    ],
                   ),
                 ),
-
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(
@@ -271,24 +276,22 @@ class _pantalla_bibliotecaState extends State<pantalla_biblioteca> {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:Colors.transparent,
+                    backgroundColor: Colors.transparent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
                   child: const Column(
-
-                      children: [
-                        SizedBox(height: 8),
-                        Icon(Icons.library_books_rounded, color: Colors.grey, size: 37.0),
-                        Text(
-                          'Biblioteca',
-                          style: TextStyle(color: Colors.white, fontSize: 12),
-                        ),
-                      ]
+                    children: [
+                      SizedBox(height: 8),
+                      Icon(Icons.library_books_rounded, color: Colors.grey, size: 37.0),
+                      Text(
+                        'Biblioteca',
+                        style: TextStyle(color: Colors.white, fontSize: 12),
+                      ),
+                    ],
                   ),
                 ),
-
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(
@@ -298,41 +301,25 @@ class _pantalla_bibliotecaState extends State<pantalla_biblioteca> {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:Colors.transparent,
+                    backgroundColor: Colors.transparent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
                   child: const Column(
-
-                      children: [
-                        SizedBox(height: 8),
-                        Icon(Icons.chat_bubble_rounded, color: Colors.grey, size: 37.0),
-                        Text(
-                          'Salas',
-                          style: TextStyle(color: Colors.white, fontSize: 12),
-                        ),
-                      ]
+                    children: [
+                      SizedBox(height: 8),
+                      Icon(Icons.chat_bubble_rounded, color: Colors.grey, size: 37.0),
+                      Text(
+                        'Salas',
+                        style: TextStyle(color: Colors.white, fontSize: 12),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
           ),
-        ],
-      ),
-
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(top: 10), // Ajusta el valor según sea necesario para la posición deseada
-        child: FloatingActionButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => Cola()), // Suponiendo que Cola sea la pantalla a la que quieres navegar
-            );
-          },
-          child: Icon(Icons.queue_music),
-        ),
-      ),
     );
   }
 
