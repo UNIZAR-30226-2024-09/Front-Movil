@@ -42,6 +42,7 @@ class _ChatDeSalaState extends State<ChatDeSala> {
   @override
   void initState() {
     super.initState();
+    _getUserInfo();
     _channel = IOWebSocketChannel.connect('ws://localhost:8000/ws');
     _loadMessages(); // Cargar mensajes al iniciar la pantalla del chat
     _channel.stream.listen((message) {
@@ -52,7 +53,7 @@ class _ChatDeSalaState extends State<ChatDeSala> {
     });
   }
 
-  Future<void> obtenerUsuario(String correo) async {
+  /*Future<void> obtenerUsuario(String correo) async {
     try {
       var url = Uri.parse('${Env.URL_PREFIX}/DevolverUsuarioAPI/');
       var response = await http.post(
@@ -76,7 +77,7 @@ class _ChatDeSalaState extends State<ChatDeSala> {
       // Manejar errores de red u otros errores
       print('Error: $error');
     }
-  }
+  }*/
 
   Future<void> _getUserInfo() async {
     try {
@@ -86,8 +87,10 @@ class _ChatDeSalaState extends State<ChatDeSala> {
         // Llama al método AuthService para obtener la información del usuario
         Map<String, dynamic> userInfo = await getUserSession.getUserInfo(token);
         setState(() {
-          _correo = userInfo['correo'];
+          userId = userInfo['correo'];
         });
+        print(userId);
+
       } else {
         print('Token is null');
       }
@@ -99,8 +102,6 @@ class _ChatDeSalaState extends State<ChatDeSala> {
   void _sendMessage(String message) {
     _channel.sink.add(message);
     _messageController.clear();
-    _getUserInfo();
-    obtenerUsuario(_correo);
     _saveMessage(message); // Guardar el mensaje enviado por el usuario
   }
 
