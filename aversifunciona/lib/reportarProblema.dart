@@ -3,6 +3,8 @@ import 'package:http/http.dart' as http;
 import 'package:aversifunciona/getUserSession.dart';
 import 'package:flutter/material.dart';
 
+import 'env.dart';
+
 class reportarProblema extends StatefulWidget {
   @override
   _reportarProblema createState() => _reportarProblema();
@@ -64,7 +66,7 @@ class _reportarProblema extends State<reportarProblema> {
       return;
     }
     print("El usuario está identificado ");
-    final url = 'http://localhost:8000/reporteAPI/';
+    final url = '${Env.URL_PREFIX}/reporteAPI/';
     final body = jsonEncode({
       'correo': correo,
       'mensaje': 'Tipo de problema: $_tipoProblema, Descripción: $_descripcion',

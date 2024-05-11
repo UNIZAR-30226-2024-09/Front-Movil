@@ -38,13 +38,21 @@ class _ChatDeSalaState extends State<ChatDeSala> {
   String userId = '-1';
   // String _correo = '';
   late IOWebSocketChannel _channel;
+  bool _isLoading = true;
+
 
   @override
   void initState() {
     super.initState();
     _getUserInfo();
     _channel = IOWebSocketChannel.connect('ws://localhost:8000/ws/chat/${widget.idDeLaSala}/'); // Conectamos el webSocket a la URL específica de la sala.
+    setState(() {
+      _isLoading = true;
+    });
     _loadMessages(); // Cargar mensajes al iniciar la pantalla del chat
+    setState(() {
+      _isLoading = false;
+    });
 
     // Escuchar mensajes entrantes a través del WebSocket
     _channel.stream.listen((message) {
@@ -240,7 +248,10 @@ class _ChatDeSalaState extends State<ChatDeSala> {
           style: TextStyle(color: Colors.white),
         ),
       ),
-      body: Container(
+      body: _isLoading
+          ? Center(
+        child: CircularProgressIndicator(),
+      ) : Container(
         color: Color(0xFF333333),
         child: Column(
           children: [
@@ -331,7 +342,13 @@ class _ChatDeSalaState extends State<ChatDeSala> {
                       ElevatedButton(
                         onPressed: () {
                           String message = _messageController.text;
+                          setState(() {
+                            _isLoading = true;
+                          });
                           _sendMessage(message);
+                          setState(() {
+                            _isLoading = false;
+                          });
                           _messageController.clear();
                         },
                         style: ElevatedButton.styleFrom(

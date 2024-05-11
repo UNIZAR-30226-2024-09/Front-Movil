@@ -51,6 +51,7 @@ class pantalla_salas extends StatefulWidget {
 class _PantallaSalasState extends State<pantalla_salas> {
   List<Sala> _listaSalas = []; // Lista de nombres de salas
   TextEditingController salaController = TextEditingController();
+  bool _isLoading = true;
 
   Future<void> listarSalas() async {
     try {
@@ -74,6 +75,11 @@ class _PantallaSalasState extends State<pantalla_salas> {
     } catch (error) {
       // Manejar errores de red u otros errores
       print('Error: $error');
+    }
+    finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -117,7 +123,11 @@ class _PantallaSalasState extends State<pantalla_salas> {
           style: TextStyle(color: Colors.white),
         ),
       ),
-      body: Column(
+      body: _isLoading
+          ? Center(
+        child: CircularProgressIndicator(),
+      )
+          :Column(
         children: [
           Expanded(
             child: ListView(
@@ -340,9 +350,15 @@ class _PantallaSalasState extends State<pantalla_salas> {
                   onPressed: () {
                     // Puedes acceder al nombre de la sala usando salaController.text
                     // Agrega aquí la lógica para crear la sala con el nombre proporcionado
+                    setState(() {
+                      _isLoading = true;
+                    });
                     String roomName = salaController.text;
                     // Agregar la nueva sala a la lista
                     crearNuevaSala(roomName);
+                    setState(() {
+                      _isLoading = false;
+                    });
                     Navigator.pop(context); // Cerrar el diálogo
                   },
                   child: Text('Aceptar'),
