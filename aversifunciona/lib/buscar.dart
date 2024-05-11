@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:aversifunciona/salas.dart';
 import 'package:http/http.dart' as http;
 import 'ciencias.dart';
-import 'clasico.dart';
+import 'clasica.dart';
 import 'cultura.dart';
 import 'ejercicio.dart';
 import 'enElCoche.dart';
@@ -452,10 +452,10 @@ class _pantalla_buscarState extends State<pantalla_buscar> {
             Navigator.push(
                context,
                MaterialPageRoute(builder: (context) => rap()));
-          } else if (title == 'Clásico') {
+          } else if (title == 'Clásica') {
             Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => clasico()));
+                MaterialPageRoute(builder: (context) => clasica()));
           } else if (title == 'Electro') {
             Navigator.push(
                 context,
@@ -484,7 +484,7 @@ class _pantalla_buscarState extends State<pantalla_buscar> {
             Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => ingles()));
-          } else if (title == 'Psicologia') {
+          } /*else if (title == 'Psicologia') {
             Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => psicologia()));
@@ -500,7 +500,7 @@ class _pantalla_buscarState extends State<pantalla_buscar> {
             Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => relax()));
-          }
+          }*/
 
           // Acción al presionar el botón
         },

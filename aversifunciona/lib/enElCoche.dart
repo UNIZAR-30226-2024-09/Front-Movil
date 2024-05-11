@@ -1,17 +1,17 @@
-import 'dart:typed_data';
-
-import 'package:aversifunciona/cancion.dart';
 import 'package:aversifunciona/pantalla_principal.dart';
+import 'package:aversifunciona/podcast.dart';
+import 'package:aversifunciona/reproductor.dart';
 import 'package:aversifunciona/salas.dart';
 import 'package:flutter/material.dart';
-import 'package:aversifunciona/reproductor.dart';
-import 'PantallaCancion.dart';
+
 import 'biblioteca.dart';
 import 'buscar.dart';
 import 'env.dart';
+
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'cola.dart';
+
 
 Route _createRoute() {
   return PageRouteBuilder(
@@ -31,67 +31,55 @@ Route _createRoute() {
   );
 }
 
-class enElCoche extends StatefulWidget {
+class psicologia extends StatefulWidget {
   @override
-  _enElCoche_State createState() => _enElCoche_State();
+  _psicologia_State createState() => _psicologia_State();
 }
 
-class _enElCoche_State extends State<enElCoche> {
-  List<dynamic> canciones = [];
+class _psicologia_State extends State<psicologia> {
+  List<dynamic> podcasts = [];
 
   @override
   void initState() {
     super.initState();
-    enElCocheCanciones();
+    filtrarPodcasts();
   }
 
-  Future<Uint8List> _fetchImageFromUrl(String imageUrl) async {
-    final response = await http.get(Uri.parse(imageUrl));
-    if (response.statusCode == 200) {
-      // Devuelve los bytes de la imagen
-      return response.bodyBytes;
-    } else {
-      // Si la solicitud falla, lanza un error
-      throw Exception('Failed to load image from $imageUrl');
-    }
-  }
-
-
-  Future<void> enElCocheCanciones() async {
+  Future<void> filtrarPodcasts() async {
     try {
       final response = await http.post(
-        Uri.parse('${Env.URL_PREFIX}/listarPlaylistsPredefinidas/'),
+        Uri.parse('${Env.URL_PREFIX}/filtrarPodcastsPorGenero/'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
+        body: jsonEncode({'genero': 'Psicología'}),
       );
+      print('Response: ${response.body}');
+
       if (response.statusCode == 200) {
         Map<String, dynamic> data = jsonDecode(response.body);
-        dynamic cancionesData = data['canciones'];
+        dynamic podcastsData = data['podcasts'];
 
-        List<dynamic> nuevasCanciones = [];
+        List<dynamic> nuevosPodcasts = [];
 
-        for (var i = 0; i < cancionesData.length; i++) {
-          Cancion cancion = Cancion.fromJson(cancionesData[i]);
-          // Filtrar solo las canciones que están en la lista cancionesCoche
-          if (canciones.any((c) => c['id'] == cancion.id)) {
-            nuevasCanciones.add(cancion);
-          }
+        for (var i = 0; i < podcastsData.length; i++) {
+          Podcast podcast = Podcast.fromJson(podcastsData[i]);
+          nuevosPodcasts.add(podcast);
         }
 
         setState(() {
-          canciones = nuevasCanciones;
+          podcasts = nuevosPodcasts;
         });
+
       } else {
         // Handle error or unexpected status code
-        throw Exception('Failed to load songs');
+        throw Exception('Failed to load podcasts');
       }
     } catch (e) {
       // Handle any errors that occur during the request
-      throw Exception('Error fetching songs: $e');
+      throw Exception('Error fetching podcasts: $e');
     }
   }
-
 
 
   @override
@@ -107,48 +95,45 @@ class _enElCoche_State extends State<enElCoche> {
         ),
         title: const Row(
           children: [
-            Text('Buscar En el coche', style: TextStyle(color: Colors.white)),
+            Text('Buscar psicología', style: TextStyle(color: Colors.white)),
           ],
         ),
         backgroundColor: Colors.black,
         automaticallyImplyLeading: false, // Eliminar el botón de retroceso predeterminado
       ),
-      body
-          : ListView.builder(
-        itemCount: canciones.length,
+      body: podcasts.isEmpty
+          ? const Center(child: CircularProgressIndicator()): ListView.builder(
+        itemCount: podcasts.length,
         itemBuilder: (context, index) {
-          return FutureBuilder<Uint8List>(
-            future: _fetchImageFromUrl('${Env.URL_PREFIX}/imagenCancion/${canciones[index]['id']}/'),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                // Muestra un indicador de carga mientras se decodifica la imagen
-                return const CircularProgressIndicator();
-              } else if (snapshot.hasError) {
-                // Muestra un mensaje de error si ocurre un error durante la decodificación
-                return Text('Error: ${snapshot.error}');
-              } else {
-                // Si la decodificación fue exitosa, muestra la imagen
-                return Image.memory(
-                  snapshot.data!,
-                  height: 100, // Tamaño fijo para la imagen
-                  width: 100, // Tamaño fijo para la imagen
-                  fit: BoxFit.cover,
+          String podcast = podcasts[index].foto;
+          return ListTile(
+            leading: Image.memory(base64Url.decode(('data:image/jpeg;base64,${utf8.decode(base64Decode(podcast.replaceAll(RegExp('/^data:image/[a-z]+;base64,/'), '')))}').split(',').last), height: 50, width: 50,),
+            title: TextButton(
+              onPressed:() {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => reproductor(cancion: podcasts[index], ids: [-33],)
+                  ),
                 );
-              }
-            },
+              },
+              child: Row(
+                  children: [
+                    Text(podcasts[index].nombre, style: const TextStyle(color: Colors.white, fontSize: 14),),
+                    const SizedBox(width: 20,)
+                  ]
+              ),
+            ),
           );
         },
       ),
-
       floatingActionButton: Padding(
-        padding: const EdgeInsets.only(top: 10),
-        // Ajusta el valor según sea necesario para la posición deseada
+        padding: const EdgeInsets.only(top: 10), // Ajusta el valor según sea necesario para la posición deseada
         child: FloatingActionButton(
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) =>
-                  Cola()), // Suponiendo que Cola sea la pantalla a la que quieres navegar
+              MaterialPageRoute(builder: (context) => Cola()), // Suponiendo que Cola sea la pantalla a la que quieres navegar
             );
           },
           child: Icon(Icons.queue_music),
@@ -170,8 +155,7 @@ class _enElCoche_State extends State<enElCoche> {
                   context,
                   MaterialPageRoute(
                       builder: (context) => pantalla_principal()),
-                );
-              },
+                );              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.transparent,
                 shape: RoundedRectangleBorder(
@@ -206,8 +190,7 @@ class _enElCoche_State extends State<enElCoche> {
               child: const Column(
                 children: [
                   SizedBox(height: 8),
-                  Icon(Icons.question_mark_outlined, color: Colors.grey,
-                      size: 37.0),
+                  Icon(Icons.question_mark_outlined, color: Colors.grey, size: 37.0),
                   Text(
                     'Buscar',
                     style: TextStyle(color: Colors.white, fontSize: 12),
@@ -232,8 +215,7 @@ class _enElCoche_State extends State<enElCoche> {
               child: const Column(
                 children: [
                   SizedBox(height: 8),
-                  Icon(Icons.library_books_rounded, color: Colors.grey,
-                      size: 37.0),
+                  Icon(Icons.library_books_rounded, color: Colors.grey, size: 37.0),
                   Text(
                     'Biblioteca',
                     style: TextStyle(color: Colors.white, fontSize: 12),
@@ -258,8 +240,7 @@ class _enElCoche_State extends State<enElCoche> {
               child: const Column(
                 children: [
                   SizedBox(height: 8),
-                  Icon(Icons.chat_bubble_rounded, color: Colors.grey,
-                      size: 37.0),
+                  Icon(Icons.chat_bubble_rounded, color: Colors.grey, size: 37.0),
                   Text(
                     'Salas',
                     style: TextStyle(color: Colors.white, fontSize: 12),
@@ -271,6 +252,7 @@ class _enElCoche_State extends State<enElCoche> {
         ),
       ),
     );
+
   }
 
 

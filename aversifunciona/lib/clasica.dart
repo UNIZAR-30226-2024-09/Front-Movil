@@ -1,15 +1,17 @@
-import 'package:aversifunciona/cancion.dart';
-import 'package:aversifunciona/pantalla_principal.dart';
-import 'package:aversifunciona/salas.dart';
+// Importaciones necesarias
 import 'package:flutter/material.dart';
-import 'package:aversifunciona/reproductor.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'dart:async';
+import 'dart:typed_data';
+import 'package:aversifunciona/env.dart'; // Asumiendo que este archivo contiene la URL_PREFIX
+import 'package:aversifunciona/cancion.dart';
+import 'PantallaCancion.dart'; // Asumiendo que este archivo contiene la definición de PantallaCancion
+import 'cola.dart';
 import 'biblioteca.dart';
 import 'buscar.dart';
-import 'PantallaCancion.dart';
-import 'env.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'cola.dart';
+import 'salas.dart';
+import 'pantalla_principal.dart';
 
 Route _createRoute() {
   return PageRouteBuilder(
@@ -29,13 +31,13 @@ Route _createRoute() {
   );
 }
 
-class clasico extends StatefulWidget {
+class clasica extends StatefulWidget {
   @override
-  _clasico_State createState() => _clasico_State();
+  _clasica_State createState() => _clasica_State();
 }
 
-class _clasico_State extends State<clasico> {
-  List<dynamic> canciones = [];
+class _clasica_State extends State<clasica> {
+  List<Map<String, dynamic>> canciones = []; // Cambio de tipo de lista
 
   @override
   void initState() {
@@ -50,31 +52,41 @@ class _clasico_State extends State<clasico> {
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
-        body: jsonEncode({'genero': 'Clásica'}),
+        body: jsonEncode({'genero': 'Clasica'}),
       );
       print('Response: ${response.body}');
       if (response.statusCode == 200) {
         Map<String, dynamic> data = jsonDecode(response.body);
-        dynamic cancionesData = data['canciones'];
+        List<dynamic> cancionesData = data['canciones'];
 
-
-        List<dynamic> nuevasCanciones = [];
-
-        for (var i = 0; i < cancionesData.length; i++) {
-          Cancion cancion = Cancion.fromJson(cancionesData[i]);
-          nuevasCanciones.add(cancion);
-        }
+        final List<Map<String, dynamic>> cancionesAux = cancionesData.map((cancion) {
+          return {
+            'id': cancion['id'] as int,
+            'nombre': cancion['nombre'] as String,
+            //'foto': cancion['foto'] as String,
+          };
+        }).toList();
 
         setState(() {
-          canciones = nuevasCanciones;
+          canciones = cancionesAux;
         });
       } else {
-        // Handle error or unexpected status code
         throw Exception('Failed to load songs');
       }
     } catch (e) {
-      // Handle any errors that occur during the request
       throw Exception('Error fetching songs: $e');
+    }
+  }
+
+  // Método para cargar una imagen desde una URL
+  Future<Uint8List> _fetchImageFromUrl(String imageUrl) async {
+    final response = await http.get(Uri.parse(imageUrl));
+    if (response.statusCode == 200) {
+      // Devuelve los bytes de la imagen
+      return response.bodyBytes;
+    } else {
+      // Si la solicitud falla, lanza un error
+      throw Exception('Failed to load image from $imageUrl');
     }
   }
 
@@ -83,46 +95,60 @@ class _clasico_State extends State<clasico> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        leading: TextButton(
-            child: const CircleAvatar(
-              child: Icon(Icons.person_rounded, color: Colors.white,),
-            ),
-            onPressed: () {
-              Navigator.of(context).push(_createRoute());
-            }
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
         title: const Row(
           children: [
-            Text('Buscar clasico', style: TextStyle(color: Colors.white)),
+            Text('Buscar clasica', style: TextStyle(color: Colors.white)),
           ],
         ),
         backgroundColor: Colors.black,
         automaticallyImplyLeading: false, // Eliminar el botón de retroceso predeterminado
       ),
       body: canciones.isEmpty
-          ? const Center(child: CircularProgressIndicator()): ListView.builder(
+          ? const Center(child: CircularProgressIndicator())
+          : ListView.builder(
         itemCount: canciones.length,
         itemBuilder: (context, index) {
-          String cancion = canciones[index].foto;
           return ListTile(
-            leading: Image.memory(base64Url.decode(('data:image/jpeg;base64,${utf8.decode(base64Decode(cancion.replaceAll(RegExp('/^data:image/[a-z]+;base64,/'), '')))}').split(',').last), height: 50, width: 50,),
             title: TextButton(
-              onPressed:() {
+              onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      //builder: (context) => reproductor(cancion: canciones[index], ids: [])
-                      builder: (context) => PantallaCancion(songId: canciones[index].id)
+                      builder: (context) => PantallaCancion(songId: canciones[index]['id'])
                   ),
                 );
               },
               child: Row(
-                  children: [
-                    Text(canciones[index].nombre, style: const TextStyle(color: Colors.white, fontSize: 14),),
-                    const SizedBox(width: 20,)
-                  ]
+                children: [
+                  FutureBuilder<Uint8List>(
+                    future: _fetchImageFromUrl('${Env.URL_PREFIX}/imagenCancion/${canciones[index]['id']}/'),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const CircularProgressIndicator();
+                      } else if (snapshot.hasError) {
+                        return const Icon(Icons.error);
+                      } else {
+                        return Image.memory(
+                          snapshot.data!,
+                          width: 50, // Tamaño fijo para la imagen
+                          height: 50, // Tamaño fijo para la imagen
+                          fit: BoxFit.cover,
+                        );
+                      }
+                    },
+                  ),
+                  const SizedBox(width: 10),
+                  Text(canciones[index]['nombre'], style: const TextStyle(color: Colors.white, fontSize: 14)),
+                ],
               ),
-            ),);
+            ),
+          );
         },
       ),
       floatingActionButton: Padding(
@@ -153,7 +179,8 @@ class _clasico_State extends State<clasico> {
                   context,
                   MaterialPageRoute(
                       builder: (context) => pantalla_principal()),
-                );              },
+                );
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.transparent,
                 shape: RoundedRectangleBorder(
@@ -250,8 +277,5 @@ class _clasico_State extends State<clasico> {
         ),
       ),
     );
-
   }
-
-
 }
