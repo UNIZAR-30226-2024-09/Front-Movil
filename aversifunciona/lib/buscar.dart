@@ -488,7 +488,7 @@ class _pantalla_buscarState extends State<pantalla_buscar> {
             Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => psicologia()));
-          } else if (title == 'En el coche') {
+          } */else if (title == 'En el coche') {
             Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => enElCoche()));
@@ -500,7 +500,7 @@ class _pantalla_buscarState extends State<pantalla_buscar> {
             Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => relax()));
-          }*/
+          }
 
           // Acción al presionar el botón
         },
