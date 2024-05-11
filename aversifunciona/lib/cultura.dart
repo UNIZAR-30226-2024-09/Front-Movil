@@ -1,16 +1,17 @@
-import 'package:aversifunciona/pantalla_principal.dart';
-import 'package:aversifunciona/podcast.dart';
-import 'package:aversifunciona/reproductor.dart';
-import 'package:aversifunciona/salas.dart';
+// Importaciones necesarias
 import 'package:flutter/material.dart';
-
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'dart:async';
+import 'dart:typed_data';
+import 'package:aversifunciona/env.dart'; // Asumiendo que este archivo contiene la URL_PREFIX
+import 'package:aversifunciona/podcast.dart';
+import 'pantallaPodcast.dart'; // Asumiendo que este archivo contiene la definición de PantallaPodcast
+import 'cola.dart';
 import 'biblioteca.dart';
 import 'buscar.dart';
-import 'env.dart';
-
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'cola.dart';
+import 'salas.dart';
+import 'pantalla_principal.dart';
 
 Route _createRoute() {
   return PageRouteBuilder(
@@ -36,7 +37,7 @@ class cultura extends StatefulWidget {
 }
 
 class _cultura_State extends State<cultura> {
-  List<dynamic> podcasts = [];
+  List<Map<String, dynamic>> podcasts = []; // Cambio de tipo de lista
 
   @override
   void initState() {
@@ -54,32 +55,41 @@ class _cultura_State extends State<cultura> {
         body: jsonEncode({'genero': 'Cultura'}),
       );
       print('Response: ${response.body}');
-
       if (response.statusCode == 200) {
         Map<String, dynamic> data = jsonDecode(response.body);
-        dynamic podcastsData = data['podcasts'];
+        List<dynamic> podcastsData = data['podcasts'];
 
-        List<dynamic> nuevosPodcasts = [];
-
-        for (var i = 0; i < podcastsData.length; i++) {
-          Podcast podcast = Podcast.fromJson(podcastsData[i]);
-          nuevosPodcasts.add(podcast);
-        }
+        final List<Map<String, dynamic>> podcastsAux = podcastsData.map((
+            podcast) {
+          return {
+            'id': podcast['id'] as int,
+            'nombre': podcast['nombre'] as String,
+            //'foto': cancion['foto'] as String,
+          };
+        }).toList();
 
         setState(() {
-          podcasts = nuevosPodcasts;
+          podcasts = podcastsAux;
         });
-
       } else {
-        // Handle error or unexpected status code
-        throw Exception('Failed to load podcasts');
+        throw Exception('Failed to load songs');
       }
     } catch (e) {
-      // Handle any errors that occur during the request
-      throw Exception('Error fetching podcasts: $e');
+      throw Exception('Error fetching songs: $e');
     }
   }
 
+  // Método para cargar una imagen desde una URL
+  Future<Uint8List> _fetchImageFromUrl(String imageUrl) async {
+    final response = await http.get(Uri.parse(imageUrl));
+    if (response.statusCode == 200) {
+      // Devuelve los bytes de la imagen
+      return response.bodyBytes;
+    } else {
+      // Si la solicitud falla, lanza un error
+      throw Exception('Failed to load image from $imageUrl');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -101,38 +111,60 @@ class _cultura_State extends State<cultura> {
         automaticallyImplyLeading: false, // Eliminar el botón de retroceso predeterminado
       ),
       body: podcasts.isEmpty
-          ? const Center(child: CircularProgressIndicator()): ListView.builder(
+          ? const Center(child: CircularProgressIndicator())
+          : ListView.builder(
         itemCount: podcasts.length,
         itemBuilder: (context, index) {
-          String podcast = podcasts[index].foto;
           return ListTile(
-            leading: Image.memory(base64Url.decode(('data:image/jpeg;base64,${utf8.decode(base64Decode(podcast.replaceAll(RegExp('/^data:image/[a-z]+;base64,/'), '')))}').split(',').last), height: 50, width: 50,),
             title: TextButton(
-              onPressed:() {
+              onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => reproductor(cancion: podcasts[index], ids: [-33],)
+                      builder: (context) =>
+                          PantallaPodcast(podcastId: podcasts[index]['id'],
+                              podcastName: podcasts[index]['nombre'])
                   ),
                 );
               },
               child: Row(
-                  children: [
-                    Text(podcasts[index].nombre, style: const TextStyle(color: Colors.white, fontSize: 14),),
-                    const SizedBox(width: 20,)
-                  ]
+                children: [
+                  FutureBuilder<Uint8List>(
+                    future: _fetchImageFromUrl('${Env
+                        .URL_PREFIX}/imagenPodcast/${podcasts[index]['id']}/'),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const CircularProgressIndicator();
+                      } else if (snapshot.hasError) {
+                        return const Icon(Icons.error);
+                      } else {
+                        return Image.memory(
+                          snapshot.data!,
+                          width: 50, // Tamaño fijo para la imagen
+                          height: 50, // Tamaño fijo para la imagen
+                          fit: BoxFit.cover,
+                        );
+                      }
+                    },
+                  ),
+                  const SizedBox(width: 10),
+                  Text(podcasts[index]['nombre'], style: const TextStyle(
+                      color: Colors.white, fontSize: 14)),
+                ],
               ),
             ),
           );
         },
       ),
       floatingActionButton: Padding(
-        padding: const EdgeInsets.only(top: 10), // Ajusta el valor según sea necesario para la posición deseada
+        padding: const EdgeInsets.only(top: 10),
+        // Ajusta el valor según sea necesario para la posición deseada
         child: FloatingActionButton(
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => Cola()), // Suponiendo que Cola sea la pantalla a la que quieres navegar
+              MaterialPageRoute(builder: (context) =>
+                  Cola()), // Suponiendo que Cola sea la pantalla a la que quieres navegar
             );
           },
           child: Icon(Icons.queue_music),
@@ -154,7 +186,8 @@ class _cultura_State extends State<cultura> {
                   context,
                   MaterialPageRoute(
                       builder: (context) => pantalla_principal()),
-                );              },
+                );
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.transparent,
                 shape: RoundedRectangleBorder(
@@ -189,7 +222,8 @@ class _cultura_State extends State<cultura> {
               child: const Column(
                 children: [
                   SizedBox(height: 8),
-                  Icon(Icons.question_mark_outlined, color: Colors.grey, size: 37.0),
+                  Icon(Icons.question_mark_outlined, color: Colors.grey,
+                      size: 37.0),
                   Text(
                     'Buscar',
                     style: TextStyle(color: Colors.white, fontSize: 12),
@@ -214,7 +248,8 @@ class _cultura_State extends State<cultura> {
               child: const Column(
                 children: [
                   SizedBox(height: 8),
-                  Icon(Icons.library_books_rounded, color: Colors.grey, size: 37.0),
+                  Icon(Icons.library_books_rounded, color: Colors.grey,
+                      size: 37.0),
                   Text(
                     'Biblioteca',
                     style: TextStyle(color: Colors.white, fontSize: 12),
@@ -239,7 +274,8 @@ class _cultura_State extends State<cultura> {
               child: const Column(
                 children: [
                   SizedBox(height: 8),
-                  Icon(Icons.chat_bubble_rounded, color: Colors.grey, size: 37.0),
+                  Icon(Icons.chat_bubble_rounded, color: Colors.grey,
+                      size: 37.0),
                   Text(
                     'Salas',
                     style: TextStyle(color: Colors.white, fontSize: 12),
@@ -251,8 +287,5 @@ class _cultura_State extends State<cultura> {
         ),
       ),
     );
-
   }
-
-
 }
