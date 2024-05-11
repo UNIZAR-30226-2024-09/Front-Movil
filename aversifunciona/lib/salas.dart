@@ -55,8 +55,13 @@ class _PantallaSalasState extends State<pantalla_salas> {
 
   Future<void> listarSalas() async {
     try {
-    var url = Uri.parse('${Env.URL_PREFIX}/ListarSalasAPI/');
-    var response = await http.get(url);
+    var url = Uri.parse('${Env.URL_PREFIX}/listarSalas/');
+    var response = await http.get(
+        url,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+    );
 
     if (response.statusCode == 200) {
       // Decodificar la respuesta JSON
@@ -67,6 +72,7 @@ class _PantallaSalasState extends State<pantalla_salas> {
       _listaSalas = salasData.map((salaData) {
       return Sala.fromJson(salaData);
       }).toList();
+
 
     } else {
         // Manejar otros códigos de estado
@@ -104,6 +110,14 @@ class _PantallaSalasState extends State<pantalla_salas> {
       print('Error: $error');
     }
   }
+
+  @override
+  void initState() {
+    super.initState();
+    // Obtener los datos de la playlist al inicializar el widget
+    listarSalas();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -123,14 +137,11 @@ class _PantallaSalasState extends State<pantalla_salas> {
           style: TextStyle(color: Colors.white),
         ),
       ),
-      body: _isLoading
-          ? Center(
-        child: CircularProgressIndicator(),
-      )
-          :Column(
+      body: Column(
         children: [
+
           Expanded(
-            child: ListView(
+            child: _isLoading ? const Center( child: CircularProgressIndicator(),) :ListView(
               shrinkWrap: true,
               children: [
                 buildButton('+', Colors.grey, 'Crear sala', () {

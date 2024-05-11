@@ -6,10 +6,11 @@ import 'dart:convert';
 import 'biblioteca.dart';
 import 'buscar.dart';
 import 'cancion.dart';
-import 'chatSalaDisponible.dart';
+
 import 'pantallaCancion.dart';
 import 'env.dart';
 import 'cola.dart';
+import 'salas.dart';
 
 class Playlist extends StatefulWidget {
   final int playlistId;

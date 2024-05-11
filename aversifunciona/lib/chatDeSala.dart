@@ -142,7 +142,7 @@ class _ChatDeSalaState extends State<ChatDeSala> {
 
   Future<void> _loadMessages() async {
     try {
-      var url = Uri.parse('${Env.URL_PREFIX}/CargarMensajesAPI/');
+      var url = Uri.parse('${Env.URL_PREFIX}/cargarMensajesAPI/');
       var response = await http.post(
         url,
         body: jsonEncode({'salaid': widget.idDeLaSala}), // Reemplaza 'idDeLaSala' con el ID real de la sala
@@ -197,7 +197,8 @@ class _ChatDeSalaState extends State<ChatDeSala> {
       int idDeLaSala = widget.idDeLaSala;
       String emisorId = userId;
 
-      var url = Uri.parse('${Env.URL_PREFIX}/RegistrarMensajeAPI/');
+      var url = Uri.parse('${Env.URL_PREFIX}/registrarMensajeAPI/');
+
       var response = await http.post(
         url,
         body: jsonEncode({
