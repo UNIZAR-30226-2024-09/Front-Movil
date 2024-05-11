@@ -1,8 +1,11 @@
+import 'package:aversifunciona/reproductor.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'getUserSession.dart';
 import 'env.dart';
+import 'reproductor.dart';
+
 
 
 class PantallaCapitulo extends StatefulWidget {
@@ -191,7 +194,17 @@ class _PantallaCapituloState extends State<PantallaCapitulo> {
                 ),
                 IconButton(
                   onPressed: () {
-                    // Lógica para reproducir la canción
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => Reproductor(cancion: capitulo, ids: )),
+                        );
+                      },
+                      icon: Icon(Icons.play_arrow),
+                      label: Text('Reproducir'),
+                    ),
+
                   },
                   icon: Icon(Icons.play_arrow, size: 40),
                   color: Colors.white,

@@ -167,7 +167,7 @@ class _verPerfilState extends State<verPerfil> {
                               // Lógica para editar el perfil
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => editarPerfil()),
+                                MaterialPageRoute(builder: (context) => EditarPerfil()),
                               );
                             },
                             child: Text('Editar perfil'),

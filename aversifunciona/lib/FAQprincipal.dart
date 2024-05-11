@@ -22,33 +22,52 @@ class FAQprincipal extends StatelessWidget {
           ),
         ),
       ),
-      home: MainScreen(),
+      home: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          title: Row(
+            children: [
+              const SizedBox(width: 10),
+              const Icon(Icons.account_circle, color: Colors.white, size: 30),
+              const SizedBox(width: 10),
+              const Text('Ayuda con la cuenta', style: TextStyle(color: Colors.white)),
+            ],
+          ),
+          backgroundColor: Colors.black,
+        ),
+        body: MainScreen(),
+      ),
     );
   }
 }
+
 
 class MainScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      /*appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
         title: Row(
           children: [
-            IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.white),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
             const SizedBox(width: 10),
-            const Icon(Icons.account_circle, color: Colors.white, size: 30), // Icono redondeado de la foto de perfil
+            const Icon(Icons.account_circle, color: Colors.white, size: 30),
             const SizedBox(width: 10),
             const Text('Ayuda con la cuenta', style: TextStyle(color: Colors.white)),
           ],
         ),
         backgroundColor: Colors.black,
-        automaticallyImplyLeading: false, // Eliminar el botón de retroceso predeterminado
-      ),
+      ),*/
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
@@ -84,7 +103,7 @@ class MainScreen extends StatelessWidget {
                 );
               },
             ),
-            const Spacer(), // Espacio flexible para empujar los botones hacia abajo
+            const Spacer(),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 10.0),
               child: Row(
@@ -145,5 +164,6 @@ class RoundedButton extends StatelessWidget {
     );
   }
 }
+
 
 

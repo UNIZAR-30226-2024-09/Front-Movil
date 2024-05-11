@@ -101,7 +101,7 @@ class _ColaState extends State<Cola> {
             } else if (value == 'configuracion') {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => configuracion()),
+                MaterialPageRoute(builder: (context) => Configuracion()),
               );
             }
           },

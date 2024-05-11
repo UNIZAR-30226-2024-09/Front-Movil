@@ -344,9 +344,6 @@ class _pantalla_buscarState extends State<pantalla_buscar> {
         shrinkWrap: true,
         itemCount: resultados.length,
         itemBuilder: (BuildContext context, int index) {
-          // Construir cada elemento de la lista de resultados
-          // Aquí puedes decidir cómo mostrar cada resultado en la lista
-          // Por ejemplo, puedes mostrar el título y el artista de una canción
           String texto = resultados[index]['nombre'];
 
           return ListTile(

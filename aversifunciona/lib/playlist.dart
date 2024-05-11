@@ -308,7 +308,7 @@ class _PlaylistState extends State<Playlist> {
                           // Lógica para reproducir la playlist
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => reproductor(cancion: canciones[0], ids: ids)), // cancion: cancion dentro de reproductor cuando esto funcione
+                            MaterialPageRoute(builder: (context) => Reproductor(cancion: canciones[0], ids: ids)), // cancion: cancion dentro de reproductor cuando esto funcione
                           );
                         },
                         icon: const Icon(Icons.play_arrow),

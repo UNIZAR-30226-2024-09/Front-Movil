@@ -13,12 +13,12 @@ import 'capitulo.dart';
 
 import 'env.dart';
 
-class reproductor extends StatelessWidget {
+class Reproductor extends StatelessWidget {
   var cancion; // Agregar el parámetro cancion
   List<int> ids;
 
                     // Create a player
-  reproductor({required this.cancion, required this.ids});
+  Reproductor({required this.cancion, required this.ids});
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

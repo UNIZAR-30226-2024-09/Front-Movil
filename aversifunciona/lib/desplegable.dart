@@ -42,7 +42,7 @@ class desplegable extends StatelessWidget {
               } else if (value == 'configuracion') {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => configuracion()),
+                  MaterialPageRoute(builder: (context) => Configuracion()),
                 );
               }
 

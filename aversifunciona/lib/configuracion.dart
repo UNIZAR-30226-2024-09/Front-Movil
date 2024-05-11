@@ -7,6 +7,7 @@ import 'package:aversifunciona/verPerfil.dart';
 import 'package:flutter/material.dart';
 import 'package:aversifunciona/getUserSession.dart';
 import 'package:aversifunciona/inicioSesion.dart';
+import 'package:aversifunciona/editarPerfil.dart';
 
 import 'biblioteca.dart';
 import 'buscar.dart';
@@ -16,7 +17,39 @@ import 'package:http/http.dart' as http;
 import 'cola.dart';
 import 'env.dart';
 
-class configuracion extends StatelessWidget {
+class Configuracion extends StatefulWidget {
+  @override
+  _ConfiguracionState createState() => _ConfiguracionState();
+}
+
+class _ConfiguracionState extends State<Configuracion> {
+
+  String _nombreS = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _getUserInfo();
+  }
+
+  Future<void> _getUserInfo() async {
+    try {
+      String? token = await getUserSession.getToken(); // Espera a que el token se resuelva
+      print("Token: $token");
+      if (token != null) {
+        // Llama al método AuthService para obtener la información del usuario
+        Map<String, dynamic> userInfo = await getUserSession.getUserInfo(token);
+        setState(() {
+          _nombreS = userInfo['nombre'];
+        });
+      } else {
+        print('Token is null');
+      }
+    } catch (e) {
+      print('Error fetching user info: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -62,21 +95,19 @@ class configuracion extends StatelessWidget {
                   child: Row(
                     children: [
                       CircleAvatar(
-                        // Aquí deberías proporcionar la imagen del perfil del usuario
+                        // Imagen del perfil del usuario
                         backgroundColor: Colors.grey,
                         radius: 20,
-                        // Supongamos que la imagen del perfil se llama 'user_profile.jpg' y está en la carpeta de activos
                         backgroundImage: AssetImage('assets/user_profile.jpg'),
                       ),
                       SizedBox(width: 10),
                       Text(
-                        'Nombre de Usuario', // Deberías reemplazar esto con el nombre del usuario
+                        _nombreS,
                         style: TextStyle(color: Colors.white),
                       ),
                     ],
                   ),
                 ),
-                Icon(Icons.arrow_forward, color: Colors.white),
               ],
             ),
           ),
@@ -84,8 +115,7 @@ class configuracion extends StatelessWidget {
           Expanded(
             child: ListView(
               children: [
-                buildOption(context, "Ver perfil", Icon(Icons.arrow_forward)),
-                buildOption(context, "Cuenta", Icon(Icons.arrow_forward)),
+                buildOption(context, "Editar perfil", Icon(Icons.arrow_forward)),
                 buildOption(context, "Ayuda", Icon(Icons.arrow_forward)),
 
               ],
@@ -116,11 +146,6 @@ class configuracion extends StatelessWidget {
                     );
 
                     if (response.statusCode == 200) {
-                      // Elimina el token de autenticación almacenado localmente
-                      // Aquí deberías implementar la lógica para eliminar el token
-
-                      // Redirige al usuario a la pantalla de inicio de sesión
-                      //Navigator.pushReplacementNamed(context, '/inicioSesion/');
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => InicioSesion()),
@@ -274,11 +299,11 @@ class configuracion extends StatelessWidget {
       trailing: trailingIcon,
       onTap: () {
         // Lógica para manejar el tap en cada opción
-        if (title == "Cuenta") {
+        if (title == "Editar perfil") {
           // Navegar a la pantalla de cuenta
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => verPerfil()),
+            MaterialPageRoute(builder: (context) => EditarPerfil()),
           );
         } else if (title == "Ayuda") {
           // Navegar a la pantalla de ayuda

@@ -12,12 +12,12 @@ import 'EditarPais.dart';
 import 'EditarSexo.dart';
 import 'env.dart';
 
-class editarPerfil extends StatefulWidget {
+class EditarPerfil extends StatefulWidget {
   @override
-  _editarPerfilState createState() => _editarPerfilState();
+  _EditarPerfilState createState() => _EditarPerfilState();
 }
 
-class _editarPerfilState extends State<editarPerfil> {
+class _EditarPerfilState extends State<EditarPerfil> {
 
   String _nombreS = '';
   String _correoS = '';

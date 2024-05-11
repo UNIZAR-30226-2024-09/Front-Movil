@@ -133,7 +133,7 @@ class pantalla_opciones extends StatelessWidget {
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => configuracion()),
+                          MaterialPageRoute(builder: (context) => Configuracion()),
                         );
                       },
                     ),
