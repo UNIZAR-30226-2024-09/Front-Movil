@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'cancion.dart';
@@ -275,6 +276,17 @@ class _PantallaCancionState extends State<PantallaCancion> {
     }
   }
 
+  void _copySongUrlToClipboard() {
+    String songUrl = 'localhost:8000/musifyc/$c_id/';
+    Clipboard.setData(ClipboardData(text: songUrl)).then((_) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('URL de la canción copiada al portapapeles'),
+        ),
+      );
+    });
+    print(songUrl);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -369,6 +381,15 @@ class _PantallaCancionState extends State<PantallaCancion> {
           ],
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _copySongUrlToClipboard, // Llama a la función para copiar la URL
+        tooltip: 'Compartir',
+        child: Icon(Icons.share),
+        backgroundColor: Colors.black,
+        foregroundColor: Colors.white,
+        elevation: 0,
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
     );
   }
 
