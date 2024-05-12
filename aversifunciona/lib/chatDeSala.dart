@@ -35,8 +35,7 @@ class _ChatDeSalaState extends State<ChatDeSala> {
   TextEditingController _messageController = TextEditingController();
   List<Map<String, dynamic>> _messages = [];
   Sala _sala = Sala(id: -1, nombre: "");
-  String userId = '-1';
-  // String _correo = '';
+  String userEmail = '';
   late IOWebSocketChannel _channel;
   bool _isLoading = true;
 
@@ -45,7 +44,7 @@ class _ChatDeSalaState extends State<ChatDeSala> {
   void initState() {
     super.initState();
     _getUserInfo();
-    _channel = IOWebSocketChannel.connect('ws://localhost:8000/ws/chat/${widget.idDeLaSala}/'); // Conectamos el webSocket a la URL específica de la sala.
+    _connectToWebSocket();
     setState(() {
       _isLoading = true;
     });
@@ -54,22 +53,20 @@ class _ChatDeSalaState extends State<ChatDeSala> {
       _isLoading = false;
     });
 
-    // Escuchar mensajes entrantes a través del WebSocket
-    _channel.stream.listen((message) {
-      // Procesar y manejar el mensaje recibido aquí
-      // Extraer el texto del mensaje y el remitente
-      String text = message['cuerpo']['mensaje'];
-      String senderId = message['cuerpo']['emisorid'];
-      int salaid = message['cuerpo']['salaid'];
-      //if(salaid == _sala.id){ // Si el mensaje que se recibe pertenece a la sala en la que no encontramos (esto no se si es necesario hacerlo)
-        // Actualizar la interfaz de usuario, agregando el mensaje a la lista de mensajes
-        setState(() {
-          _messages.add({
-            'texto': text,
-            'miUsuario': senderId,
-          });
+  }
+
+  // Escuchar mensajes entrantes a través del WebSocket
+  void _connectToWebSocket() {
+    _channel = IOWebSocketChannel.connect('ws://localhost:8000/ws/chat/${widget.idDeLaSala}/');
+    _channel!.stream.listen((message) {
+      setState(() {
+        _messages.add({
+          'cuerpo': {
+            'mensaje': message['cuerpo']['mensaje'],
+            'emisorid': message['cuerpo']['emisorid'],
+          },
         });
-        //}
+      });
     });
   }
 
@@ -107,9 +104,9 @@ class _ChatDeSalaState extends State<ChatDeSala> {
         // Llama al método AuthService para obtener la información del usuario
         Map<String, dynamic> userInfo = await getUserSession.getUserInfo(token);
         setState(() {
-          userId = userInfo['correo'];
+          userEmail = userInfo['correo'];
         });
-        print(userId);
+        print(userEmail);
 
       } else {
         print('Token is null');
@@ -123,7 +120,7 @@ class _ChatDeSalaState extends State<ChatDeSala> {
     Map<String, dynamic> messageData = {
       'cuerpo': {
         'mensaje': message,
-        'emisorid': userId,
+        'emisorid': userEmail,
         'salaid': widget.idDeLaSala,
       }
     };
@@ -195,7 +192,7 @@ class _ChatDeSalaState extends State<ChatDeSala> {
     try {
       // SharedPreferences prefs = await SharedPreferences.getInstance();
       int idDeLaSala = widget.idDeLaSala;
-      String emisorId = userId;
+      String emisorId = userEmail;
 
       var url = Uri.parse('${Env.URL_PREFIX}/registrarMensajeAPI/');
 
@@ -262,7 +259,7 @@ class _ChatDeSalaState extends State<ChatDeSala> {
                   itemCount: _messages.length,
                   itemBuilder: (context, index) {
                     final message = _messages.reversed.toList()[index];
-                    final isCurrentUser = message['miUsuario'] == userId; // comparamos el propietario del mensaje que estamos tratando con el usuario actual
+                    final isCurrentUser = message['miUsuario'] == userEmail; // comparamos el propietario del mensaje que estamos tratando con el usuario actual
                     return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: Column(
