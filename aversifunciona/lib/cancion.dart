@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+import 'dart:typed_data';
 
 class Cancion {
   final int? id;
   final String nombre;
   final int? miAlbum;
   final int? puntuacion;
-  final String? archivomp3;
-  final String foto;
+  final Uint8List? archivomp3;
+  final Uint8List? foto;
 
 
   const Cancion({
@@ -31,8 +32,8 @@ class Cancion {
         nombre: json['nombre'] as String,
         miAlbum: json['miAlbum'] as int?,
         puntuacion: json['puntuacion'] as int?,
-        archivomp3: json['archivoMp3'] as String?,
-        foto: json['foto'] as String,
+        archivomp3: json['archivoMp3'] as Uint8List?,
+        foto: json['foto'] as Uint8List?,
       );
     } else {
       throw const FormatException('Failed to load album.');

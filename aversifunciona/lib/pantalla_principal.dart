@@ -67,8 +67,6 @@ Route _createRoute() {
 
 class pantalla_opciones extends StatelessWidget {
 
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

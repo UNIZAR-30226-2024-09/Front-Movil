@@ -1,6 +1,9 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'cancion.dart';
 import 'getUserSession.dart';
 import 'env.dart';
 
@@ -14,8 +17,10 @@ class PantallaCancion extends StatefulWidget {
 }
 
 class _PantallaCancionState extends State<PantallaCancion> {
+  late int c_id = 0;
   late String nombre = '';
   late int album = 0;
+  late String archivoMP3 = '';
   late String albumName = '';
   late String artistName = '';
   late String artista = '';
@@ -34,6 +39,7 @@ class _PantallaCancionState extends State<PantallaCancion> {
 
   Future<void> _fetchSongData() async {
     try {
+
       final response = await http.post(
         Uri.parse('${Env.URL_PREFIX}/devolverCancion/'),
         headers: {'Content-Type': 'application/json'},
@@ -41,12 +47,16 @@ class _PantallaCancionState extends State<PantallaCancion> {
           'cancionId': widget.songId,
         }),
       );
+
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
         final songData = responseData['cancion'];
+
         setState(() {
+          c_id = widget.songId;
           nombre = songData['nombre'];
           album = songData['miAlbum'];
+          archivoMP3 = songData['archivoMp3'];
         });
         await _fetchAlbumName(album);
         await _fetchArtistName(album);
@@ -83,6 +93,28 @@ class _PantallaCancionState extends State<PantallaCancion> {
     } catch (e) {
       print('Error: $e');
       // Manejar el error aquí
+    }
+  }
+
+  Future<Uint8List> _fetchImageFromUrl(String imageUrl) async {
+    final response = await http.get(Uri.parse(imageUrl));
+    if (response.statusCode == 200) {
+      // Devuelve los bytes de la imagen
+      return response.bodyBytes;
+    } else {
+      // Si la solicitud falla, lanza un error
+      throw Exception('Failed to load image from $imageUrl');
+    }
+  }
+
+  Future<Uint8List> _fetchAudioFromUrl(String audioUrl) async {
+    final response = await http.get(Uri.parse(audioUrl));
+    if (response.statusCode == 200) {
+      // Devuelve los bytes de la imagen
+      return response.bodyBytes;
+    } else {
+      // Si la solicitud falla, lanza un error
+      throw Exception('Failed to load audio from $audioUrl');
     }
   }
 
@@ -144,7 +176,7 @@ class _PantallaCancionState extends State<PantallaCancion> {
       );
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text('Canción añadida a la cola de reproducción con éxito'),
           ),
         );
@@ -210,20 +242,20 @@ class _PantallaCancionState extends State<PantallaCancion> {
         );
         if (response.statusCode == 200) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
+            const SnackBar(
               content: Text('Canción añadida a la playlist con éxito'),
             ),
           );
         } else if (response.statusCode == 400) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
+            const SnackBar(
               content: Text('La canción ya está en la playlist'),
             ),
           );
           throw Exception('La canción ya está en la playlist');
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
+            const SnackBar(
               content: Text('Error al añadir la canción a la playlist'),
             ),
           );
@@ -231,7 +263,7 @@ class _PantallaCancionState extends State<PantallaCancion> {
         }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text('No se encontró la playlist correspondiente'),
           ),
         );
@@ -256,19 +288,19 @@ class _PantallaCancionState extends State<PantallaCancion> {
             Navigator.pop(context);
           },
         ),
-        title: Text('Detalles de la Canción', style: TextStyle(color: Colors.white)),
+        title: const Text('Detalles de la Canción', style: TextStyle(color: Colors.white)),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SizedBox(height: 40),
+            const SizedBox(height: 40),
             Container(
               width: 200,
               height: 200,
               color: Colors.grey.withOpacity(0.5),
-              child: Center(
+              child: const Center(
                 child: Icon(
                   Icons.music_note,
                   size: 100,
@@ -276,49 +308,52 @@ class _PantallaCancionState extends State<PantallaCancion> {
                 ),
               ),
             ),
-            SizedBox(height: 40),
+            const SizedBox(height: 40),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 ElevatedButton.icon(
                   onPressed: _addToQueue,
-                  icon: Icon(Icons.queue),
-                  label: Text('Añadir a la Cola'),
+                  icon: const Icon(Icons.queue),
+                  label: const Text('Añadir a la Cola'),
                 ),
                 ElevatedButton.icon(
                   onPressed: () {
                     _fetchUserPlaylists();
                     _showPlaylistModal(context);
                   },
-                  icon: Icon(Icons.playlist_add),
-                  label: Text('Añadir a Playlist'),
+                  icon: const Icon(Icons.playlist_add),
+                  label: const Text('Añadir a Playlist'),
                 ),
               ],
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   nombre,
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
                 ),
                 IconButton(
-                  onPressed: () {
+                  onPressed: () async{
                     // Lógica para reproducir la canción
+                    Uint8List imagen = await _fetchImageFromUrl('${Env.URL_PREFIX}/imagenCancion/$nombre/');
+                    Uint8List audio = await _fetchAudioFromUrl('${Env.URL_PREFIX}/audioCancion/$nombre/');
+                    Cancion capitulo = Cancion(id: c_id, nombre: nombre, miAlbum: 0, puntuacion: 0, archivomp3: audio, foto: imagen);
                   },
-                  icon: Icon(Icons.play_arrow, size: 40),
+                  icon: const Icon(Icons.play_arrow, size: 40),
                   color: Colors.white,
                 ),
               ],
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Text(
                   '$albumName - $artistName',
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                  style: const TextStyle(fontSize: 16, color: Colors.grey),
                 ),
               ],
             ),
@@ -327,7 +362,7 @@ class _PantallaCancionState extends State<PantallaCancion> {
               children: [
                 Text(
                   'Duración: $duracion',
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                  style: const TextStyle(fontSize: 16, color: Colors.grey),
                 ),
               ],
             ),
@@ -350,7 +385,7 @@ class _PantallaCancionState extends State<PantallaCancion> {
           ),
           decoration: BoxDecoration(
             color: Colors.grey[900], // Color de fondo del modal
-            borderRadius: BorderRadius.only(
+            borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(20.0),
               topRight: Radius.circular(20.0),
             ),
@@ -358,8 +393,8 @@ class _PantallaCancionState extends State<PantallaCancion> {
           child: Column(
             mainAxisSize: MainAxisSize.min, // Ajusta el tamaño del Column al mínimo
             children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
+              const Padding(
+                padding: EdgeInsets.all(8.0),
                 child: Text(
                   'Elija una playlist',
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
@@ -379,7 +414,7 @@ class _PantallaCancionState extends State<PantallaCancion> {
                       child: ListTile(
                         title: Text(
                           playlistName,
-                          style: TextStyle(color: Colors.white),
+                          style:const  TextStyle(color: Colors.white),
                         ),
                       ),
                     );

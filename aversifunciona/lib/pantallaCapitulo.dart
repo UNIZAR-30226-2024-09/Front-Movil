@@ -1,9 +1,12 @@
+import 'dart:typed_data';
+
 import 'package:aversifunciona/reproductor.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'getUserSession.dart';
 import 'env.dart';
+import 'cancion.dart';
 import 'reproductor.dart';
 
 
@@ -19,7 +22,10 @@ class PantallaCapitulo extends StatefulWidget {
 
 class _PantallaCapituloState extends State<PantallaCapitulo> {
   late String nombre = '';
+  late int cap_id = 0 ;
+  late String archivoMP3 = '';
   late int podcast = 0;
+  late int p_id = 0;
   late String albumName = '';
   late String artistName = '';
   late String artista = '';
@@ -34,6 +40,17 @@ class _PantallaCapituloState extends State<PantallaCapitulo> {
     super.initState();
     _fetchEpisodeData();
     _getUserInfo();
+  }
+
+  Future<Uint8List> _fetchImageFromUrl(String imageUrl) async {
+    final response = await http.get(Uri.parse(imageUrl));
+    if (response.statusCode == 200) {
+      // Devuelve los bytes de la imagen
+      return response.bodyBytes;
+    } else {
+      // Si la solicitud falla, lanza un error
+      throw Exception('Failed to load image from $imageUrl');
+    }
   }
 
   Future<void> _getUserInfo() async {
@@ -68,8 +85,10 @@ class _PantallaCapituloState extends State<PantallaCapitulo> {
         final responseData = jsonDecode(response.body);
         final songData = responseData['capitulo'];
         setState(() {
+          cap_id = songData['id'];
           nombre = songData['nombre'];
           podcast = songData['miPodcast'];
+          archivoMP3 = songData['archivoMp3'];
         });
         await _fetchPodcastName(podcast);
         //await _fetchArtistName(album);
@@ -97,7 +116,8 @@ class _PantallaCapituloState extends State<PantallaCapitulo> {
         final podcastName = podcastData['nombre']; // Suponiendo que 'nombre' es el campo que contiene el nombre del álbum
         setState(() {
           // Actualizar el estado con el nombre del podcast
-          this.podcast = podcastName;
+          p_id = podcastData['id'];
+          podcast = podcastName;
         });
       } else {
         throw Exception('Error al obtener el nombre del podcast');
@@ -135,6 +155,7 @@ class _PantallaCapituloState extends State<PantallaCapitulo> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
@@ -157,7 +178,7 @@ class _PantallaCapituloState extends State<PantallaCapitulo> {
               width: 200,
               height: 200,
               color: Colors.grey.withOpacity(0.5),
-              child: Center(
+              child: const Center(
                 child: Icon(
                   Icons.music_note,
                   size: 100,
@@ -165,7 +186,7 @@ class _PantallaCapituloState extends State<PantallaCapitulo> {
                 ),
               ),
             ),
-            SizedBox(height: 40),
+            const SizedBox(height: 40),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -179,31 +200,34 @@ class _PantallaCapituloState extends State<PantallaCapitulo> {
                     //_fetchUserPlaylists();
                     //_showPlaylistModal(context);
                   },
-                  icon: Icon(Icons.playlist_add),
-                  label: Text('Añadir a Playlist'),
+                  icon: const Icon(Icons.playlist_add),
+                  label: const Text('Añadir a Playlist'),
                 ),
               ],
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   nombre,
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
                 ),
                 IconButton(
                   onPressed: () {
                     ElevatedButton.icon(
-                      onPressed: () {
+                      onPressed: () async {
+                        Uint8List datos = await _fetchImageFromUrl('${Env.URL_PREFIX}/imagenPodcast/$p_id/');
+                        Cancion capitulo = Cancion(id: cap_id, nombre: nombre, miAlbum: 0, puntuacion: 0, archivomp3: null, foto: datos);
+
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => Reproductor(cancion: capitulo, ids: )),
+                          MaterialPageRoute(builder: (context) => Reproductor(cancion: capitulo, ids: [-33])),
                         );
                       },
-                      icon: Icon(Icons.play_arrow),
-                      label: Text('Reproducir'),
-                    ),
+                      icon: const Icon(Icons.play_arrow),
+                      label: const Text('Reproducir'),
+                    );
 
                   },
                   icon: Icon(Icons.play_arrow, size: 40),

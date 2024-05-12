@@ -298,7 +298,7 @@ class _PlaylistState extends State<Playlist> {
 
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => reproductor(cancion: song, ids: ids)), // cancion: cancion dentro de reproductor cuando esto funcione
+                            MaterialPageRoute(builder: (context) => Reproductor(cancion: song, ids: ids)), // cancion: cancion dentro de reproductor cuando esto funcione
                           );
                         },
                       ),

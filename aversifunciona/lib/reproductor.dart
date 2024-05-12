@@ -13,6 +13,24 @@ import 'capitulo.dart';
 
 import 'env.dart';
 
+class MyJABytesSource extends StreamAudioSource {
+  final Uint8List _buffer;
+
+  MyJABytesSource(this._buffer) : super(tag: 'MyAudioSource');
+
+  @override
+  Future<StreamAudioResponse> request([int? start, int? end]) async {
+    // Returning the stream audio response with the parameters
+    return StreamAudioResponse(
+      sourceLength: _buffer.length,
+      contentLength: (end ?? _buffer.length) - (start ?? 0),
+      offset: start ?? 0,
+      stream: Stream.fromIterable([_buffer.sublist(start ?? 0, end)]),
+      contentType: 'audio/wav',
+    );
+  }
+}
+
 class Reproductor extends StatelessWidget {
   var cancion; // Agregar el parámetro cancion
   List<int> ids;
@@ -51,6 +69,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
   var posible_podcast;
   var cancion;
   bool podcast = false;
+  bool capitulo = false;
   List<dynamic> capitulos = [];
   int index = 0;
   AudioPlayer mp3player = AudioPlayer();
@@ -64,6 +83,10 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
       ids = [];
       podcast = true;
     }
+    else if (index_[0] == -32){
+      ids = [];
+      capitulo = true;
+    }
     else{
       ids = index_;
     }
@@ -76,17 +99,16 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
 
         String song = capitulos[index].archivomp3!;
         //song.replaceAll(RegExp('^data:audio\\/mp3;base64,'), '').replaceAll(RegExp('^data:[^;]+;base64,'), '')
-        String song2 = ('data:audio/mp3;base64,${(utf8.decode(base64Decode(
+        /*String song2 = ('data:audio/mp3;base64,${(utf8.decode(base64Decode(
             song.replaceAll(RegExp(r'^data:audio\/mp3;base64,'), '')
                 .replaceAll(
                 RegExp(r'^data:[^;]+;base64,'), ''))))}')
             .split(',')
             .last;
+        */
+        MyJABytesSource audioSource = MyJABytesSource(capitulos[index].archivomp3!);
 
-        // Cargar el archivo temporal en el reproductor de audio
-        //await mp3player.setFilePath(tempFile.path);
-        await mp3player.setAudioSource(
-            Base64AudioSource(song2, kAudioFormatMP3));
+        await mp3player.setAudioSource(audioSource);
 
         // Cargar el AudioSource en el reproductor de audio
       }
@@ -234,6 +256,9 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
     if(podcast){
       ids = [];
       cargar_capitulos();
+    }
+    else if (capitulo){
+
     }
     else{
       cargar_cancion(cancion, ids, 0);
