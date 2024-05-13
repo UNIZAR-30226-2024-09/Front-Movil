@@ -242,166 +242,169 @@ class _PlaylistState extends State<Playlist> {
           ),
         ],
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          ElevatedButton(
-            onPressed: () {
-              _togglePlaylistPrivacy();
-            },
-            child: Text(playlistPublica ? 'Cambiar a Privada' : 'Cambiar a Pública'),
-          ),
-          const SizedBox(height: 20),
-          // Aquí iría la foto de la playlist (cuadrada, en el centro, dentro de un contenedor gris)
-          Container(
-            color: Colors.black,
-            padding: const EdgeInsets.all(20),
-            child: Center(
-              child: SizedBox(
-                width: 200,
-                height: 200,
-                child: Container(
-                  color: Colors.grey.withOpacity(0.5),
-                  child: Center(
-                    child: Image.asset('lib/playlist.jpg'),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            ElevatedButton(
+              onPressed: () {
+                _togglePlaylistPrivacy();
+              },
+              child: Text(playlistPublica ? 'Cambiar a Privada' : 'Cambiar a Pública'),
+            ),
+            const SizedBox(height: 20),
+            // Aquí iría la foto de la playlist (cuadrada, en el centro, dentro de un contenedor gris)
+            Container(
+              color: Colors.black,
+              padding: const EdgeInsets.all(20),
+              child: Center(
+                child: SizedBox(
+                  width: 200,
+                  height: 200,
+                  child: Container(
+                    color: Colors.grey.withOpacity(0.5),
+                    child: Center(
+                      child: Image.asset('lib/playlist.jpg'),
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-
-          const SizedBox(height: 20),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      playlistName,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+        
+            const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        playlistName,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 5),
-                    Text(
-                      userName,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: Colors.grey,
+                      const SizedBox(height: 5),
+                      Text(
+                        userName,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 5),
-                    Text(
-                      'Duración: $duration',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: Colors.grey,
+                      const SizedBox(height: 5),
+                      Text(
+                        'Duración: $duration',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    ElevatedButton(
-                      child: const Icon(Icons.shuffle, color: Colors.green),
-                      style: ButtonStyle(backgroundColor: MaterialStateProperty.all<Color>(Colors.white), ),
-                      onPressed: () async{
-                        // Lógica para reproducir la playlist
-                        ids.shuffle();
-                        Cancion? song;
-                        for (var cancion in canciones){
-                          if(ids[0] == cancion.id){
-                            Uint8List image = await _fetchImageFromUrl('${Env.URL_PREFIX}/imagenCancion/${cancion?.id}/');
-                            Uint8List audio = await _fetchAudioFromUrl('${Env.URL_PREFIX}/audioCancion/${cancion?.id}/');
-                            Cancion cancion2 = Cancion(id: cancion?.id, nombre: cancion!.nombre, miAlbum: cancion.miAlbum, puntuacion: cancion.puntuacion, archivomp3: audio, foto: image);
-                            song = cancion2;
-                          }
-                        }
-
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => Reproductor(cancion: song, ids: ids)), // cancion: cancion dentro de reproductor cuando esto funcione
-                        );
-                      },
-                    ),
-                    const SizedBox(width: 10,),
-                    ElevatedButton.icon(
-                      onPressed: () async {
-                        // Lógica para reproducir la playlist
-                        Cancion? song;
-                        for (var cancion in canciones){
-                          if(ids[0] == cancion.id){
-                            Uint8List image = await _fetchImageFromUrl('${Env.URL_PREFIX}/imagenCancion/${cancion?.id}/');
-                            Uint8List audio = await _fetchAudioFromUrl('${Env.URL_PREFIX}/audioCancion/${cancion?.id}/');
-                            Cancion cancion2 = Cancion(id: cancion?.id, nombre: cancion!.nombre, miAlbum: cancion.miAlbum, puntuacion: cancion.puntuacion, archivomp3: audio, foto: image);
-                            song = cancion2;
-                          }
-                        }
-
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => Reproductor(cancion: canciones[0], ids: ids)), // cancion: cancion dentro de reproductor cuando esto funcione
-                        );
-                      },
-                      icon: const Icon(Icons.play_arrow),
-                      label: const Text('Play'),
-                    ),
-                  ],
-                )
-
-              ],
-            ),
-          ),
-          const SizedBox(height: 20),
-          !cargado ? const CircularProgressIndicator(): Expanded(
-            child: ListView.builder(
-              itemCount: songs.length,
-              itemBuilder: (context, index) {
-                final song = songs[index];
-                final artistas = song['artista'] as List<Map<String, dynamic>>?;
-                final artistasString =
-                artistas != null ? artistas.map((artista) => artista['nombre']).join(', ') : 'Artistas no disponibles';
-                return Dismissible(
-                  key: UniqueKey(),
-                  direction: DismissDirection.endToStart,
-                  onDismissed: (direction) {
-                    _deleteSongFromPlaylist(song['id']); // Eliminar la canción de la playlist
-                  },
-                  background: Container(
-                    alignment: Alignment.centerRight,
-                    color: Colors.red,
-                    child: const Padding(
-                      padding: EdgeInsets.only(right: 10),
-                      child: Icon(Icons.delete, color: Colors.white),
-                    ),
+                    ],
                   ),
-                  child: GestureDetector(
-                    onTap: () {
-                      // Verificar si song['cancionId'] no es nulo antes de pasar a PantallaCancion
-                      if (song['id'] != null) {
-                        // Navegar a la pantalla de detalles de la canción
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => PantallaCancion(songId: song['id'])),
-                        );
-                      }
+                  Row(
+                    children: [
+                      ElevatedButton(
+                        child: const Icon(Icons.shuffle, color: Colors.green),
+                        style: ButtonStyle(backgroundColor: MaterialStateProperty.all<Color>(Colors.white), ),
+                        onPressed: () async{
+                          // Lógica para reproducir la playlist
+                          ids.shuffle();
+                          Cancion? song;
+                          for (var cancion in canciones){
+                            if(ids[0] == cancion.id){
+                              Uint8List image = await _fetchImageFromUrl('${Env.URL_PREFIX}/imagenCancion/${cancion?.id}/');
+                              Uint8List audio = await _fetchAudioFromUrl('${Env.URL_PREFIX}/audioCancion/${cancion?.id}/');
+                              Cancion cancion2 = Cancion(id: cancion?.id, nombre: cancion!.nombre, miAlbum: cancion.miAlbum, puntuacion: cancion.puntuacion, archivomp3: audio, foto: image);
+                              song = cancion2;
+                            }
+                          }
+        
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => Reproductor(cancion: song, ids: ids)), // cancion: cancion dentro de reproductor cuando esto funcione
+                          );
+                        },
+                      ),
+                      const SizedBox(width: 10,),
+                      ElevatedButton.icon(
+                        onPressed: () async {
+                          // Lógica para reproducir la playlist
+                          Cancion? song;
+                          for (var cancion in canciones){
+                            if(ids[0] == cancion.id){
+                              Uint8List image = await _fetchImageFromUrl('${Env.URL_PREFIX}/imagenCancion/${cancion?.id}/');
+                              Uint8List audio = await _fetchAudioFromUrl('${Env.URL_PREFIX}/audioCancion/${cancion?.id}/');
+                              Cancion cancion2 = Cancion(id: cancion?.id, nombre: cancion!.nombre, miAlbum: cancion.miAlbum, puntuacion: cancion.puntuacion, archivomp3: audio, foto: image);
+                              song = cancion2;
+                            }
+                          }
+        
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => Reproductor(cancion: song, ids: ids)), // cancion: cancion dentro de reproductor cuando esto funcione
+                          );
+                        },
+                        icon: const Icon(Icons.play_arrow),
+                        label: const Text('Play'),
+                      ),
+                    ],
+                  )
+        
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            !cargado ? const CircularProgressIndicator(): Container(
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: songs.length,
+                itemBuilder: (context, index) {
+                  final song = songs[index];
+                  final artistas = song['artista'] as List<Map<String, dynamic>>?;
+                  final artistasString =
+                  artistas != null ? artistas.map((artista) => artista['nombre']).join(', ') : 'Artistas no disponibles';
+                  return Dismissible(
+                    key: UniqueKey(),
+                    direction: DismissDirection.endToStart,
+                    onDismissed: (direction) {
+                      _deleteSongFromPlaylist(song['id']); // Eliminar la canción de la playlist
                     },
-                    child: ListTile(
-                      leading: const Icon(Icons.music_note),
-                      title: Text(song['nombre'] ?? 'Nombre no disponible', style: const TextStyle(color: Colors.white)),
-                      subtitle: Text(artistasString, style: const TextStyle(color: Colors.grey)),
+                    background: Container(
+                      alignment: Alignment.centerRight,
+                      color: Colors.red,
+                      child: const Padding(
+                        padding: EdgeInsets.only(right: 10),
+                        child: Icon(Icons.delete, color: Colors.white),
+                      ),
                     ),
-                  ),
-                );
-              },
+                    child: GestureDetector(
+                      onTap: () {
+                        // Verificar si song['cancionId'] no es nulo antes de pasar a PantallaCancion
+                        if (song['id'] != null) {
+                          // Navegar a la pantalla de detalles de la canción
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => PantallaCancion(songId: song['id'])),
+                          );
+                        }
+                      },
+                      child: ListTile(
+                        leading: const Icon(Icons.music_note),
+                        title: Text(song['nombre'] ?? 'Nombre no disponible', style: const TextStyle(color: Colors.white)),
+                        subtitle: Text(artistasString, style: const TextStyle(color: Colors.grey)),
+                      ),
+                    ),
+                  );
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
       floatingActionButton: Padding(
         padding: const EdgeInsets.only(top: 10), // Ajusta el valor según sea necesario para la posición deseada
