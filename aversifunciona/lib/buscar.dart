@@ -3,6 +3,8 @@ import 'dart:async';
 
 import 'package:aversifunciona/biblioteca.dart';
 import 'package:aversifunciona/pantalla_principal.dart';
+import 'package:aversifunciona/perfilAjeno.dart';
+import 'package:aversifunciona/playlist.dart';
 import 'package:aversifunciona/pop.dart';
 import 'package:aversifunciona/reggaeton.dart';
 import 'package:aversifunciona/rock.dart';
@@ -22,6 +24,9 @@ import 'rap.dart';
 import 'env.dart';
 import 'cola.dart';
 import 'relax.dart';
+import 'pantallaCancion.dart';
+import 'pantallaCapitulo.dart';
+import 'pantallaPodcast.dart';
 
 
 Route _createRoute() {
@@ -118,20 +123,10 @@ class _pantalla_buscarState extends State<pantalla_buscar> {
 
       if (response.statusCode == 200) {
         // Procesar la respuesta de la API y mostrar los resultados
-        //List<dynamic> resultados = jsonDecode(response.body);
-
         List<dynamic> lista = jsonDecode(response.body);
 
-        List <dynamic> resultado = [];
-
-        for (var value in lista){
-          for (var valor in value.values) {
-            resultado.add(valor);
-          }
-        }
-
         setState(() {
-          resultados = resultado;
+          resultados = lista;
         });
 
         // Aquí puedes mostrar los resultados en tu aplicación de acuerdo a tus necesidades
@@ -336,23 +331,68 @@ class _pantalla_buscarState extends State<pantalla_buscar> {
     }
   }
 
-  Widget pantalla_busqueda(){
-
+  Widget pantalla_busqueda() {
     return Container(
       height: MediaQuery.of(context).size.height,
       child: ListView.builder(
         shrinkWrap: true,
         itemCount: resultados.length,
         itemBuilder: (BuildContext context, int index) {
-          String texto = resultados[index]['nombre'];
+          dynamic item = resultados[index];
+          String nombre;
+          Widget pantallaCorrespondiente;
 
-          return ListTile(
-            title: Text(texto, style: const TextStyle(color: Colors.white, fontSize: 12),),
+          if (item.containsKey('cancion')) {
+            nombre = item['cancion']['nombre'];
+            pantallaCorrespondiente = PantallaCancion(songId:item['cancion']['id']);
+          } else if (item.containsKey('capitulo')) {
+            nombre = item['capitulo']['nombre'];
+            pantallaCorrespondiente = PantallaCapitulo(capituloId:item['capitulo']['id']);
+          } else if (item.containsKey('podcast')) {
+            nombre = item['podcast']['nombre'];
+            pantallaCorrespondiente = PantallaPodcast(podcastId:item['podcast']['id'], podcastName: item['podcast']['nombre'],);
+          } /*else if (item.containsKey('artista')) {
+            nombre = item['artista']['nombre'];
+            pantallaCorrespondiente = PantallaArtista(capituloId:item['artista']['id']);
+          } else if (item.containsKey('album')) {
+            nombre = item['album']['nombre'];
+            pantallaCorrespondiente = PantallaAlbum(capituloId:item['album']['id']);
+          } else if (item.containsKey('presentador')) {
+            nombre = item['presentador']['nombre'];
+            pantallaCorrespondiente = PantallaPresentador(capituloId:item['presentador']['id']);
+          } else if (item.containsKey('playlist')) {
+            nombre = item['playlist']['nombre'];
+            pantallaCorrespondiente = Playlist(playlistId:item['playlist']['id'], playlistName: item['playlist']['nombre']);
+          } else if (item.containsKey('usuario')) {
+            nombre = item['usuario']['nombre'];
+            pantallaCorrespondiente = PerfilAjeno(usuario:item);
+          } */else {
+            // Si no es una canción, podrías asignarle un valor predeterminado,
+            // como una pantalla de error o una pantalla de detalles genérica.
+            nombre = "Elemento no reconocido";
+            pantallaCorrespondiente = pantalla_categorias();
+          }
+
+          return GestureDetector(
+            onTap: () {
+              // Solo intenta navegar si pantallaCorrespondiente no es nulo
+              //if (pantallaCorrespondiente != null) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => pantallaCorrespondiente),
+                );
+              //}
+            },
+            child: ListTile(
+              title: Text(nombre, style: const TextStyle(color: Colors.white, fontSize: 12)),
+            ),
           );
         },
       ),
     );
   }
+
+
 
   Widget pantalla_categorias(){
     return Column(
@@ -371,7 +411,7 @@ class _pantalla_buscarState extends State<pantalla_buscar> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               buildTopButton('Rap', Colors.blue.shade400),
-              buildTopButton('Clásico', Colors.red.shade400),
+              buildTopButton('Clasica', Colors.red.shade400),
             ],
           ),
         ),
@@ -449,7 +489,7 @@ class _pantalla_buscarState extends State<pantalla_buscar> {
             Navigator.push(
                context,
                MaterialPageRoute(builder: (context) => rap()));
-          } else if (title == 'Clásica') {
+          } else if (title == 'Clasica') {
             Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => clasica()));
