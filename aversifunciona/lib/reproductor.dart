@@ -9,24 +9,25 @@ import 'package:base64_audio_source/base64_audio_source.dart';
 import 'package:path_provider/path_provider.dart';
 import 'cancion.dart';
 import 'dart:convert';
+import 'cancionSin.dart';
 import 'capitulo.dart';
 
 import 'env.dart';
 
-class MyJABytesSource extends StreamAudioSource {
-  final Uint8List _buffer;
-
-  MyJABytesSource(this._buffer) : super(tag: 'MyAudioSource');
+class MyCustomSource extends StreamAudioSource {
+  final Uint8List bytes;
+  MyCustomSource(this.bytes);
 
   @override
   Future<StreamAudioResponse> request([int? start, int? end]) async {
-    // Returning the stream audio response with the parameters
+    start ??= 0;
+    end ??= bytes.length;
     return StreamAudioResponse(
-      sourceLength: _buffer.length,
-      contentLength: (end ?? _buffer.length) - (start ?? 0),
-      offset: start ?? 0,
-      stream: Stream.fromIterable([_buffer.sublist(start ?? 0, end)]),
-      contentType: 'audio/wav',
+      sourceLength: bytes.length,
+      contentLength: end - start,
+      offset: start,
+      stream: Stream.value(bytes.sublist(start, end)),
+      contentType: 'audio/mpeg',
     );
   }
 }
@@ -92,12 +93,34 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
     }
   }
 
+  Future<Uint8List> _fetchImageFromUrl(String imageUrl) async {
+    final response = await http.get(Uri.parse(imageUrl));
+    if (response.statusCode == 200) {
+      // Devuelve los bytes de la imagen
+      return response.bodyBytes;
+    } else {
+      // Si la solicitud falla, lanza un error
+      throw Exception('Failed to load image from $imageUrl');
+    }
+  }
+
+  Future<Uint8List> _fetchAudioFromUrl(String audioUrl) async {
+    final response = await http.get(Uri.parse(audioUrl));
+    if (response.statusCode == 200) {
+      // Devuelve los bytes de la imagen
+      return response.bodyBytes;
+    } else {
+      // Si la solicitud falla, lanza un error
+      throw Exception('Failed to load audio from $audioUrl');
+    }
+  }
+
   Future<void> sig_capitulo(int index) async{
 
       try {
         // Decodificar el audio base64 a bytes
 
-        String song = capitulos[index].archivomp3!;
+        Uint8List song = capitulos[index].archivomp3!;
         //song.replaceAll(RegExp('^data:audio\\/mp3;base64,'), '').replaceAll(RegExp('^data:[^;]+;base64,'), '')
         /*String song2 = ('data:audio/mp3;base64,${(utf8.decode(base64Decode(
             song.replaceAll(RegExp(r'^data:audio\/mp3;base64,'), '')
@@ -106,9 +129,14 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
             .split(',')
             .last;
         */
-        MyJABytesSource audioSource = MyJABytesSource(capitulos[index].archivomp3!);
+        MyCustomSource audioSource = MyCustomSource(capitulos[index].archivomp3!);
 
-        await mp3player.setAudioSource(audioSource);
+        await mp3player.setAudioSource(
+            ConcatenatingAudioSource(children: [
+              AudioSource.uri(Uri.dataFromBytes(
+                song,
+                mimeType: 'audio/mp3',
+              ))]));
 
         // Cargar el AudioSource en el reproductor de audio
       }
@@ -152,6 +180,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
         throw Exception('Failed to load chapters');
       }
 
+      /*
       String song = capitulos[0].archivomp3!;
       //song.replaceAll(RegExp('^data:audio\\/mp3;base64,'), '').replaceAll(RegExp('^data:[^;]+;base64,'), '')
       String song2 = ('data:audio/mp3;base64,${(utf8.decode(base64Decode(
@@ -163,8 +192,16 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
 
       // Cargar el archivo temporal en el reproductor de audio
       //await mp3player.setFilePath(tempFile.path);
+      MyCustomSource audioSource = MyCustomSource(capitulos[index].archivomp3!);
+
+      */
+
       await mp3player.setAudioSource(
-          Base64AudioSource(song2, kAudioFormatMP3));
+          ConcatenatingAudioSource(children: [
+            AudioSource.uri(Uri.dataFromBytes(
+              capitulos[0].archivomp3!,
+              mimeType: 'audio/mp3',
+            ))]));
 
       // Cargar el AudioSource en el reproductor de audio
     }
@@ -188,16 +225,23 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
         final responseData = jsonDecode(response.body);
         final utilData = responseData['cancion'];
         debugPrint(responseData.toString());
-        Cancion song_ = Cancion.fromJson(utilData);
+        CancionSin song_ = CancionSin.fromJson(utilData);
+
+        Uint8List imagen = await _fetchImageFromUrl('${Env.URL_PREFIX}/imagenCancion/${song_.id}/');
+        Uint8List audio = await _fetchAudioFromUrl('${Env.URL_PREFIX}/audioCancion/${song_.id}/');
+
+        Cancion song2 = Cancion(id: song_.id, nombre: song_.nombre, miAlbum: song_.miAlbum, puntuacion: song_.puntuacion, archivomp3: audio, foto: imagen);
 
         setState(() {
-          cancion = song_;
+          cancion = song2;
         });
 
         try {
           // Decodificar el audio base64 a bytes
 
-          String song = cancion.archivomp3!;
+          // String song = cancion.archivomp3!;
+
+          /*
           //song.replaceAll(RegExp('^data:audio\\/mp3;base64,'), '').replaceAll(RegExp('^data:[^;]+;base64,'), '')
           String song2 = ('data:audio/mp3;base64,${(utf8.decode(base64Decode(
               song.replaceAll(RegExp(r'^data:audio\/mp3;base64,'), '')
@@ -206,10 +250,15 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
               .split(',')
               .last;
 
+          */
           // Cargar el archivo temporal en el reproductor de audio
           //await mp3player.setFilePath(tempFile.path);
           await mp3player.setAudioSource(
-              Base64AudioSource(song2, kAudioFormatMP3));
+              ConcatenatingAudioSource(children: [
+                AudioSource.uri(Uri.dataFromBytes(
+                  cancion.archivomp3!,
+                  mimeType: 'audio/mp3',
+                ))]));
 
           // Cargar el AudioSource en el reproductor de audio
         }
@@ -226,8 +275,9 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
     try {
       // Decodificar el audio base64 a bytes
 
-        String song = cancion.archivomp3!;
-        //song.replaceAll(RegExp('^data:audio\\/mp3;base64,'), '').replaceAll(RegExp('^data:[^;]+;base64,'), '')
+      /*
+        String song = base64UrlEncode(cancion.archivomp3!);
+
         String song2 = ('data:audio/mp3;base64,${(utf8.decode(base64Decode(
             song.replaceAll(RegExp(r'^data:audio\/mp3;base64,'), '')
                 .replaceAll(
@@ -235,10 +285,20 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
             .split(',')
             .last;
 
+        debugPrint(song2);
+        */
+
         // Cargar el archivo temporal en el reproductor de audio
         //await mp3player.setFilePath(tempFile.path);
+
+        //MyCustomSource audioSource = MyCustomSource(base64Decode(song2));
+
         await mp3player.setAudioSource(
-            Base64AudioSource(song2, kAudioFormatMP3));
+            ConcatenatingAudioSource(children: [
+              AudioSource.uri(Uri.dataFromBytes(
+                object.archivomp3!,
+                mimeType: 'audio/mp3',
+        ))]));
 
         // Cargar el AudioSource en el reproductor de audio
       }
@@ -410,7 +470,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Image.memory(base64Url.decode(('data:image/jpeg;base64,${utf8.decode(base64Decode(cancion.foto.replaceAll(RegExp('/^data:image/[a-z]+;base64,/'), '')))}').split(',').last), height: 200, width: 200,),
+                Image.memory(cancion.foto, height: 200, width: 200,),
                 const SizedBox(height: 20.0),
                 // Agregar aquí la imagen de la canción
                 const SizedBox(height: 20.0),
@@ -489,6 +549,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
                           });
                         },
                       ),
+
 
                     const Padding(padding: EdgeInsets.symmetric(horizontal: 2) , child: Icon(Icons.volume_up, color: Colors.white,),),
 

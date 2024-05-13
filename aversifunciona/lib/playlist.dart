@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:aversifunciona/pantalla_principal.dart';
 import 'package:aversifunciona/reproductor.dart';
 import 'package:flutter/material.dart';
@@ -130,6 +132,28 @@ class _PlaylistState extends State<Playlist> {
           content: Text('Error al obtener las canciones de la playlist'),
         ),
       );
+    }
+  }
+
+  Future<Uint8List> _fetchImageFromUrl(String imageUrl) async {
+    final response = await http.get(Uri.parse(imageUrl));
+    if (response.statusCode == 200) {
+      // Devuelve los bytes de la imagen
+      return response.bodyBytes;
+    } else {
+      // Si la solicitud falla, lanza un error
+      throw Exception('Failed to load image from $imageUrl');
+    }
+  }
+
+  Future<Uint8List> _fetchAudioFromUrl(String audioUrl) async {
+    final response = await http.get(Uri.parse(audioUrl));
+    if (response.statusCode == 200) {
+      // Devuelve los bytes de la imagen
+      return response.bodyBytes;
+    } else {
+      // Si la solicitud falla, lanza un error
+      throw Exception('Failed to load audio from $audioUrl');
     }
   }
 
@@ -289,10 +313,13 @@ class _PlaylistState extends State<Playlist> {
                       onPressed: () async{
                         // Lógica para reproducir la playlist
                         ids.shuffle();
-                        CancionSin? song;
+                        Cancion? song;
                         for (var cancion in canciones){
                           if(ids[0] == cancion.id){
-                            song = cancion;
+                            Uint8List image = await _fetchImageFromUrl('${Env.URL_PREFIX}/imagenCancion/${cancion?.id}/');
+                            Uint8List audio = await _fetchAudioFromUrl('${Env.URL_PREFIX}/audioCancion/${cancion?.id}/');
+                            Cancion cancion2 = Cancion(id: cancion?.id, nombre: cancion!.nombre, miAlbum: cancion.miAlbum, puntuacion: cancion.puntuacion, archivomp3: audio, foto: image);
+                            song = cancion2;
                           }
                         }
 
@@ -304,8 +331,18 @@ class _PlaylistState extends State<Playlist> {
                     ),
                     const SizedBox(width: 10,),
                     ElevatedButton.icon(
-                      onPressed: () {
+                      onPressed: () async {
                         // Lógica para reproducir la playlist
+                        Cancion? song;
+                        for (var cancion in canciones){
+                          if(ids[0] == cancion.id){
+                            Uint8List image = await _fetchImageFromUrl('${Env.URL_PREFIX}/imagenCancion/${cancion?.id}/');
+                            Uint8List audio = await _fetchAudioFromUrl('${Env.URL_PREFIX}/audioCancion/${cancion?.id}/');
+                            Cancion cancion2 = Cancion(id: cancion?.id, nombre: cancion!.nombre, miAlbum: cancion.miAlbum, puntuacion: cancion.puntuacion, archivomp3: audio, foto: image);
+                            song = cancion2;
+                          }
+                        }
+
                         Navigator.push(
                           context,
                           MaterialPageRoute(builder: (context) => Reproductor(cancion: canciones[0], ids: ids)), // cancion: cancion dentro de reproductor cuando esto funcione
