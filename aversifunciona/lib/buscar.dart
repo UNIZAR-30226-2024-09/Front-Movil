@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:async';
 
 import 'package:aversifunciona/biblioteca.dart';
+import 'package:aversifunciona/pantallaAlbum.dart';
 import 'package:aversifunciona/pantalla_principal.dart';
 import 'package:aversifunciona/perfilAjeno.dart';
 import 'package:aversifunciona/playlist.dart';
@@ -354,10 +355,10 @@ class _pantalla_buscarState extends State<pantalla_buscar> {
           } /*else if (item.containsKey('artista')) {
             nombre = item['artista']['nombre'];
             pantallaCorrespondiente = PantallaArtista(capituloId:item['artista']['id']);
-          } else if (item.containsKey('album')) {
+          } */else if (item.containsKey('album')) {
             nombre = item['album']['nombre'];
-            pantallaCorrespondiente = PantallaAlbum(capituloId:item['album']['id']);
-          } else if (item.containsKey('presentador')) {
+            pantallaCorrespondiente = PantallaAlbum(albumId:item['album']['id'], albumName:item['album']['nombre']);
+          }/* else if (item.containsKey('presentador')) {
             nombre = item['presentador']['nombre'];
             pantallaCorrespondiente = PantallaPresentador(capituloId:item['presentador']['id']);
           } else if (item.containsKey('playlist')) {
