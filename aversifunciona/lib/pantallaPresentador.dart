@@ -8,52 +8,52 @@ import 'package:aversifunciona/getUserSession.dart';
 
 import 'historialAjeno.dart';
 
-class PantallaArtista extends StatefulWidget {
-  final int artistaId;
-  final String artistaName;
+class PantallaPresentador extends StatefulWidget {
+  final int presentadorId;
+  final String presentadorName;
 
-  PantallaArtista({required this.artistaId, required this.artistaName});
+  PantallaPresentador({required this.presentadorId, required this.presentadorName});
 
   @override
-  _PantallaArtistaState createState() => _PantallaArtistaState();
+  _PantallaPresentadorState createState() => _PantallaPresentadorState();
 }
 
-class _PantallaArtistaState extends State<PantallaArtista> {
+class _PantallaPresentadorState extends State<PantallaPresentador> {
   String _nombreS = '';
   String _correoS = '';
-  Map<String, dynamic> artistaData = {};
+  Map<String, dynamic> presentadorData = {};
 
   @override
   void initState() {
     super.initState();
-    _fetchArtistaData();
+    _fetchPresentadorData();
   }
 
-  Future<void> _fetchArtistaData() async {
+  Future<void> _fetchPresentadorData() async {
     try {
       final response = await http.post(
-        Uri.parse('${Env.URL_PREFIX}/devolverArtista/'),
+        Uri.parse('${Env.URL_PREFIX}/devolverPresentador/'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
-          'artistaId': widget.artistaId,
+          'presentadorId': widget.presentadorId,
         }),
       );
 
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
-        artistaData = responseData['artista'];
+        presentadorData = responseData['presentador'];
         setState(() {
-          _nombreS = artistaData['nombre']; // Obtener el nombre del artista
+          _nombreS = presentadorData['nombre']; // Obtener el nombre del artista
         });
 
       } else {
-        throw Exception('Error al obtener los datos del artista');
+        throw Exception('Error al obtener los datos del presentador');
       }
     } catch (e) {
       print('Error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Error al obtener los datos del artista'),
+          content: Text('Error al obtener los datos del presentador'),
         ),
       );
     }
@@ -75,7 +75,7 @@ class _PantallaArtistaState extends State<PantallaArtista> {
             Navigator.pop(context);
           },
         ),
-        title: const Text('Artista', style: TextStyle(color: Colors.white)),
+        title: const Text('Presentador', style: TextStyle(color: Colors.white)),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -88,7 +88,7 @@ class _PantallaArtistaState extends State<PantallaArtista> {
                 children: [
                   CircleAvatar(
                     radius: 50,
-                    backgroundImage: NetworkImage('${Env.URL_PREFIX}/imagenArtista/${artistaData['id']}/'), // Usar la URL de la imagen del perfil
+                    backgroundImage: NetworkImage('${Env.URL_PREFIX}/imagenPresentador/${presentadorData['id']}/'), // Usar la URL de la imagen del perfil
                   ),
                   SizedBox(width: 20),
                   Column(
@@ -136,27 +136,6 @@ class PlaylistItem extends StatelessWidget {
       padding: EdgeInsets.symmetric(vertical: 8),
       child: Row(
         children: [
-          /*child: FutureBuilder<Uint8List>(
-            future: _fetchImageFromUrl('${Env.URL_PREFIX}/imagenArtista/${artista['id']}/'),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                // Muestra un indicador de carga mientras se decodifica la imagen
-                return const CircularProgressIndicator();
-              } else if (snapshot.hasError) {
-                // Muestra un mensaje de error si ocurre un error durante la decodificación
-                return Text('Error: ${snapshot.error}');
-              } else {
-                // Si la decodificación fue exitosa, muestra la imagen
-                return Image.memory(
-                  snapshot.data!,
-                  height: 80, // Tamaño fijo para la imagen
-                  width: 80, // Tamaño fijo para la imagen
-                  fit: BoxFit.cover,
-
-                );
-              }
-            },
-          ),*/
 
           SizedBox(width: 20),
           Text(

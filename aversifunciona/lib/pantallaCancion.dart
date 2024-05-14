@@ -30,6 +30,7 @@ class _PantallaCancionState extends State<PantallaCancion> {
   List<String> playlists = []; // Lista de playlists del usuario
   List<String> _playlists = [];
   Map<String, int> _playlistsIds = {};
+  Uint8List imagen=Uint8List(0);
 
   @override
   void initState() {
@@ -52,13 +53,15 @@ class _PantallaCancionState extends State<PantallaCancion> {
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
         final songData = responseData['cancion'];
-
         setState(() {
           c_id = widget.songId;
           nombre = songData['nombre'];
           album = songData['miAlbum'];
-          archivoMP3 = songData['archivoMp3'];
+          //archivoMP3 = songData['archivoMp3'];
+
         });
+        imagen = await _fetchImageFromUrl('${Env.URL_PREFIX}/imagenCancion/${c_id}/');
+        print('${Env.URL_PREFIX}/imagenCancion/${c_id}/');
         await _fetchAlbumName(album);
         await _fetchArtistName(album);
       } else {
@@ -69,6 +72,8 @@ class _PantallaCancionState extends State<PantallaCancion> {
       // Manejar el error aquí
     }
   }
+
+
 
   Future<void> _fetchAlbumName(int albumId) async {
     try {
@@ -156,6 +161,8 @@ class _PantallaCancionState extends State<PantallaCancion> {
         print(userInfo);
         setState(() {
           _correoS = userInfo['correo'];
+          nombre = userInfo['nombre'];
+
         });
       } else {
         print('Token is null');
@@ -307,19 +314,25 @@ class _PantallaCancionState extends State<PantallaCancion> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+
+
             const SizedBox(height: 40),
             Container(
               width: 200,
               height: 200,
               color: Colors.grey.withOpacity(0.5),
-              child: const Center(
-                child: Icon(
-                  Icons.music_note,
-                  size: 100,
-                  color: Colors.white,
-                ),
+              child: Center(
+                child: imagen.isNotEmpty // Verifica si la lista de bytes de la imagen no está vacía
+                    ? Image.memory(
+                  imagen,
+                  height: 200,
+                  width: 200,
+                  fit: BoxFit.cover, // Ajusta la imagen para que cubra el contenedor
+                )
+                    : CircularProgressIndicator(), // Muestra un indicador de carga si la lista de bytes está vacía
               ),
             ),
+
             const SizedBox(height: 40),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -350,8 +363,8 @@ class _PantallaCancionState extends State<PantallaCancion> {
                 IconButton(
                   onPressed: () async{
                     // Lógica para reproducir la canción
-                    Uint8List imagen = await _fetchImageFromUrl('${Env.URL_PREFIX}/imagenCancion/$nombre/');
-                    Uint8List audio = await _fetchAudioFromUrl('${Env.URL_PREFIX}/audioCancion/$nombre/');
+                    Uint8List imagen = await _fetchImageFromUrl('${Env.URL_PREFIX}/imagenCancion/$c_id/');
+                    Uint8List audio = await _fetchAudioFromUrl('${Env.URL_PREFIX}/audioCancion/$c_id/');
                     Cancion capitulo = Cancion(id: c_id, nombre: nombre, miAlbum: 0, puntuacion: 0, archivomp3: audio, foto: imagen);
                   },
                   icon: const Icon(Icons.play_arrow, size: 40),
