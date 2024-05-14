@@ -58,7 +58,7 @@ class _ChatDeSalaState extends State<ChatDeSala> {
   // Escuchar mensajes entrantes a través del WebSocket
   void _connectToWebSocket() {
     _channel = IOWebSocketChannel.connect('ws://localhost:8000/ws/chat/${widget.idDeLaSala}/');
-    _channel!.stream.listen((message) {
+    _channel.stream.listen((message) {
       setState(() {
         _messages.add({
           'cuerpo': {
@@ -85,34 +85,35 @@ class _ChatDeSalaState extends State<ChatDeSala> {
         userId = data['usuario'];
       } else if (response.statusCode == 404) {
         // El usuario no existe
-        print('El usuario no existe');
+        debugPrint('El usuario no existe');
       } else {
         // Manejar otros códigos de estado
-        print('Error al obtener el usuario: ${response.statusCode}');
+        debugPrint('Error al obtener el usuario: ${response.statusCode}');
       }
     } catch (error) {
       // Manejar errores de red u otros errores
-      print('Error: $error');
+      debugPrint('Error: $error');
     }
   }*/
 
   Future<void> _getUserInfo() async {
     try {
       String? token = await getUserSession.getToken(); // Espera a que el token se resuelva
-      print("Token: $token");
+      debugPrint("Token: $token");
       if (token != null) {
         // Llama al método AuthService para obtener la información del usuario
         Map<String, dynamic> userInfo = await getUserSession.getUserInfo(token);
+        debugPrint(userInfo.toString());
         setState(() {
           userEmail = userInfo['correo'];
         });
-        print(userEmail);
+        debugPrint(userEmail);
 
       } else {
-        print('Token is null');
+        debugPrint('Token is null');
       }
     } catch (e) {
-      print('Error fetching user info: $e');
+      debugPrint('Error fetching user info: $e');
     }
   }
 
@@ -158,7 +159,9 @@ class _ChatDeSalaState extends State<ChatDeSala> {
         );
 
         // Obtener mensajes
+        debugPrint(data['mensajes'].toString());
         List<dynamic> mensajesData = data['mensajes'];
+
         List<Map<String, dynamic>> mensajes = mensajesData.map((message) {
           return {
             "texto": message['texto'], // Obtener el texto del mensaje
@@ -175,14 +178,14 @@ class _ChatDeSalaState extends State<ChatDeSala> {
 
       } else if (response.statusCode == 404) {
         // Mostrar un mensaje si la sala no existe
-        print('La sala no existe');
+        debugPrint('La sala no existe');
       } else {
         // Manejar otros códigos de estado
-        print('Error al cargar los mensajes: ${response.statusCode}');
+        debugPrint('Error al cargar los mensajes: ${response.statusCode}');
       }
     } catch (error) {
       // Manejar errores de red u otros errores
-      print('Error: $error');
+      debugPrint('Error: $error');
     }
   }
 
@@ -207,16 +210,16 @@ class _ChatDeSalaState extends State<ChatDeSala> {
       );
 
       if (response.statusCode == 200) {
-        print('Mensaje registrado con éxito');
+        debugPrint('Mensaje registrado con éxito');
       }else if (response.statusCode == 404) {
-        print('El emisor o la sala no existen.');
+        debugPrint('El emisor o la sala no existen.');
       } else {
         // Manejar otros códigos de estado
-        print('Error al guardar el mensaje: ${response.statusCode}');
+        debugPrint('Error al guardar el mensaje: ${response.statusCode}');
       }
     } catch (error) {
       // Manejar errores de red u otros errores
-      print('Error: $error');
+      debugPrint('Error: $error');
     }
   }
 
@@ -228,14 +231,14 @@ class _ChatDeSalaState extends State<ChatDeSala> {
       appBar: AppBar(
         backgroundColor: Colors.black,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.close, color: Colors.white),
+            icon: const Icon(Icons.close, color: Colors.white),
             onPressed: () {
               Navigator.pop(context);
             },
@@ -243,14 +246,14 @@ class _ChatDeSalaState extends State<ChatDeSala> {
         ],
         title: Text(
           _sala.nombre,
-          style: TextStyle(color: Colors.white),
+          style: const TextStyle(color: Colors.white),
         ),
       ),
       body: _isLoading
-          ? Center(
+          ? const Center(
         child: CircularProgressIndicator(),
       ) : Container(
-        color: Color(0xFF333333),
+        color: const Color(0xFF333333),
         child: Column(
           children: [
             Expanded(
@@ -268,7 +271,7 @@ class _ChatDeSalaState extends State<ChatDeSala> {
                             : CrossAxisAlignment.start,
                         children: [
                           if (isCurrentUser)
-                            Text(
+                            const Text(
                               "Tú:",
                               style: TextStyle(
                                 color: Colors.white,
@@ -278,7 +281,7 @@ class _ChatDeSalaState extends State<ChatDeSala> {
                           else
                             Text(
                               message['miUsuario'] + ':',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -326,8 +329,8 @@ class _ChatDeSalaState extends State<ChatDeSala> {
                               padding: const EdgeInsets.symmetric(horizontal: 16.0),
                               child: TextField(
                                 controller: _messageController,
-                                style: TextStyle(color: Colors.black),
-                                decoration: InputDecoration(
+                                style: const TextStyle(color: Colors.black),
+                                decoration: const InputDecoration(
                                   hintText: 'Escribe un mensaje...',
                                   hintStyle: TextStyle(color: Colors.grey),
                                   border: InputBorder.none,
@@ -355,17 +358,17 @@ class _ChatDeSalaState extends State<ChatDeSala> {
                             borderRadius: BorderRadius.circular(20),
                           ),
                         ),
-                        child: Text(
+                        child: const Text(
                           'Enviar',
                           style: TextStyle(color: Colors.white),
                         ),
                       ),
                     ],
                   ),
-                  SizedBox(height: 30),
+                  const SizedBox(height: 30),
                   Container(
                     height: 70,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       border: Border(
                         top: BorderSide(width: 1.0, color: Colors.white),
                       ),
@@ -386,7 +389,7 @@ class _ChatDeSalaState extends State<ChatDeSala> {
                               borderRadius: BorderRadius.circular(20),
                             ),
                           ),
-                          child: Column(
+                          child: const Column(
                             children: [
                               SizedBox(height: 8),
                               Icon(Icons.house_outlined, color: Colors.grey, size: 37.0),
@@ -410,7 +413,7 @@ class _ChatDeSalaState extends State<ChatDeSala> {
                               borderRadius: BorderRadius.circular(20),
                             ),
                           ),
-                          child: Column(
+                          child: const Column(
                             children: [
                               SizedBox(height: 8),
                               Icon(Icons.question_mark_outlined, color: Colors.grey, size: 37.0),
@@ -434,7 +437,7 @@ class _ChatDeSalaState extends State<ChatDeSala> {
                               borderRadius: BorderRadius.circular(20),
                             ),
                           ),
-                          child: Column(
+                          child: const Column(
                             children: [
                               SizedBox(height: 8),
                               Icon(Icons.library_books_rounded, color: Colors.grey, size: 37.0),
@@ -458,7 +461,7 @@ class _ChatDeSalaState extends State<ChatDeSala> {
                               borderRadius: BorderRadius.circular(20),
                             ),
                           ),
-                          child: Column(
+                          child: const Column(
                             children: [
                               SizedBox(height: 8),
                               Icon(Icons.chat_bubble_rounded, color: Colors.grey, size: 37.0),

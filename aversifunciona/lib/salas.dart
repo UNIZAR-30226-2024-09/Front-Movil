@@ -91,7 +91,7 @@ class _PantallaSalasState extends State<pantalla_salas> {
 
   Future<void> crearNuevaSala(String nombreSala) async {
     try {
-      var url = Uri.parse('${Env.URL_PREFIX}/CrearSalaAPI/');
+      var url = Uri.parse('${Env.URL_PREFIX}/crearSalaAPI/');
       var response = await http.post(
         url,
         body: jsonEncode({'nombre': nombreSala}),

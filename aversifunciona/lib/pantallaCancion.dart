@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:aversifunciona/reproductor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
@@ -365,7 +366,11 @@ class _PantallaCancionState extends State<PantallaCancion> {
                     // Lógica para reproducir la canción
                     Uint8List imagen = await _fetchImageFromUrl('${Env.URL_PREFIX}/imagenCancion/$c_id/');
                     Uint8List audio = await _fetchAudioFromUrl('${Env.URL_PREFIX}/audioCancion/$c_id/');
-                    Cancion capitulo = Cancion(id: c_id, nombre: nombre, miAlbum: 0, puntuacion: 0, archivomp3: audio, foto: imagen);
+                    Cancion cancion = Cancion(id: c_id, nombre: nombre, miAlbum: 0, puntuacion: 0, archivomp3: audio, foto: imagen);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => Reproductor(cancion: cancion, ids: [], playlist: 'Reproduciendo canción',)), // cancion: cancion dentro de reproductor cuando esto funcione
+                    );
                   },
                   icon: const Icon(Icons.play_arrow, size: 40),
                   color: Colors.white,

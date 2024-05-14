@@ -326,7 +326,7 @@ class _PlaylistState extends State<Playlist> {
 
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => Reproductor(cancion: song, ids: ids)), // cancion: cancion dentro de reproductor cuando esto funcione
+                            MaterialPageRoute(builder: (context) => Reproductor(cancion: song, ids: ids, playlist: 'Reproduciendo desde: $playlistName',)), // cancion: cancion dentro de reproductor cuando esto funcione
                           );
                         },
                         child: const Icon(Icons.shuffle, color: Colors.green),
@@ -347,7 +347,7 @@ class _PlaylistState extends State<Playlist> {
         
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => Reproductor(cancion: song, ids: ids)), // cancion: cancion dentro de reproductor cuando esto funcione
+                            MaterialPageRoute(builder: (context) => Reproductor(cancion: song, ids: ids, playlist: 'Reproduciendo desde: $playlistName',)), // cancion: cancion dentro de reproductor cuando esto funcione
                           );
                         },
                         icon: const Icon(Icons.play_arrow),
