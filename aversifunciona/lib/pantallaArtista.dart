@@ -20,13 +20,25 @@ class PantallaArtista extends StatefulWidget {
 
 class _PantallaArtistaState extends State<PantallaArtista> {
   String _nombreS = '';
-  String _correoS = '';
   Map<String, dynamic> artistaData = {};
+  List<dynamic> canciones = []; // Lista para almacenar las canciones del artista
 
   @override
   void initState() {
     super.initState();
     _fetchArtistaData();
+    _fetchCanciones();
+  }
+
+  Future<Uint8List> _fetchImageFromUrl(String imageUrl) async {
+    final response = await http.get(Uri.parse(imageUrl));
+    if (response.statusCode == 200) {
+      // Devuelve los bytes de la imagen
+      return response.bodyBytes;
+    } else {
+      // Si la solicitud falla, lanza un error
+      throw Exception('Failed to load image from $imageUrl');
+    }
   }
 
   Future<void> _fetchArtistaData() async {
@@ -45,7 +57,6 @@ class _PantallaArtistaState extends State<PantallaArtista> {
         setState(() {
           _nombreS = artistaData['nombre']; // Obtener el nombre del artista
         });
-
       } else {
         throw Exception('Error al obtener los datos del artista');
       }
@@ -59,9 +70,33 @@ class _PantallaArtistaState extends State<PantallaArtista> {
     }
   }
 
+  Future<void> _fetchCanciones() async {
+    try {
+      final response = await http.post(
+        Uri.parse('${Env.URL_PREFIX}/listarCancionesArtista/'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'artistaId': widget.artistaId,
+        }),
+      );
 
-
-
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        setState(() {
+          canciones = responseData['canciones']; // Obtener las canciones del artista
+        });
+      } else {
+        throw Exception('Error al obtener las canciones del artista');
+      }
+    } catch (e) {
+      print('Error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Error al obtener las canciones del artista'),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -105,75 +140,63 @@ class _PantallaArtistaState extends State<PantallaArtista> {
               ),
             ),
             SizedBox(height: 20),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              child: Text(
+                'Canciones del artista:',
+                style: TextStyle(color: Colors.white, fontSize: 18),
+              ),
+            ),
             SizedBox(height: 10),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Lista de canciones del artista
+                ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: canciones.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return Padding(
+                      padding: EdgeInsets.symmetric(vertical: 8),
+                      child: Row(
+                        children: [
+                          FutureBuilder<Uint8List>(
+                            future: _fetchImageFromUrl('${Env.URL_PREFIX}/imagenCancion/${canciones[index]['id']}/'),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState == ConnectionState.waiting) {
+                                // Muestra un indicador de carga mientras se decodifica la imagen
+                                return CircularProgressIndicator();
+                              } else if (snapshot.hasError) {
+                                // Muestra un mensaje de error si ocurre un error durante la decodificación
+                                return Text('Error: ${snapshot.error}');
+                              } else {
+                                // Si la decodificación fue exitosa, muestra la imagen
+                                return CircleAvatar(
+                                  radius: 30,
+                                  backgroundImage: MemoryImage(snapshot.data!),
+                                );
+                              }
+                            },
+                          ),
+                          SizedBox(width: 20),
+                          Text(
+                            canciones[index]['nombre'],
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+
+              ],
+            ),
           ],
         ),
       ),
     );
   }
-}
-
-class PlaylistItem extends StatelessWidget {
-  final String name;
-  final String imageUrl;
-
-  PlaylistItem({required this.name, required this.imageUrl});
-
-  Future<Uint8List> _fetchImageFromUrl(String imageUrl) async {
-    final response = await http.get(Uri.parse(imageUrl));
-    if (response.statusCode == 200) {
-      // Devuelve los bytes de la imagen
-      return response.bodyBytes;
-    } else {
-      // Si la solicitud falla, lanza un error
-      throw Exception('Failed to load image from $imageUrl');
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        children: [
-          /*child: FutureBuilder<Uint8List>(
-            future: _fetchImageFromUrl('${Env.URL_PREFIX}/imagenArtista/${artista['id']}/'),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                // Muestra un indicador de carga mientras se decodifica la imagen
-                return const CircularProgressIndicator();
-              } else if (snapshot.hasError) {
-                // Muestra un mensaje de error si ocurre un error durante la decodificación
-                return Text('Error: ${snapshot.error}');
-              } else {
-                // Si la decodificación fue exitosa, muestra la imagen
-                return Image.memory(
-                  snapshot.data!,
-                  height: 80, // Tamaño fijo para la imagen
-                  width: 80, // Tamaño fijo para la imagen
-                  fit: BoxFit.cover,
-
-                );
-              }
-            },
-          ),*/
-
-          SizedBox(width: 20),
-          Text(
-            name,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-            ),
-
-          ),
-
-        ],
-
-      ),
-
-    );
-
-  }
-
 }

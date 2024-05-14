@@ -161,7 +161,7 @@ class _PantallaCancionState extends State<PantallaCancion> {
         print(userInfo);
         setState(() {
           _correoS = userInfo['correo'];
-          nombre = userInfo['nombre'];
+          //nombre = userInfo['nombre'];
 
         });
       } else {
@@ -215,10 +215,10 @@ class _PantallaCancionState extends State<PantallaCancion> {
           final Map<String, int> playlistIds = {}; // Mapa para guardar IDs de playlists
 
           playlistData.forEach((data) {
-            final nombre = data['nombre'].toString();
+            final nombrePlaylist = data['nombre'].toString();
             final id = data['id'] as int;
-            playlists.add(nombre);
-            playlistIds[nombre] = id; // Asociar nombre de playlist con su ID
+            playlists.add(nombrePlaylist);
+            playlistIds[nombrePlaylist] = id; // Asociar nombre de playlist con su ID
           });
 
           setState(() {

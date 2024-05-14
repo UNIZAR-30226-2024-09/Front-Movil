@@ -62,6 +62,28 @@ class MusicPlayerScreen extends StatefulWidget {
   _MusicPlayerScreenState createState() => _MusicPlayerScreenState(cancion, player, ids);
 }
 
+class Letra extends StatelessWidget {
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        leading: Row(children: [
+          IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+        ]),
+        backgroundColor: Colors.black,
+      ),
+
+    );
+  }
+}
+
 class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
   bool isPlaying = false;
   double progress = 0.0; // Representa la posición de reproducción de la canción
@@ -533,10 +555,12 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
                 const SizedBox(height: 20,),
                 Center(
                   child: Row(
-                    children: [
-
-                    const Padding(padding: EdgeInsets.symmetric(horizontal: 2), child: Icon(Icons.volume_mute, color: Colors.white,),),
-
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      IconButton(
+                        icon: const Icon(Icons.volume_mute, color: Colors.white,),
+                        onPressed: () {},
+                      ),
                       Slider(
                         activeColor: Colors.green,
                         inactiveColor: Colors.grey.shade600,
@@ -549,12 +573,26 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
                           });
                         },
                       ),
-
-
-                    const Padding(padding: EdgeInsets.symmetric(horizontal: 2) , child: Icon(Icons.volume_up, color: Colors.white,),),
-
-                  ],
-                ),
+                      IconButton(
+                        icon: const Icon(Icons.volume_up, color: Colors.white,),
+                        onPressed: () {},
+                      ),
+                      SizedBox(width: 10), // Espacio entre el control de volumen y el nuevo botón
+                      GestureDetector( // Envuelve el botón con GestureDetector para manejar la navegación
+                        onTap: () {
+                          // Navegar a la otra pantalla cuando se presione el botón
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => Letra()),
+                          );
+                        },
+                        child: IconButton( // Botón con icono de micrófono
+                          icon: const Icon(Icons.mic, color: Colors.white,),
+                          onPressed: () {},
+                        ),
+                      ),
+                    ],
+                  ),
               ),
               ],
             ),
