@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:aversifunciona/verPerfil.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
@@ -12,7 +13,9 @@ import 'dart:convert';
 import 'cancionSin.dart';
 import 'capitulo.dart';
 
+import 'configuracion.dart';
 import 'env.dart';
+import 'historial.dart';
 
 class MyCustomSource extends StreamAudioSource {
   final Uint8List bytes;
@@ -31,6 +34,7 @@ class MyCustomSource extends StreamAudioSource {
     );
   }
 }
+
 
 class Reproductor extends StatelessWidget {
   var cancion; // Agregar el parámetro cancion
@@ -62,27 +66,71 @@ class MusicPlayerScreen extends StatefulWidget {
   _MusicPlayerScreenState createState() => _MusicPlayerScreenState(cancion, player, ids);
 }
 
-class Letra extends StatelessWidget {
+class Letra extends StatefulWidget {
+  //final List<LyricLine> lyrics;
+
+  //const Letra({Key? key, required this.lyrics}) : super(key: key);
+
+  @override
+  _LetraState createState() => _LetraState();
+}
+
+
+
+class _LetraState extends State<Letra> {
+  ScrollController _scrollController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        leading: Row(children: [
-          IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-        ]),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
         backgroundColor: Colors.black,
       ),
-
+      body: ListView.builder(
+        controller: _scrollController,
+        //itemCount: widget.lyrics.length,
+        itemBuilder: (context, index) {
+          return ListTile(
+            //title: Text(
+              //widget.lyrics[index].text,
+              //style: TextStyle(color: Colors.white),
+            //),
+          );
+        },
+      ),
     );
   }
-}
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollToLyric();
+  }
+
+  void _scrollToLyric() {
+    // Encuentra la línea de letra actual según el progreso de la canción
+    //final currentLyricIndex = widget.lyrics.indexWhere((lyric) {
+      //return lyric.time.inMilliseconds >= segundos * 1000;
+    //});
+
+    // Si se encontró una línea de letra válida, desplázate a ella
+    /*if (currentLyricIndex != -1) {
+      _scrollController.animateTo(
+        currentLyricIndex.toDouble() * 50, // Altura estimada de cada línea de letra
+        duration: Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      );*/
+    }
+  }
+
+
 
 class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
   bool isPlaying = false;
@@ -619,7 +667,12 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
                         },
                         child: IconButton( // Botón con icono de micrófono
                           icon: const Icon(Icons.mic, color: Colors.white,),
-                          onPressed: () {},
+                          onPressed: () {
+                            // Navegar a la otra pantalla cuando se presione el botón
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => Letra()));
+                          },
                         ),
                       ),
                     ],

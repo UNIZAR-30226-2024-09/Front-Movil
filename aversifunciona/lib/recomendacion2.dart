@@ -185,7 +185,7 @@ class _Recomendacion2ScreenState extends State<Recomendacion2Screen> {
                               });
                             },
                             child: CircleAvatar(
-                              //backgroundImage: AssetImage('assets/imagen_presentador.jpg'), // Aquí debes colocar la ruta de tu imagen
+                              backgroundImage: NetworkImage('${Env.URL_PREFIX}/imagenPresentador/${presentador['id']}/'),
                               radius: 20.0,
                               backgroundColor: seleccionado ? Colors.white : null,
                             ),
@@ -245,9 +245,9 @@ class _Recomendacion2ScreenState extends State<Recomendacion2Screen> {
                               });
                             },
                             child: CircleAvatar(
-                              //backgroundImage: AssetImage('assets/imagen_presentador.jpg'), // Aquí debes colocar la ruta de tu imagen
+                              backgroundImage: NetworkImage('${Env.URL_PREFIX}/imagenPresentador/${presentador['id']}/'),
                               radius: 20.0,
-                              backgroundColor: seleccionado ? Colors.white : null,
+                              //backgroundColor: seleccionado ? Colors.white : null,
                             ),
                           ),
                           SizedBox(height: 8.0),
