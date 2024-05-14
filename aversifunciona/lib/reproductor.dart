@@ -89,6 +89,9 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
   double progress = 0.0; // Representa la posición de reproducción de la canción
   double volume = 1.0;
   Timer? timer;
+  String duracion = '';
+  String progreso = '0:00';
+  int segundos = 0;
   var posible_podcast;
   var cancion;
   bool podcast = false;
@@ -160,6 +163,10 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
                 mimeType: 'audio/mp3',
               ))]));
 
+        setState(() {
+          duracion = '${mp3player.duration!.inMinutes}:${mp3player.duration!.inSeconds % 60 >= 10 ? mp3player.duration!.inSeconds %60: '0${mp3player.duration!.inSeconds % 60}'}';
+        });
+
         // Cargar el AudioSource en el reproductor de audio
       }
 
@@ -195,6 +202,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
 
         setState(() {
           capitulos = nuevosCapitulos;
+          duracion = '${mp3player.duration!.inMinutes}:${mp3player.duration!.inSeconds % 60 >= 10 ? mp3player.duration!.inSeconds %60: '0${mp3player.duration!.inSeconds % 60}'}';
         });
 
       } else {
@@ -282,6 +290,10 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
                   mimeType: 'audio/mp3',
                 ))]));
 
+          setState(() {
+            duracion = '${mp3player.duration!.inMinutes}:${mp3player.duration!.inSeconds % 60 >= 10 ? mp3player.duration!.inSeconds %60: '0${mp3player.duration!.inSeconds % 60}'}';
+          });
+
           // Cargar el AudioSource en el reproductor de audio
         }
 
@@ -321,6 +333,10 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
                 object.archivomp3!,
                 mimeType: 'audio/mp3',
         ))]));
+
+        setState(() {
+          duracion = '${mp3player.duration!.inMinutes}:${mp3player.duration!.inSeconds % 60 >= 10 ? mp3player.duration!.inSeconds %60: '0${mp3player.duration!.inSeconds % 60}'}';
+        });
 
         // Cargar el AudioSource en el reproductor de audio
       }
@@ -382,7 +398,14 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
           progress = 0.0;
           stopPlaying();
         } else {
+          segundos = segundos + 1;
+          progreso = '${(segundos / 60).truncate()}:${segundos % 60 >= 10 ? segundos %60: '0${segundos % 60}'}';
           progress += progressIncrement!;
+          if(progress >= 1.00){
+            progress = 0.00;
+            progreso = '0:00';
+            nextSong();
+          }
         }
       });
     });
@@ -428,11 +451,12 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
       progress = 0.0;
       if(comienzo){
         isPlaying = false;
+        segundos = 0;
         timer?.cancel();
       }
       else{
-
         isPlaying = true;
+        segundos = 0;
         startPlaying();
       }
 
@@ -459,6 +483,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
     setState(() {
       progress = 0.0;
       isPlaying = true;
+      segundos = 0;
       startPlaying();
     });
   }
@@ -471,6 +496,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
     setState(() {
       progress = 0.0;
       isPlaying = true;
+      segundos = 0;
       startPlaying();
     });
   }
@@ -507,20 +533,25 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
                           Row(
                             children: [
 
-                              const Padding(padding: EdgeInsets.symmetric(horizontal: 2), child: Text('x:xx', textAlign: TextAlign.right, style: TextStyle(color: Colors.white),)),
+                              Padding(padding: const EdgeInsets.symmetric(horizontal: 2), child: Text(progreso, textAlign: TextAlign.right, style: TextStyle(color: Colors.white),)),
                               Expanded(
                                 child: Slider(
                                   activeColor: Colors.white,
                                   inactiveColor: Colors.grey,
                                   value: progress,
                                   onChanged: (newValue) {
+                                    int secundos = 0;
                                     setState(() {
                                       progress = newValue;
+                                      secundos = (newValue * mp3player.duration!.inSeconds.toDouble()).truncate();
+                                      segundos = secundos;
+                                      progreso = '${(secundos / 60).truncate()}:${secundos % 60 >= 10 ? secundos %60: '0${secundos % 60}'}';
+                                      mp3player.seek(Duration(minutes: (secundos / 60).truncate(), seconds: secundos % 60));
                                     });
                                   },
                                 ),
                               ),
-                              const Padding(padding: EdgeInsets.symmetric(horizontal: 2) , child: Text('x:xx', textAlign: TextAlign.left, style: TextStyle(color: Colors.white),)),
+                              Padding(padding: const EdgeInsets.symmetric(horizontal: 2) , child: Text(duracion, textAlign: TextAlign.left, style: TextStyle(color: Colors.white),)),
 
                             ],
                           ),

@@ -67,7 +67,7 @@ class _PlaylistState extends State<Playlist> {
           // Otros datos...
         } else {
           // Manejar el caso en el que playlistData es null
-          print('playlistData es null');
+          debugPrint('playlistData es null');
         }
 
         setState(() {
@@ -75,14 +75,14 @@ class _PlaylistState extends State<Playlist> {
           playlistPublica = playlistData['publica'];
           // Otros datos...
         });
-        print('Playlist: $playlistName');
-        print('Pública: $playlistPublica');
+        debugPrint('Playlist: $playlistName');
+        debugPrint('Pública: $playlistPublica');
         _fetchPlaylistSongs();
       } else {
         throw Exception('Error al obtener los datos de la playlist');
       }
     } catch (e) {
-      print('Error: $e');
+      debugPrint('Error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Error al obtener los datos de la playlist'),
@@ -126,7 +126,7 @@ class _PlaylistState extends State<Playlist> {
         throw Exception('Error al obtener las canciones de la playlist');
       }
     } catch (e) {
-      print('Error: $e');
+      debugPrint('Error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Error al obtener las canciones de la playlist'),
@@ -177,7 +177,7 @@ class _PlaylistState extends State<Playlist> {
         throw Exception('Error al obtener los artistas de la canción $songId');
       }
     } catch (e) {
-      print('Error: $e');
+      debugPrint('Error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error al obtener los artistas de la canción $songId'),
@@ -211,7 +211,7 @@ class _PlaylistState extends State<Playlist> {
         throw Exception('Error al eliminar la canción de la playlist');
       }
     } catch (e) {
-      print('Error: $e');
+      debugPrint('Error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Error al eliminar la canción de la playlist'),
@@ -309,7 +309,7 @@ class _PlaylistState extends State<Playlist> {
                   Row(
                     children: [
                       ElevatedButton(
-                        child: const Icon(Icons.shuffle, color: Colors.green),
+
                         style: ButtonStyle(backgroundColor: MaterialStateProperty.all<Color>(Colors.white), ),
                         onPressed: () async{
                           // Lógica para reproducir la playlist
@@ -317,18 +317,19 @@ class _PlaylistState extends State<Playlist> {
                           Cancion? song;
                           for (var cancion in canciones){
                             if(ids[0] == cancion.id){
-                              Uint8List image = await _fetchImageFromUrl('${Env.URL_PREFIX}/imagenCancion/${cancion?.id}/');
-                              Uint8List audio = await _fetchAudioFromUrl('${Env.URL_PREFIX}/audioCancion/${cancion?.id}/');
-                              Cancion cancion2 = Cancion(id: cancion?.id, nombre: cancion!.nombre, miAlbum: cancion.miAlbum, puntuacion: cancion.puntuacion, archivomp3: audio, foto: image);
+                              Uint8List image = await _fetchImageFromUrl('${Env.URL_PREFIX}/imagenCancion/${cancion.id}/');
+                              Uint8List audio = await _fetchAudioFromUrl('${Env.URL_PREFIX}/audioCancion/${cancion.id}/');
+                              Cancion cancion2 = Cancion(id: cancion.id, nombre: cancion.nombre, miAlbum: cancion.miAlbum, puntuacion: cancion.puntuacion, archivomp3: audio, foto: image);
                               song = cancion2;
                             }
                           }
-        
+
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => Reproductor(cancion: song, ids: ids)), // cancion: cancion dentro de reproductor cuando esto funcione
                           );
                         },
+                        child: const Icon(Icons.shuffle, color: Colors.green),
                       ),
                       const SizedBox(width: 10,),
                       ElevatedButton.icon(
@@ -337,9 +338,9 @@ class _PlaylistState extends State<Playlist> {
                           Cancion? song;
                           for (var cancion in canciones){
                             if(ids[0] == cancion.id){
-                              Uint8List image = await _fetchImageFromUrl('${Env.URL_PREFIX}/imagenCancion/${cancion?.id}/');
-                              Uint8List audio = await _fetchAudioFromUrl('${Env.URL_PREFIX}/audioCancion/${cancion?.id}/');
-                              Cancion cancion2 = Cancion(id: cancion?.id, nombre: cancion!.nombre, miAlbum: cancion.miAlbum, puntuacion: cancion.puntuacion, archivomp3: audio, foto: image);
+                              Uint8List image = await _fetchImageFromUrl('${Env.URL_PREFIX}/imagenCancion/${cancion.id}/');
+                              Uint8List audio = await _fetchAudioFromUrl('${Env.URL_PREFIX}/audioCancion/${cancion.id}/');
+                              Cancion cancion2 = Cancion(id: cancion.id, nombre: cancion.nombre, miAlbum: cancion.miAlbum, puntuacion: cancion.puntuacion, archivomp3: audio, foto: image);
                               song = cancion2;
                             }
                           }
@@ -415,7 +416,7 @@ class _PlaylistState extends State<Playlist> {
               MaterialPageRoute(builder: (context) => Cola()), // Suponiendo que Cola sea la pantalla a la que quieres navegar
             );
           },
-          child: Icon(Icons.queue_music),
+          child: const Icon(Icons.queue_music),
         ),
       ),
       bottomNavigationBar: Container(
@@ -558,7 +559,7 @@ class _PlaylistState extends State<Playlist> {
         throw Exception('Error al cambiar la privacidad de la playlist');
       }
     } catch (e) {
-      print('Error: $e');
+      debugPrint('Error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Error al cambiar la privacidad de la playlist'),
@@ -619,7 +620,7 @@ class _PlaylistState extends State<Playlist> {
         throw Exception('Error al añadir el colaborador');
       }
     } catch (e) {
-      print('Error: $e');
+      debugPrint('Error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Error al añadir el colaborador'),
