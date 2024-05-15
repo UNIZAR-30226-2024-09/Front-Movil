@@ -143,54 +143,34 @@ class _ChatDeSalaState extends State<ChatDeSala> {
       var url = Uri.parse('${Env.URL_PREFIX}/cargarMensajesAPI/');
       var response = await http.post(
         url,
-        body: jsonEncode({'salaid': widget.idDeLaSala}), // Reemplaza 'idDeLaSala' con el ID real de la sala
+        body: jsonEncode({'salaid': widget.idDeLaSala}),
         headers: {'Content-Type': 'application/json'},
       );
 
       if (response.statusCode == 200) {
-        // Decodificar la respuesta JSON
         final Map<String, dynamic> data = jsonDecode(response.body);
-
-        // Obtener información sobre la sala
-        Map<String, dynamic> salaData = data['miSala'];
-        Sala sala = Sala(
-          id: salaData['id'],
-          nombre: salaData['nombre'],
-        );
-
-        // Obtener mensajes
-        debugPrint(data['mensajes'].toString());
-        List<dynamic> mensajesData = data['mensajes'];
+        final List<dynamic> mensajesData = data['mensajes'];
 
         List<Map<String, dynamic>> mensajes = mensajesData.map((message) {
           return {
-            "texto": message['texto'], // Obtener el texto del mensaje
-            "miUsuario": message['miUsuario'], // Obtener el autor del mensaje
+            "texto": message['texto'],
+            "miUsuario": message['miUsuario'],
           };
         }).toList();
 
-        // Actualizar el estado
         setState(() {
-          _sala = sala;
-          _messages = mensajes;
-          _messages = _messages.reversed.toList(); // Invertir la lista para mostrar los mensajes más recientes al final
+          _messages = mensajes.reversed.toList();
+          _isLoading = false;
         });
-
       } else if (response.statusCode == 404) {
-        // Mostrar un mensaje si la sala no existe
         debugPrint('La sala no existe');
       } else {
-        // Manejar otros códigos de estado
         debugPrint('Error al cargar los mensajes: ${response.statusCode}');
       }
     } catch (error) {
-      // Manejar errores de red u otros errores
-      debugPrint('Error: $error');
+      debugPrint('Error loadMessages: $error');
     }
   }
-
-
-
   Future<void> _saveMessage(String message) async {
     try {
       // SharedPreferences prefs = await SharedPreferences.getInstance();

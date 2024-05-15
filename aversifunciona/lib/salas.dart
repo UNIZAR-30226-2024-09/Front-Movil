@@ -55,8 +55,8 @@ class _PantallaSalasState extends State<pantalla_salas> {
 
   Future<void> listarSalas() async {
     try {
-    var url = Uri.parse('${Env.URL_PREFIX}/listarSalas/');
-    var response = await http.get(
+      var url = Uri.parse('${Env.URL_PREFIX}/listarSalas/');
+      var response = await http.get(
         url,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
@@ -69,23 +69,20 @@ class _PantallaSalasState extends State<pantalla_salas> {
       List<dynamic> salasData = data['salas'];
 
       // Mapear los datos de las salas a objetos Sala
-      _listaSalas = salasData.map((salaData) {
-      return Sala.fromJson(salaData);
-      }).toList();
-
-
+      setState(() {
+        _listaSalas = salasData.map((salaData) {
+          return Sala.fromJson(salaData);
+        }).toList();
+        _isLoading = false;
+      });
+      //}).toList();
     } else {
         // Manejar otros códigos de estado
         print('Error al listar las salas: ${response.statusCode}');
       }
     } catch (error) {
       // Manejar errores de red u otros errores
-      print('Error: $error');
-    }
-    finally {
-      setState(() {
-        _isLoading = false;
-      });
+      print('Error listarSalas: $error');
     }
   }
 
@@ -101,6 +98,7 @@ class _PantallaSalasState extends State<pantalla_salas> {
       if (response.statusCode == 200) {
         // La sala se creó exitosamente
         print('Sala creada exitosamente');
+        listarSalas();
       } else {
         // Manejar otros códigos de estado
         print('Error al crear la sala: ${response.statusCode}');
