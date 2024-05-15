@@ -105,17 +105,20 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
     posible_podcast = song;
     cancion = song;
     mp3player = player;
-    if(index_[0] == -33){
-      ids = [];
-      podcast = true;
-    }
-    else if (index_[0] == -32){
-      ids = [];
-      capitulo = true;
-    }
-    else{
+    if (index_.isEmpty){
       ids = index_;
     }
+    else{
+      if(index_[0] == -33){
+        ids = [];
+        podcast = true;
+      }
+      else if (index_[0] == -32){
+        ids = [];
+        capitulo = true;
+      }
+    }
+
   }
 
   Future<Uint8List> _fetchImageFromUrl(String imageUrl) async {
@@ -349,7 +352,6 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
 
   @override
   void initState(){
-    super.initState();
 
     if(podcast){
       ids = [];
@@ -361,7 +363,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
     else{
       cargar_cancion(cancion, ids, 0);
     }
-
+    super.initState();
   }
   void togglePlay() {
 

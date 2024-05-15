@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:aversifunciona/biblioteca.dart';
 import 'package:aversifunciona/pantallaAlbum.dart';
@@ -7,7 +8,6 @@ import 'package:aversifunciona/pantallaArtista.dart';
 import 'package:aversifunciona/pantallaPresentador.dart';
 import 'package:aversifunciona/pantalla_principal.dart';
 import 'package:aversifunciona/perfilAjeno.dart';
-import 'package:aversifunciona/playlist.dart';
 import 'package:aversifunciona/pop.dart';
 import 'package:aversifunciona/reggaeton.dart';
 import 'package:aversifunciona/rock.dart';
@@ -106,6 +106,17 @@ class _pantalla_buscarState extends State<pantalla_buscar> {
     }
   }
 
+  Future<Uint8List> _fetchImageFromUrl(String imageUrl) async {
+    final response = await http.get(Uri.parse(imageUrl));
+    if (response.statusCode == 200) {
+      // Devuelve los bytes de la imagen
+      return response.bodyBytes;
+    } else {
+      // Si la solicitud falla, lanza un error
+      throw Exception('Failed to load image from $imageUrl');
+    }
+  }
+
   void _agregarAlHistorial(String term) {
     setState(() {
       elHistorial.add(HistorialItem(term, DateTime.now()));
@@ -133,14 +144,14 @@ class _pantalla_buscarState extends State<pantalla_buscar> {
         });
 
         // Aquí puedes mostrar los resultados en tu aplicación de acuerdo a tus necesidades
-        //print('Resultados de la búsqueda: $resultados');
+        //debugPrint('Resultados de la búsqueda: $resultados');
       } else {
         // Mostrar un mensaje de error si la solicitud no fue exitosa
-        print('Error al realizar la búsqueda');
+        debugPrint('Error al realizar la búsqueda');
       }
     } catch (e) {
       // Manejar cualquier error que ocurra durante la búsqueda
-      print("Error al realizar la búsqueda: $e");
+      debugPrint("Error al realizar la búsqueda: $e");
     }
   }
 
@@ -208,7 +219,7 @@ class _pantalla_buscarState extends State<pantalla_buscar> {
               MaterialPageRoute(builder: (context) => Cola()), // Suponiendo que Cola sea la pantalla a la que quieres navegar
             );
           },
-          child: Icon(Icons.queue_music),
+          child: const Icon(Icons.queue_music),
         ),
       ),
       bottomNavigationBar: Container(
@@ -341,11 +352,13 @@ class _pantalla_buscarState extends State<pantalla_buscar> {
         shrinkWrap: true,
         itemCount: resultados.length,
         itemBuilder: (BuildContext context, int index) {
+          Uint8List imagen; // Usarlo para mostrar imagenes pequeñas pero por ahora dejarlo como algo secundario...
           dynamic item = resultados[index];
           String nombre;
           Widget pantallaCorrespondiente;
 
           if (item.containsKey('cancion')) {
+            // como una pantalla de error o una pantalla de detalles genérica.
             nombre = item['cancion']['nombre'];
             pantallaCorrespondiente = PantallaCancion(songId:item['cancion']['id']);
           } else if (item.containsKey('capitulo')) {
