@@ -285,7 +285,7 @@ class _PantallaCancionState extends State<PantallaCancion> {
   }
 
   void _copySongUrlToClipboard() {
-    String songUrl = 'localhost:8000/musifyc/$c_id/';
+    String songUrl = '${Env.URL_PREFIX}/musifyc/${c_id}/';
     Clipboard.setData(ClipboardData(text: songUrl)).then((_) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(

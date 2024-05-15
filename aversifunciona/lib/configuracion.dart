@@ -98,7 +98,7 @@ class _ConfiguracionState extends State<Configuracion> {
                         // Imagen del perfil del usuario
                         backgroundColor: Colors.grey,
                         radius: 20,
-                        backgroundImage: AssetImage('assets/user_profile.jpg'),
+                        backgroundImage: AssetImage('lib/panda.jpg'),
                       ),
                       SizedBox(width: 10),
                       Text(

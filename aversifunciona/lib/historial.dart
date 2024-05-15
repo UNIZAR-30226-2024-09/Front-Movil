@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:aversifunciona/biblioteca.dart';
 import 'package:aversifunciona/buscar.dart';
@@ -31,6 +32,18 @@ class _historialState extends State<historial> {
   void initState() {
     super.initState();
     _getListarHistorial();
+  }
+
+// Método para cargar una imagen desde una URL
+  Future<Uint8List> _fetchImageFromUrl(String imageUrl) async {
+    final response = await http.get(Uri.parse(imageUrl));
+    if (response.statusCode == 200) {
+      // Devuelve los bytes de la imagen
+      return response.bodyBytes;
+    } else {
+      // Si la solicitud falla, lanza un error
+      throw Exception('Failed to load image from $imageUrl');
+    }
   }
 
   Future<void> _getListarHistorial() async {
@@ -100,9 +113,26 @@ class _historialState extends State<historial> {
               itemCount: _historial.length,
               itemBuilder: (context, index) {
                 final cancion = _historial[index];
-                return ListTile(
+                return   ListTile(
+                  leading: FutureBuilder<Uint8List>(
+                    future: _fetchImageFromUrl('${Env.URL_PREFIX}/imagenCancion/${cancion['id']}/'),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const SizedBox(); // Devuelve un widget vacío mientras espera
+                      } else if (snapshot.hasError) {
+                        return const Icon(Icons.error);
+                      } else {
+                        return Image.memory(
+                          snapshot.data!,
+                          width: 50,
+                          height: 50,
+                          fit: BoxFit.cover,
+                        );
+                      }
+                    },
+                  ),
                   title: Text(
-                    cancion['nombre'] ?? '', // Reemplaza 'nombre' por el nombre del campo que contiene el nombre de la canción
+                    cancion['nombre'] ?? '',
                     style: TextStyle(color: Colors.white),
                   ),
                   onTap: () {
