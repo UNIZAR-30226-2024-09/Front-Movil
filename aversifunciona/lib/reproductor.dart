@@ -11,6 +11,7 @@ import 'cancion.dart';
 import 'dart:convert';
 import 'cancionSin.dart';
 import 'capitulo.dart';
+import 'package:flutter/services.dart' show rootBundle;
 
 import 'env.dart';
 
@@ -62,27 +63,95 @@ class MusicPlayerScreen extends StatefulWidget {
   _MusicPlayerScreenState createState() => _MusicPlayerScreenState(cancion, player, ids);
 }
 
-class Letra extends StatelessWidget {
+
+class Letra extends StatefulWidget {
+  final String letraPath; // Ruta del archivo de letra
+  final AudioPlayer player;
+
+  const Letra({Key? key, required this.letraPath, required this.player}) : super(key: key);
+
+  @override
+  _LetraState createState() => _LetraState();
+}
+
+class _LetraState extends State<Letra> {
+  List<Map<String, dynamic>> letraData = [];
+  String currentLine = "";
+  Timer? timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadLyrics();
+    _startLyricsSync();
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _loadLyrics() async {
+    try {
+      final lyricsString = await rootBundle.loadString(widget.letraPath);
+      final List<Map<String, dynamic>> parsedLyrics = json.decode(lyricsString).cast<Map<String, dynamic>>();
+      setState(() {
+        letraData = parsedLyrics;
+      });
+    } catch (e) {
+      print('Error cargando la letra: $e');
+    }
+  }
+
+  void _startLyricsSync() {
+    timer = Timer.periodic(const Duration(seconds: 1), (Timer t) {
+      final currentPosition = widget.player.position.inSeconds;
+
+      // Encuentra la línea correspondiente al tiempo actual
+      final currentLyricsLine = letraData.lastWhere(
+            (line) => line["time"] <= currentPosition,
+        orElse: () => {"text": ""},
+      );
+
+      setState(() {
+        currentLine = currentLyricsLine["text"];
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        leading: Row(children: [
-          IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-        ]),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
         backgroundColor: Colors.black,
       ),
-
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                currentLine,
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Colors.white, fontSize: 24),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
+
 
 class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
   bool isPlaying = false;
@@ -531,7 +600,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
                 ),
                 const SizedBox(height: 20.0),
 
-                    
+
                           Row(
                             children: [
 
@@ -557,7 +626,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
 
                             ],
                           ),
-                            
+
 
                 const SizedBox(height: 20.0),
                 Row(
@@ -611,19 +680,22 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
                         onPressed: () {},
                       ),
                       SizedBox(width: 10), // Espacio entre el control de volumen y el nuevo botón
-                      GestureDetector( // Envuelve el botón con GestureDetector para manejar la navegación
-                        onTap: () {
-                          // Navegar a la otra pantalla cuando se presione el botón
+                      IconButton(
+                        icon: const Icon(Icons.mic, color: Colors.white),
+                        onPressed: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => Letra()),
+                            MaterialPageRoute(
+                              builder: (context) => Letra(
+                                letraPath: 'lib/letras/${cancion.id}.js',
+                                player: mp3player,
+                              ),
+                            ),
                           );
                         },
-                        child: IconButton( // Botón con icono de micrófono
-                          icon: const Icon(Icons.mic, color: Colors.white,),
-                          onPressed: () {},
-                        ),
                       ),
+
+
                     ],
                   ),
               ),

@@ -369,7 +369,7 @@ class _PantallaCancionState extends State<PantallaCancion> {
                     Cancion cancion = Cancion(id: c_id, nombre: nombre, miAlbum: 0, puntuacion: 0, archivomp3: audio, foto: imagen);
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => Reproductor(cancion: cancion, ids: [], playlist: 'Reproduciendo canción',)), // cancion: cancion dentro de reproductor cuando esto funcione
+                      MaterialPageRoute(builder: (context) => Reproductor(cancion: cancion, ids: [], /*playlist: 'Reproduciendo canción',*/)), // cancion: cancion dentro de reproductor cuando esto funcione
                     );
                   },
                   icon: const Icon(Icons.play_arrow, size: 40),
