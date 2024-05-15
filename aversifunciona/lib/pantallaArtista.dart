@@ -70,6 +70,34 @@ class _PantallaArtistaState extends State<PantallaArtista> {
     }
   }
 
+  /*Future<void> _fetchCanciones() async {
+    try {
+      final response = await http.post(
+        Uri.parse('${Env.URL_PREFIX}/listarCancionesArtista/'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'artistaId': widget.artistaId,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        setState(() {
+          canciones = responseData['canciones']; // Obtener las canciones del artista
+        });
+      } else {
+        throw Exception('Error al obtener las canciones del artista');
+      }
+    } catch (e) {
+      print('Error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Error al obtener las canciones del artista'),
+        ),
+      );
+    }
+  }*/
+
   Future<void> _fetchCanciones() async {
     try {
       final response = await http.post(
@@ -151,9 +179,9 @@ class _PantallaArtistaState extends State<PantallaArtista> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Lista de canciones del artista
                 ListView.builder(
                   shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(), // Deshabilitar el desplazamiento de la lista interna
                   itemCount: canciones.length,
                   itemBuilder: (BuildContext context, int index) {
                     return Padding(
@@ -164,13 +192,10 @@ class _PantallaArtistaState extends State<PantallaArtista> {
                             future: _fetchImageFromUrl('${Env.URL_PREFIX}/imagenCancion/${canciones[index]['id']}/'),
                             builder: (context, snapshot) {
                               if (snapshot.connectionState == ConnectionState.waiting) {
-                                // Muestra un indicador de carga mientras se decodifica la imagen
                                 return CircularProgressIndicator();
                               } else if (snapshot.hasError) {
-                                // Muestra un mensaje de error si ocurre un error durante la decodificación
                                 return Text('Error: ${snapshot.error}');
                               } else {
-                                // Si la decodificación fue exitosa, muestra la imagen
                                 return CircleAvatar(
                                   radius: 30,
                                   backgroundImage: MemoryImage(snapshot.data!),
@@ -191,7 +216,6 @@ class _PantallaArtistaState extends State<PantallaArtista> {
                     );
                   },
                 ),
-
               ],
             ),
           ],
