@@ -318,7 +318,7 @@ class _AlbumState extends State<Album> {
 
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => Reproductor(cancion: song, ids: ids, /*playlist: 'Reproduciendo desde: $playlistName',*/)), // cancion: cancion dentro de reproductor cuando esto funcione
+                            MaterialPageRoute(builder: (context) => Reproductor(cancion: song, ids: ids, playlist: 'Reproduciendo desde: $albumName',)), // cancion: cancion dentro de reproductor cuando esto funcione
 
                           );
                         },
@@ -340,7 +340,7 @@ class _AlbumState extends State<Album> {
 
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => Reproductor(cancion: song, ids: ids, /*playlist: 'Reproduciendo desde: $playlistName',*/)), // cancion: cancion dentro de reproductor cuando esto funcione
+                            MaterialPageRoute(builder: (context) => Reproductor(cancion: song, ids: ids, playlist: 'Reproduciendo desde: $albumName',)), // cancion: cancion dentro de reproductor cuando esto funcione
 
                           );
                         },
