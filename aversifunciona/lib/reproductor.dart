@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:base64_audio_source/base64_audio_source.dart';
+import 'package:path_provider/path_provider.dart';
 import 'cancion.dart';
 import 'dart:convert';
 import 'cancionSin.dart';
@@ -12,12 +14,30 @@ import 'capitulo.dart';
 
 import 'env.dart';
 
+class MyCustomSource extends StreamAudioSource {
+  final Uint8List bytes;
+  MyCustomSource(this.bytes);
+
+  @override
+  Future<StreamAudioResponse> request([int? start, int? end]) async {
+    start ??= 0;
+    end ??= bytes.length;
+    return StreamAudioResponse(
+      sourceLength: bytes.length,
+      contentLength: end - start,
+      offset: start,
+      stream: Stream.value(bytes.sublist(start, end)),
+      contentType: 'audio/mpeg',
+    );
+  }
+}
+
 class Reproductor extends StatelessWidget {
   var cancion; // Agregar el parámetro cancion
   List<int> ids;
-  String playlist;
 
-  Reproductor({required this.cancion, required this.ids, required this.playlist});
+                    // Create a player
+  Reproductor({required this.cancion, required this.ids});
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -27,7 +47,7 @@ class Reproductor extends StatelessWidget {
         primaryColor: Colors.white,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MusicPlayerScreen(cancion: cancion, ids: ids, playlist: playlist),
+      home: MusicPlayerScreen(cancion: cancion, ids: ids,),
     );
   }
 }
@@ -35,12 +55,11 @@ class Reproductor extends StatelessWidget {
 class MusicPlayerScreen extends StatefulWidget {
   var cancion; // Agregar el parámetro cancion
   List<int> ids;
-  String playlist;
-  MusicPlayerScreen({required this.cancion, required this.ids, required this.playlist});
+  MusicPlayerScreen({required this.cancion, required this.ids});
   final player = AudioPlayer();
 
   @override
-  _MusicPlayerScreenState createState() => _MusicPlayerScreenState(cancion, player, ids, playlist);
+  _MusicPlayerScreenState createState() => _MusicPlayerScreenState(cancion, player, ids);
 }
 
 class Letra extends StatelessWidget {
@@ -72,7 +91,6 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
   Timer? timer;
   String duracion = '';
   String progreso = '0:00';
-  String playlist = '';
   int segundos = 0;
   var posible_podcast;
   var cancion;
@@ -83,9 +101,8 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
   AudioPlayer mp3player = AudioPlayer();
   List<int> ids = [];
 
-  _MusicPlayerScreenState(var song, AudioPlayer player, List<int> index_, String playlist_){
+  _MusicPlayerScreenState(var song, AudioPlayer player, List<int> index_){
     posible_podcast = song;
-    playlist = playlist_;
     cancion = song;
     mp3player = player;
     if (index_.isEmpty){
@@ -128,28 +145,37 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
 
   Future<void> sig_capitulo(int index) async{
 
-    try {
-      // Decodificar el audio base64 a bytes
+      try {
+        // Decodificar el audio base64 a bytes
 
-      Uint8List song = capitulos[index].archivomp3!;
+        Uint8List song = capitulos[index].archivomp3!;
+        //song.replaceAll(RegExp('^data:audio\\/mp3;base64,'), '').replaceAll(RegExp('^data:[^;]+;base64,'), '')
+        /*String song2 = ('data:audio/mp3;base64,${(utf8.decode(base64Decode(
+            song.replaceAll(RegExp(r'^data:audio\/mp3;base64,'), '')
+                .replaceAll(
+                RegExp(r'^data:[^;]+;base64,'), ''))))}')
+            .split(',')
+            .last;
+        */
+        MyCustomSource audioSource = MyCustomSource(capitulos[index].archivomp3!);
 
-      await mp3player.setAudioSource(
-          ConcatenatingAudioSource(children: [
-            AudioSource.uri(Uri.dataFromBytes(
-              song,
-              mimeType: 'audio/mp3',
-            ))]));
+        await mp3player.setAudioSource(
+            ConcatenatingAudioSource(children: [
+              AudioSource.uri(Uri.dataFromBytes(
+                song,
+                mimeType: 'audio/mp3',
+              ))]));
 
-      setState(() {
-        duracion = '${mp3player.duration!.inMinutes}:${mp3player.duration!.inSeconds % 60 >= 10 ? mp3player.duration!.inSeconds %60: '0${mp3player.duration!.inSeconds % 60}'}';
-      });
+        setState(() {
+          duracion = '${mp3player.duration!.inMinutes}:${mp3player.duration!.inSeconds % 60 >= 10 ? mp3player.duration!.inSeconds %60: '0${mp3player.duration!.inSeconds % 60}'}';
+        });
 
-      // Cargar el AudioSource en el reproductor de audio
-    }
+        // Cargar el AudioSource en el reproductor de audio
+      }
 
-    catch (e) {
-      debugPrint("Error cargando audio base64: $e");
-    }
+      catch (e) {
+        print("Error cargando audio base64: $e");
+      }
 
   }
 
@@ -187,6 +213,22 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
         throw Exception('Failed to load chapters');
       }
 
+      /*
+      String song = capitulos[0].archivomp3!;
+      //song.replaceAll(RegExp('^data:audio\\/mp3;base64,'), '').replaceAll(RegExp('^data:[^;]+;base64,'), '')
+      String song2 = ('data:audio/mp3;base64,${(utf8.decode(base64Decode(
+          song.replaceAll(RegExp(r'^data:audio\/mp3;base64,'), '')
+              .replaceAll(
+              RegExp(r'^data:[^;]+;base64,'), ''))))}')
+          .split(',')
+          .last;
+
+      // Cargar el archivo temporal en el reproductor de audio
+      //await mp3player.setFilePath(tempFile.path);
+      MyCustomSource audioSource = MyCustomSource(capitulos[index].archivomp3!);
+
+      */
+
       await mp3player.setAudioSource(
           ConcatenatingAudioSource(children: [
             AudioSource.uri(Uri.dataFromBytes(
@@ -194,11 +236,12 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
               mimeType: 'audio/mp3',
             ))]));
 
+      // Cargar el AudioSource en el reproductor de audio
     }
 
 
     catch (e) {
-      debugPrint("Error cargando audio base64: $e");
+      print("Error cargando audio base64: $e");
     }
   }
 
@@ -206,8 +249,6 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
     if (ids.isNotEmpty) {
       final response = await http.post(
         Uri.parse('${Env.URL_PREFIX}/devolverCancion/'),
-
-
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'cancionId': ids[index],
@@ -229,6 +270,22 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
         });
 
         try {
+          // Decodificar el audio base64 a bytes
+
+          // String song = cancion.archivomp3!;
+
+          /*
+          //song.replaceAll(RegExp('^data:audio\\/mp3;base64,'), '').replaceAll(RegExp('^data:[^;]+;base64,'), '')
+          String song2 = ('data:audio/mp3;base64,${(utf8.decode(base64Decode(
+              song.replaceAll(RegExp(r'^data:audio\/mp3;base64,'), '')
+                  .replaceAll(
+                  RegExp(r'^data:[^;]+;base64,'), ''))))}')
+              .split(',')
+              .last;
+
+          */
+          // Cargar el archivo temporal en el reproductor de audio
+          //await mp3player.setFilePath(tempFile.path);
           await mp3player.setAudioSource(
               ConcatenatingAudioSource(children: [
                 AudioSource.uri(Uri.dataFromBytes(
@@ -240,10 +297,11 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
             duracion = '${mp3player.duration!.inMinutes}:${mp3player.duration!.inSeconds % 60 >= 10 ? mp3player.duration!.inSeconds %60: '0${mp3player.duration!.inSeconds % 60}'}';
           });
 
+          // Cargar el AudioSource en el reproductor de audio
         }
 
         catch (e) {
-          debugPrint("Error cargando audio base64: $e");
+          print("Error cargando audio base64: $e");
         }
 
       }
@@ -252,23 +310,43 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
 
   Future<void> cargar_cancion(var object, List<int> ids, int index) async{
     try {
+      // Decodificar el audio base64 a bytes
 
-      await mp3player.setAudioSource(
-          ConcatenatingAudioSource(children: [
-            AudioSource.uri(Uri.dataFromBytes(
-              object.archivomp3!,
-              mimeType: 'audio/mp3',
-            ))]));
+      /*
+        String song = base64UrlEncode(cancion.archivomp3!);
 
-      setState(() {
-        duracion = '${mp3player.duration!.inMinutes}:${mp3player.duration!.inSeconds % 60 >= 10 ? mp3player.duration!.inSeconds %60: '0${mp3player.duration!.inSeconds % 60}'}';
-      });
+        String song2 = ('data:audio/mp3;base64,${(utf8.decode(base64Decode(
+            song.replaceAll(RegExp(r'^data:audio\/mp3;base64,'), '')
+                .replaceAll(
+                RegExp(r'^data:[^;]+;base64,'), ''))))}')
+            .split(',')
+            .last;
 
-    }
+        debugPrint(song2);
+        */
+
+        // Cargar el archivo temporal en el reproductor de audio
+        //await mp3player.setFilePath(tempFile.path);
+
+        //MyCustomSource audioSource = MyCustomSource(base64Decode(song2));
+
+        await mp3player.setAudioSource(
+            ConcatenatingAudioSource(children: [
+              AudioSource.uri(Uri.dataFromBytes(
+                object.archivomp3!,
+                mimeType: 'audio/mp3',
+        ))]));
+
+        setState(() {
+          duracion = '${mp3player.duration!.inMinutes}:${mp3player.duration!.inSeconds % 60 >= 10 ? mp3player.duration!.inSeconds %60: '0${mp3player.duration!.inSeconds % 60}'}';
+        });
+
+        // Cargar el AudioSource en el reproductor de audio
+      }
 
 
     catch (e) {
-      debugPrint("Error cargando audio base64: $e");
+      print("Error cargando audio base64: $e");
     }
   }
 
@@ -291,6 +369,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
 
     setState(() {
       isPlaying = !isPlaying;
+      // Simulamos el progreso de la canción
       if (isPlaying) {
         startPlaying();
       } else {
@@ -300,9 +379,11 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
   }
 
   void startPlaying() async{
-
+    // Cancelar el temporizador anterior si existe
     mp3player.play();
     timer?.cancel();
+    // Aquí podrías iniciar la reproducción de la canción
+    // Por ahora solo actualizamos el progreso de forma simulada
     double? progressIncrement;
     if (mp3player.duration?.inSeconds == null){
       progressIncrement = 0.01;
@@ -333,14 +414,14 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
   }
 
   void stopPlaying() async{
-
+    // Detener el temporizador si existe
     await mp3player.pause();
     timer?.cancel();
     isPlaying = false;
   }
 
   void nextSong() async{
-
+    // Aquí iría la lógica para avanzar a la siguiente canción
     timer?.cancel();
     bool comienzo = false;
     await mp3player.stop();
@@ -385,7 +466,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
   }
 
   void previousSong() async{
-
+    // Aquí iría la lógica para volver a la canción anterior
     timer?.cancel();
     if (index <= 0){
       index = 0;
@@ -424,7 +505,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
 
   @override
   void dispose() {
-
+    // Asegurarse de cancelar el temporizador cuando se desmonta el widget
     timer?.cancel();
     mp3player.dispose();
     super.dispose();
@@ -433,114 +514,87 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        leading: IconButton(
-          icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white, size: 30.0,),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        title: Text(
-          playlist,
-          style: const TextStyle(color: Colors.white, fontSize: 14),
-        ),
-      ),
       body: Stack(
         children: [
           Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-
-                Image.memory(cancion.foto, height: 250, width: 250,),
+                Image.memory(cancion.foto, height: 200, width: 200,),
+                const SizedBox(height: 20.0),
+                // Agregar aquí la imagen de la canción
                 const SizedBox(height: 20.0),
 
                 Text(
-                  cancion.nombre,
+                  cancion.nombre, // Nombre de la canción actual
                   style: const TextStyle(fontSize: 20.0, color: Colors.white),
                 ),
                 const SizedBox(height: 20.0),
 
+                    
+                          Row(
+                            children: [
 
-                Row(
-                  children: [
-                    const SizedBox(width: 5,),
-                    Padding(padding: const EdgeInsets.symmetric(horizontal: 2), child: Text(progreso, textAlign: TextAlign.right, style: const TextStyle(color: Colors.white),)),
-                    Expanded(
-                      child: Slider(
-                        activeColor: Colors.white,
-                        inactiveColor: Colors.grey,
-                        value: progress,
-                        onChanged: (newValue) {
-                          int secundos = 0;
-                          setState(() {
-                            progress = newValue;
-                            secundos = (newValue * mp3player.duration!.inSeconds.toDouble()).truncate();
-                            segundos = secundos;
-                            progreso = '${(secundos / 60).truncate()}:${secundos % 60 >= 10 ? secundos %60: '0${secundos % 60}'}';
-                            mp3player.seek(Duration
+                              Padding(padding: const EdgeInsets.symmetric(horizontal: 2), child: Text(progreso, textAlign: TextAlign.right, style: TextStyle(color: Colors.white),)),
+                              Expanded(
+                                child: Slider(
+                                  activeColor: Colors.white,
+                                  inactiveColor: Colors.grey,
+                                  value: progress,
+                                  onChanged: (newValue) {
+                                    int secundos = 0;
+                                    setState(() {
+                                      progress = newValue;
+                                      secundos = (newValue * mp3player.duration!.inSeconds.toDouble()).truncate();
+                                      segundos = secundos;
+                                      progreso = '${(secundos / 60).truncate()}:${secundos % 60 >= 10 ? secundos %60: '0${secundos % 60}'}';
+                                      mp3player.seek(Duration(minutes: (secundos / 60).truncate(), seconds: secundos % 60));
+                                    });
+                                  },
+                                ),
+                              ),
+                              Padding(padding: const EdgeInsets.symmetric(horizontal: 2) , child: Text(duracion, textAlign: TextAlign.left, style: TextStyle(color: Colors.white),)),
 
-                              (minutes: (secundos / 60).truncate(), seconds: secundos % 60));
-                          });
-                        },
-                      ),
-                    ),
-                    Padding(padding: const EdgeInsets.symmetric(horizontal: 2) , child: Text(duracion, textAlign: TextAlign.left, style: const TextStyle(color: Colors.white),)),
-                    const SizedBox(width: 5,),
-                  ],
-                ),
-
+                            ],
+                          ),
+                            
 
                 const SizedBox(height: 20.0),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     IconButton(
-                      icon: const Icon(Icons.skip_previous, color: Colors.white),
-                      iconSize: 55.0,
+                      icon: const Icon(Icons.skip_previous, color: Colors.white), // Icono blanco
+                      iconSize: 64.0,
                       onPressed: previousSong,
                     ),
                     IconButton(
-                      icon: isPlaying ? const Icon(Icons.pause, color: Colors.white) : const Icon(Icons.play_arrow, color: Colors.white),
-                      iconSize: 55.0,
+                      icon: isPlaying ? const Icon(Icons.pause, color: Colors.white) : const Icon(Icons.play_arrow, color: Colors.white), // Iconos blancos
+                      iconSize: 64.0,
                       onPressed: togglePlay,
                     ),
                     IconButton(
-                      icon: const Icon(Icons.skip_next, color: Colors.white),
-                      iconSize: 55.0,
+                      icon: const Icon(Icons.skip_next, color: Colors.white), // Icono blanco
+                      iconSize: 64.0,
                       onPressed: nextSong,
                     ),
                     IconButton(
-                      icon: const Icon(Icons.replay, color: Colors.white),
-                      iconSize: 55.0,
+                      icon: const Icon(Icons.replay, color: Colors.white), // Icono blanco
+                      iconSize: 64.0,
                       onPressed: replaySong,
                     ),
                   ],
                 ),
-
-              ],
-            ),
-          ),
-
-        ],
-      ),
-      bottomNavigationBar: Container(
-        height: 60,
-
-        child: Column(
-          children: [
-            Center(
-              child:
-              Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    IconButton(
-                      icon: const Icon(Icons.volume_mute, color: Colors.white, size: 30.0,),
-                      onPressed: () {},
-                    ),
-                    Expanded(
-                      child: Slider(
+                const SizedBox(height: 20,),
+                Center(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      IconButton(
+                        icon: const Icon(Icons.volume_mute, color: Colors.white,),
+                        onPressed: () {},
+                      ),
+                      Slider(
                         activeColor: Colors.green,
                         inactiveColor: Colors.grey.shade600,
                         thumbColor: Colors.white,
@@ -552,34 +606,53 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
                           });
                         },
                       ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.volume_up, color: Colors.white, size: 30.0,),
-                      onPressed: () {},
-                    ),
-
-                    const SizedBox(width: 20),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => Letra()),
-                        );
-                      },
-                      child: IconButton(
-                        icon: const Icon(Icons.mic_rounded, color: Colors.white, size: 30.0,),
+                      IconButton(
+                        icon: const Icon(Icons.volume_up, color: Colors.white,),
                         onPressed: () {},
                       ),
-                    ),
-                    const SizedBox(width: 10),
-                  ]
+                      SizedBox(width: 10), // Espacio entre el control de volumen y el nuevo botón
+                      GestureDetector( // Envuelve el botón con GestureDetector para manejar la navegación
+                        onTap: () {
+                          // Navegar a la otra pantalla cuando se presione el botón
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => Letra()),
+                          );
+                        },
+                        child: IconButton( // Botón con icono de micrófono
+                          icon: const Icon(Icons.mic, color: Colors.white,),
+                          onPressed: () {},
+                        ),
+                      ),
+                    ],
+                  ),
               ),
-
+              ],
             ),
-            const SizedBox(height: 5),
-          ],
-        ),
+          ),
+          Positioned(
+            left: 10,
+            top: 10,
+            child: Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+                const SizedBox(width: 10),
+                const Text(
+                  'Nombre de la Playlist',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
 }
+
+

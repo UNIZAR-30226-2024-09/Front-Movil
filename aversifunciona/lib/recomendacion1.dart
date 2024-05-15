@@ -184,9 +184,9 @@ class _Recomendacion1ScreenState extends State<Recomendacion1Screen> {
                               });
                             },
                             child: CircleAvatar(
-                              //backgroundImage: AssetImage('assets/imagen_artista.jpg'), // Aquí debes colocar la ruta de tu imagen
+                              backgroundImage: NetworkImage('${Env.URL_PREFIX}/imagenArtista/${artista['id']}/'), // Aquí debes colocar la ruta de tu imagen
                               radius: 20.0,
-                              backgroundColor: seleccionado ? Colors.white : null,
+                              //backgroundColor: seleccionado ? Colors.white : null,
                             ),
                           ),
                           SizedBox(height: 8.0),
@@ -244,9 +244,9 @@ class _Recomendacion1ScreenState extends State<Recomendacion1Screen> {
                               });
                             },
                             child: CircleAvatar(
-                              //backgroundImage: AssetImage('assets/imagen_artista.jpg'), // Aquí debes colocar la ruta de tu imagen
+                              backgroundImage: NetworkImage('${Env.URL_PREFIX}/imagenArtista/${artista['id']}/'), // Aquí debes colocar la ruta de tu imagen
                               radius: 20.0,
-                              backgroundColor: seleccionado ? Colors.white : null,
+                              //backgroundColor: seleccionado ? Colors.white : null,
                             ),
                           ),
                           SizedBox(height: 8.0),
