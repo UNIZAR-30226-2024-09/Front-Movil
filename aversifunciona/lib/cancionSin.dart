@@ -35,7 +35,7 @@ class CancionSin {
         //foto: json['foto'] as Uint8List?,
       );
     } else {
-      throw const FormatException('Failed to load cancion.');
+      throw const FormatException('Failed to load cancion sin.');
     }
   }
 }
