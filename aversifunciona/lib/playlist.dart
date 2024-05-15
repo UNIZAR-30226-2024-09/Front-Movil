@@ -126,7 +126,7 @@ class _PlaylistState extends State<Playlist> {
         throw Exception('Error al obtener las canciones de la playlist');
       }
     } catch (e) {
-      debugPrint('Error: $e');
+      debugPrint('Error fetchPlaylistSongs: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Error al obtener las canciones de la playlist'),
@@ -158,7 +158,7 @@ class _PlaylistState extends State<Playlist> {
     }
   }
 
-  Future<void> _fetchSongArtists(String songId) async {
+  Future<void> _fetchSongArtists(int songId) async {
     try {
       final response = await http.post(
         Uri.parse('${Env.URL_PREFIX}/listarArtistasCancion/'),
@@ -174,12 +174,12 @@ class _PlaylistState extends State<Playlist> {
         setState(() {
           songs.firstWhere((song) => song['id'] == songId)['artista'] = List<Map<String, dynamic>>.from(artistsData);
         });
-        print(artistsData);
+        print("artistas: $artistsData");
       } else {
         throw Exception('Error al obtener los artistas de la canción $songId');
       }
     } catch (e) {
-      debugPrint('Error: $e');
+      debugPrint('Error fetchSongArtists: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error al obtener los artistas de la canción $songId'),
@@ -397,7 +397,23 @@ class _PlaylistState extends State<Playlist> {
                         }
                       },
                       child: ListTile(
-                        leading: const Icon(Icons.music_note),
+                        leading: FutureBuilder<Uint8List>(
+                          future: _fetchImageFromUrl('${Env.URL_PREFIX}/imagenCancion/${song['id']}/'),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return const SizedBox(); // Devuelve un widget vacío mientras espera
+                            } else if (snapshot.hasError) {
+                              return const Icon(Icons.error);
+                            } else {
+                              return Image.memory(
+                                snapshot.data!,
+                                width: 50,
+                                height: 50,
+                                fit: BoxFit.cover,
+                              );
+                            }
+                          },
+                        ),
                         title: Text(song['nombre'] ?? 'Nombre no disponible', style: const TextStyle(color: Colors.white)),
                         subtitle: Text(artistasString, style: const TextStyle(color: Colors.grey)),
                       ),
