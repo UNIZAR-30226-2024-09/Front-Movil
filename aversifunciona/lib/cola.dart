@@ -298,7 +298,7 @@ class _ColaState extends State<Cola> {
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: Column(
+                  child: const Column(
                     children: [
                       SizedBox(height: 8),
                       Icon(Icons.question_mark_outlined, color: Colors.grey, size: 37.0),
@@ -323,7 +323,7 @@ class _ColaState extends State<Cola> {
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: Column(
+                  child: const Column(
                     children: [
                       SizedBox(height: 8),
                       Icon(Icons.library_books_rounded, color: Colors.grey, size: 37.0),
@@ -348,7 +348,7 @@ class _ColaState extends State<Cola> {
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: Column(
+                  child: const Column(
                     children: [
                       SizedBox(height: 8),
                       Icon(Icons.chat_bubble_rounded, color: Colors.grey, size: 37.0),

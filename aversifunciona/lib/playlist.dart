@@ -135,6 +135,7 @@ class _PlaylistState extends State<Playlist> {
     }
   }
 
+  // Método para cargar una imagen desde una URL
   Future<Uint8List> _fetchImageFromUrl(String imageUrl) async {
     final response = await http.get(Uri.parse(imageUrl));
     if (response.statusCode == 200) {
@@ -173,6 +174,7 @@ class _PlaylistState extends State<Playlist> {
         setState(() {
           songs.firstWhere((song) => song['id'] == songId)['artista'] = List<Map<String, dynamic>>.from(artistsData);
         });
+        print(artistsData);
       } else {
         throw Exception('Error al obtener los artistas de la canción $songId');
       }
@@ -326,7 +328,7 @@ class _PlaylistState extends State<Playlist> {
 
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => Reproductor(cancion: song, ids: ids, playlist: 'Reproduciendo desde: $playlistName',)), // cancion: cancion dentro de reproductor cuando esto funcione
+                            MaterialPageRoute(builder: (context) => Reproductor(cancion: song, ids: ids)), // cancion: cancion dentro de reproductor cuando esto funcione
                           );
                         },
                         child: const Icon(Icons.shuffle, color: Colors.green),
@@ -347,7 +349,7 @@ class _PlaylistState extends State<Playlist> {
         
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => Reproductor(cancion: song, ids: ids, playlist: 'Reproduciendo desde: $playlistName',)), // cancion: cancion dentro de reproductor cuando esto funcione
+                            MaterialPageRoute(builder: (context) => Reproductor(cancion: song, ids: ids)), // cancion: cancion dentro de reproductor cuando esto funcione
                           );
                         },
                         icon: const Icon(Icons.play_arrow),
