@@ -34,10 +34,9 @@ class _EditarPerfilState extends State<EditarPerfil> {
 
   Future<void> _getUserInfo() async {
     try {
-      String? token = await getUserSession.getToken(); // Espera a que el token se resuelva
+      String? token = await getUserSession.getToken();
       print("Token: $token");
       if (token != null) {
-        // Llama al método AuthService para obtener la información del usuario
         Map<String, dynamic> userInfo = await getUserSession.getUserInfo(token);
         setState(() {
           _nombreS = userInfo['nombre'];
@@ -45,6 +44,7 @@ class _EditarPerfilState extends State<EditarPerfil> {
           _nacimientoS = userInfo['nacimiento'];
           _sexoS = userInfo['sexo'];
           _paisS = userInfo['pais'];
+          _contrasegnaS = userInfo['contrasegna'] ?? ''; // Verifica si la contraseña es nula
         });
       } else {
         print('Token is null');
@@ -56,6 +56,8 @@ class _EditarPerfilState extends State<EditarPerfil> {
 
   Future<bool> actualizarUsuario(TextEditingController nombre, TextEditingController sexo, TextEditingController nacimiento,
       TextEditingController contrasegna, TextEditingController pais) async {
+    String contrasegnaAux = contrasegna.text != "" ? contrasegna.text : _contrasegnaS;
+
     try {
       final response = await http.post(
         Uri.parse('${Env.URL_PREFIX}/actualizarUsuario/'),
@@ -67,7 +69,7 @@ class _EditarPerfilState extends State<EditarPerfil> {
           'nombre': nombre.text,
           'sexo': sexo.text,
           'nacimiento': nacimiento.text,
-          'contrasegna': contrasegna.text,
+          'contrasegna': contrasegnaAux,
           'pais': pais.text,
         }),
       );
@@ -92,6 +94,7 @@ class _EditarPerfilState extends State<EditarPerfil> {
     TextEditingController _contrasegna = TextEditingController(text: _contrasegnaS);
     TextEditingController _pais = TextEditingController(text: _paisS);
     TextEditingController _correo = TextEditingController(text: _correoS);
+
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
@@ -102,134 +105,143 @@ class _EditarPerfilState extends State<EditarPerfil> {
             Navigator.pop(context);
           },
         ),
-        title: const Text('Editar Perfil', style: TextStyle(color: Colors.white))
-        ,
+        title: const Text('Editar Perfil', style: TextStyle(color: Colors.white)),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: Container(
-              // Foto del usuario (puedes agregar la imagen del usuario aquí)
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Container(
+              margin: EdgeInsets.all(16.0),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white, // Puedes cambiar el color de fondo
+                color: Colors.white,
               ),
-              child: Center(
-                child: Text(
-                  'Foto del Usuario',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              child: ClipOval(
+                child: Image.asset(
+                  'lib/panda.jpg',
+                  width: 100,
+                  height: 100,
+                  fit: BoxFit.cover,
                 ),
               ),
             ),
-          ),
-          // Opciones para editar
-
-          ListTile(
-            title: Text(
-              'Nombre de usuario',
-              style: TextStyle(color: Colors.white),
-            ),
-            subtitle: TextField(
-              controller: _nombre,
-              style: TextStyle(color: Colors.grey),
-            ),
-          ),
-
-          ListTile(
-            title: Text(
-              'Contraseña',
-              style: TextStyle(color: Colors.white),
-            ),
-            subtitle: TextField(
-              controller: _contrasegna,
-              style: TextStyle(color: Colors.grey),
-            ),
-          ),
-
-          ListTile(
-            title: Text(
-              'Fecha de nacimiento',
-              style: TextStyle(color: Colors.white),
-            ),
-            subtitle: TextField(
-              controller: _nacimiento,
-              style: TextStyle(color: Colors.grey),
-            ),
-          ),
-
-          ListTile(
-            title: Text(
-              'Correo electrónico',
-              style: TextStyle(color: Colors.white),
-            ),
-            subtitle: TextField(
-              controller: _correo,
-              style: TextStyle(color: Colors.grey),
-            ),
-          ),
-
-          ListTile(
-            title: Text(
-              'Sexo',
-              style: TextStyle(color: Colors.white),
-            ),
-            subtitle: TextField(
-              controller: _sexo,
-              style: TextStyle(color: Colors.grey),
-            ),
-          ),
-
-          ListTile(
-            title: Text(
-              'País o región',
-              style: TextStyle(color: Colors.white),
-            ),
-            subtitle: TextField(
-              controller: _pais,
-              style: TextStyle(color: Colors.grey),
-            ),
-          ),
-
-
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                  // Lógica para cancelar los cambios
-                  _getUserInfo(); // Recargar la información del usuario
-                },
-                child: Text('Cancelar'),
+            ListTile(
+              title: Text(
+                'Nombre de usuario',
+                style: TextStyle(color: Colors.white),
               ),
-              ElevatedButton(
-                onPressed: () async {
-                  // Lógica para aceptar los cambios
-                  bool cambiosGuardados = await actualizarUsuario(_nombre, _sexo, _nacimiento, _contrasegna, _pais);
-                  if (cambiosGuardados) {
-                    // Mostrar mensaje de éxito
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Cambios guardados correctamente'),
-                        backgroundColor: Colors.green,
-                      ),
-                    );
-                  } else {
-                    // Mostrar mensaje de error
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Error al guardar los cambios'),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-                  }
-                },
-                child: Text('Guardar'),
+              subtitle: TextField(
+                controller: _nombre,
+                style: TextStyle(color: Colors.grey),
               ),
-            ],
-          )
-        ],
+            ),
+
+            ListTile(
+              title: Text(
+                'Contraseña',
+                style: TextStyle(color: Colors.white),
+              ),
+              subtitle: TextField(
+                controller: _contrasegna,
+                style: TextStyle(color: Colors.grey),
+              ),
+            ),
+
+            ListTile(
+              title: Text(
+                'Fecha de nacimiento',
+                style: TextStyle(color: Colors.white),
+              ),
+              subtitle: TextField(
+                controller: _nacimiento,
+                style: TextStyle(color: Colors.grey),
+              ),
+            ),
+
+            ListTile(
+              title: Text(
+                'Correo electrónico',
+                style: TextStyle(color: Colors.white),
+              ),
+              subtitle: GestureDetector(
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('No se puede cambiar el correo electrónico'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                },
+                child: AbsorbPointer(
+                  child: TextField(
+                    controller: _correo,
+                    style: TextStyle(color: Colors.grey),
+                    decoration: InputDecoration(
+                      hintText: 'No se puede cambiar',
+                      hintStyle: TextStyle(color: Colors.grey),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+            ListTile(
+              title: Text(
+                'Sexo',
+                style: TextStyle(color: Colors.white),
+              ),
+              subtitle: TextField(
+                controller: _sexo,
+                style: TextStyle(color: Colors.grey),
+              ),
+            ),
+
+            ListTile(
+              title: Text(
+                'País o región',
+                style: TextStyle(color: Colors.white),
+              ),
+              subtitle: TextField(
+                controller: _pais,
+                style: TextStyle(color: Colors.grey),
+              ),
+            ),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    _getUserInfo();
+                  },
+                  child: Text('Cancelar'),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    bool cambiosGuardados = await actualizarUsuario(_nombre, _sexo, _nacimiento, _contrasegna, _pais);
+                    if (cambiosGuardados) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Cambios guardados correctamente'),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Error al guardar los cambios'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
+                  },
+                  child: Text('Guardar'),
+                ),
+              ],
+            )
+          ],
+        ),
       ),
     );
   }
 }
-
