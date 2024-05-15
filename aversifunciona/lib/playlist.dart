@@ -286,7 +286,7 @@ class _PlaylistState extends State<Playlist> {
                 ),
               ),
             ),
-        
+
             const SizedBox(height: 20),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -361,7 +361,7 @@ class _PlaylistState extends State<Playlist> {
                               song = cancion2;
                             }
                           }
-        
+
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => Reproductor(cancion: song, ids: ids, playlist: 'Reproduciendo desde: $playlistName',)), // cancion: cancion dentro de reproductor cuando esto funcione
@@ -373,7 +373,7 @@ class _PlaylistState extends State<Playlist> {
                       ),
                     ],
                   )
-        
+
                 ],
               ),
             ),
