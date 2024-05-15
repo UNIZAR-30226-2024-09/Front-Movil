@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:aversifunciona/biblioteca.dart';
 import 'package:aversifunciona/buscar.dart';
@@ -26,6 +27,7 @@ class Cola extends StatefulWidget {
 class _ColaState extends State<Cola> {
   String _correoS = '';
   List<dynamic> _cola = [];
+  bool cargado = false;
 
   @override
   void initState() {
@@ -50,19 +52,20 @@ class _ColaState extends State<Cola> {
         if (response.statusCode == 200) {
           final responseData = json.decode(response.body);
 
-          if (responseData.containsKey('cola') && responseData['cola'] != null) {
-            final List<dynamic> colaData = responseData['cola'];
+          if (responseData.containsKey('queue') && responseData['queue'] != null) {
+            final List<dynamic> colaData = responseData['queue'];
             final List<String> cola = colaData.map((data) => data['nombre'].toString()).toList();
 
             setState(() {
               _cola = cola;
+              cargado = true;
             });
           } else {
             print('No se encontraron canciones en la cola de este usuario.');
           }
 
           setState(() {
-            _cola = responseData['cola'];
+            _cola = responseData['queue'];
           });
         } else {
           throw Exception('Error al obtener la cola: ${response.statusCode}');
@@ -72,6 +75,51 @@ class _ColaState extends State<Cola> {
       }
     } catch (e) {
       print('Catch: $e');
+    }
+  }
+
+  // Método para cargar una imagen desde una URL
+  Future<Uint8List> _fetchImageFromUrl(String imageUrl) async {
+    final response = await http.get(Uri.parse(imageUrl));
+    if (response.statusCode == 200) {
+      // Devuelve los bytes de la imagen
+      return response.bodyBytes;
+    } else {
+      // Si la solicitud falla, lanza un error
+      throw Exception('Failed to load image from $imageUrl');
+    }
+  }
+
+  void _deleteSongFromQueue(int songId) async {
+    try {
+      final response = await http.post(
+        Uri.parse('${Env.URL_PREFIX}/eliminarCancionCola/'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'correo': _correoS,
+        }),
+      );
+      if (response.statusCode == 200) {
+        // Eliminación exitosa
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Canción eliminada de la cola'),
+          ),
+        );
+        // Actualizar la lista de canciones después de eliminar la canción
+        setState(() {
+          _cola.removeWhere((song) => song['id'] == songId);
+        });
+      } else {
+        throw Exception('Error al eliminar la canción de la playlist');
+      }
+    } catch (e) {
+      debugPrint('Error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Error al eliminar la canción de la playlist'),
+        ),
+      );
     }
   }
 
@@ -136,20 +184,67 @@ class _ColaState extends State<Cola> {
       ),
       body: Column(
         children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              IconButton(
+                icon: Icon(Icons.play_arrow, color: Colors.white),
+                onPressed: () {
+                  // Acción al presionar el botón de reproducción
+                },
+              ),
+            ],
+          ),
           SizedBox(height: 20),
           Expanded(
-            child: ListView.builder(
+            child: !cargado
+                ? Center(
+              child: CircularProgressIndicator(),
+            )
+                : ListView.builder(
               itemCount: _cola.length,
               itemBuilder: (context, index) {
                 final cancion = _cola[index];
-                return ListTile(
-                  title: Text(
-                    cancion['nombre'] ?? '', // Reemplaza 'nombre' por el nombre del campo que contiene el nombre de la canción
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  onTap: () {
-                    // Acción al seleccionar una canción del historial
+                return Dismissible(
+                  key: UniqueKey(),
+                  direction: DismissDirection.endToStart,
+                  onDismissed: (direction) {
+                    _deleteSongFromQueue(cancion['id']); // Eliminar la canción de la playlist
                   },
+                  background: Container(
+                    alignment: Alignment.centerRight,
+                    color: Colors.red,
+                    child: const Padding(
+                      padding: EdgeInsets.only(right: 10),
+                      child: Icon(Icons.delete, color: Colors.white),
+                    ),
+                  ),
+                  child: ListTile(
+                    leading: FutureBuilder<Uint8List>(
+                      future: _fetchImageFromUrl('${Env.URL_PREFIX}/imagenCancion/${cancion['id']}/'),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return const SizedBox(); // Devuelve un widget vacío mientras espera
+                        } else if (snapshot.hasError) {
+                          return const Icon(Icons.error);
+                        } else {
+                          return Image.memory(
+                            snapshot.data!,
+                            width: 50,
+                            height: 50,
+                            fit: BoxFit.cover,
+                          );
+                        }
+                      },
+                    ),
+                    title: Text(
+                      cancion['nombre'] ?? '',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    onTap: () {
+                      // Acción al seleccionar una canción del historial
+                    },
+                  ),
                 );
               },
             ),
@@ -203,7 +298,7 @@ class _ColaState extends State<Cola> {
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: Column(
+                  child: const Column(
                     children: [
                       SizedBox(height: 8),
                       Icon(Icons.question_mark_outlined, color: Colors.grey, size: 37.0),
@@ -228,7 +323,7 @@ class _ColaState extends State<Cola> {
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: Column(
+                  child: const Column(
                     children: [
                       SizedBox(height: 8),
                       Icon(Icons.library_books_rounded, color: Colors.grey, size: 37.0),
@@ -253,7 +348,7 @@ class _ColaState extends State<Cola> {
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: Column(
+                  child: const Column(
                     children: [
                       SizedBox(height: 8),
                       Icon(Icons.chat_bubble_rounded, color: Colors.grey, size: 37.0),
