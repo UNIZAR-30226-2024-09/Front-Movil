@@ -165,7 +165,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
     posible_podcast = song;
     cancion = song;
     mp3player = player;
-    if (index_.isEmpty){
+    if (index_.isNotEmpty){
       ids = index_;
     }
     else{
@@ -385,6 +385,26 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
   }
 
   Future<void> sig_cancion(List<int> ids, int index) async{
+
+    String? token = await getUserSession.getToken();
+    if (token != null) {
+      Map<String, dynamic> userInfo = await getUserSession.getUserInfo(token);
+      setState(() {
+        _correoS = userInfo['correo'];
+      });
+      final response = await http.post(
+        Uri.parse('${Env.URL_PREFIX}/agnadirCancionHistorial/'), // Reemplaza 'tu_url_de_la_api' por la URL correcta
+        body: json.encode({'correo': _correoS, 'cancionId': ids[index]}),
+        headers: {'Content-Type': 'application/json'},
+      );
+      if (response.statusCode == 200) {
+        debugPrint("Pedro");
+      }
+      else {
+        throw Exception('Error al obtener la cola: ${response.statusCode}');
+      }
+    }
+
     if (ids.length > 1) {
       final response = await http.post(
         Uri.parse('${Env.URL_PREFIX}/devolverCancion/'),
@@ -448,7 +468,29 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
   }
 
   Future<void> cargar_cancion(var object, List<int> ids, int index) async{
+    debugPrint(ids.toString());
+    String? token = await getUserSession.getToken();
+    if (token != null) {
+      Map<String, dynamic> userInfo = await getUserSession.getUserInfo(token);
+      setState(() {
+        _correoS = userInfo['correo'];
+      });
+      final response = await http.post(
+        Uri.parse('${Env.URL_PREFIX}/agnadirCancionHistorial/'), // Reemplaza 'tu_url_de_la_api' por la URL correcta
+        body: json.encode({'correo': _correoS, 'cancionId': ids[index]}),
+        headers: {'Content-Type': 'application/json'},
+      );
+      if (response.statusCode == 200) {
+        debugPrint("Pedro");
+      }
+      else {
+        throw Exception('Error al obtener la cola: ${response.statusCode}');
+      }
+    }
+
+
     try {
+
       // Decodificar el audio base64 a bytes
 
       /*
@@ -519,9 +561,8 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
 
   void startPlaying() async{
     // Cancelar el temporizador anterior si existe
-
-    timer?.cancel();
     mp3player.play();
+    timer?.cancel();
     // Aquí podrías iniciar la reproducción de la canción
     // Por ahora solo actualizamos el progreso de forma simulada
     double? progressIncrement;
@@ -551,6 +592,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
         }
       });
     });
+
   }
 
   void stopPlaying() async{
