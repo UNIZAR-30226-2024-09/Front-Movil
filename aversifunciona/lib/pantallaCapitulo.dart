@@ -221,7 +221,8 @@ class _PantallaCapituloState extends State<PantallaCapitulo> {
 
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => Reproductor(cancion: capitulo, ids: [-33])),
+                          MaterialPageRoute(builder: (context) => Reproductor(cancion: capitulo, ids: [-33], /*playlist: 'Reproduciendo capitulo de podcast',*/)),
+
                         );
                       },
                       icon: const Icon(Icons.play_arrow),

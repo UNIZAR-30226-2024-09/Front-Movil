@@ -74,6 +74,24 @@ flutter:
     - lib/logoMusify.png
     - lib/googleLogo.png
     - lib/playlist.jpg
+    - lib/letras/32.js
+    - lib/letras/33.js
+    - lib/letras/34.js
+    - lib/letras/35.js
+    - lib/letras/36.js
+    - lib/letras/37.js
+    - lib/letras/38.js
+    - lib/letras/39.js
+    - lib/letras/40.js
+    - lib/letras/41.js
+    - lib/letras/42.js
+    - lib/letras/43.js
+    - lib/letras/44.js
+    - lib/letras/45.js
+    - lib/letras/49.js
+    - lib/letras/51.js
+    - lib/letras/52.js
+    - lib/letras/53.js
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
