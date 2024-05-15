@@ -27,8 +27,18 @@ class _PerfilAjenoState extends State<PerfilAjeno> {
   @override
   void initState() {
     super.initState();
-    _devolverUsuario(widget.usuario['seguido']);
+    if (widget.usuario.containsKey('seguido')) {
+      _devolverUsuario(widget.usuario['seguido']);
+    } else if(widget.usuario != null) {
+      print('el nombre del ususario es ${widget.usuario['nombre']}');
+      _devolverUsuario(widget.usuario['correo']);
+    } else {
+      print('El usuario pasado al perfil es nulo o no contiene la clave "seguido".');
+      // Aquí puedes manejar el caso en el que el usuario es nulo o no contiene la clave esperada.
+    }
   }
+
+
 
   void toggleFollow() {
     setState(() {
@@ -43,11 +53,17 @@ class _PerfilAjenoState extends State<PerfilAjeno> {
 
   void _seguirUsuario() async {
     try {
+      String correoAux;
+      if (widget.usuario.containsKey('seguido')) {
+        correoAux = widget.usuario['seguido'];
+      } else {
+        correoAux = widget.usuario['correo'];
+      }
       final response = await http.post(
         Uri.parse('${Env.URL_PREFIX}/seguir/'),
         body: jsonEncode({
           'correo': _correoS, // Correo del usuario actual
-          'seguido': widget.usuario['seguido'], // Correo del usuario del perfil
+          'seguido': correoAux, // Correo del usuario del perfil
         }),
         headers: {'Content-Type': 'application/json'},
       );
@@ -249,8 +265,16 @@ class _PerfilAjenoState extends State<PerfilAjeno> {
                 children: [
                   CircleAvatar(
                     radius: 50,
-                    backgroundImage: NetworkImage('URL_DE_LA_IMAGEN_DEL_PERFIL'),
+                    child: ClipOval(
+                      child: Image.asset(
+                        'lib/panda2.jpg',
+                        width: 100,
+                        height: 100,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
                   ),
+
                   SizedBox(width: 20),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
