@@ -59,6 +59,10 @@ class _ListaSeguidosState extends State<ListaSeguidos> {
     }
   }
 
+  void _handleNavigatorResult() async {
+    // Recargar la lista de seguidos
+    await _fetchSeguidos();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,8 +72,10 @@ class _ListaSeguidosState extends State<ListaSeguidos> {
         backgroundColor: Colors.black,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () {
+          onPressed: () async {
             Navigator.pop(context);
+            // Manejar el resultado
+            _handleNavigatorResult();
           },
         ),
         title: Text('Lista de Seguidos', style: TextStyle(color: Colors.white)),
@@ -86,6 +92,7 @@ class _ListaSeguidosState extends State<ListaSeguidos> {
           return ListTile(
             title: GestureDetector(
               onTap: () {
+                print('Navegando a PerfilAjeno con datos: $usuario');
                 // Navegar a la pantalla del perfil del usuario y pasar los datos del usuario
                 Navigator.push(
                   context,

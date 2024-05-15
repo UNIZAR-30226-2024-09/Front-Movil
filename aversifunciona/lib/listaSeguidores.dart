@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'env.dart'; // Suponiendo que aquí tienes la definición de Env.URL_PREFIX
-
+import 'env.dart';
+import 'perfilAjenoSeguidor.dart';
 import 'getUserSession.dart';
 
 class ListaSeguidores extends StatefulWidget {
@@ -12,7 +12,7 @@ class ListaSeguidores extends StatefulWidget {
 
 class _ListaSeguidoresState extends State<ListaSeguidores> {
   List<Map<String, dynamic>> _listaSeguidores = [];
-  String _correoS = '';
+  String? _correoS;
 
   @override
   void initState() {
@@ -21,43 +21,44 @@ class _ListaSeguidoresState extends State<ListaSeguidores> {
   }
 
   Future<void> _fetchSeguidores() async {
-
     try {
-      String? token = await getUserSession.getToken(); // Espera a que el token se resuelva
+      String? token = await getUserSession.getToken();
       print("Token: $token");
       if (token != null) {
-        // Llama al método AuthService para obtener la información del usuario
         Map<String, dynamic> userInfo = await getUserSession.getUserInfo(token);
         setState(() {
           _correoS = userInfo['correo'];
         });
-      } else {
-        print('Token is null');
-      }
-      final response = await http.post(
-        Uri.parse('${Env.URL_PREFIX}/listarSeguidores/'),
-        body: jsonEncode({'correo': _correoS}),
-        headers: {'Content-Type': 'application/json'},
-      );
-      print('Response: ${response.body}');
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> responseData = jsonDecode(response.body);
-        final List<dynamic> seguidores = responseData['seguidores']; // Acceder a la lista de seguidos
-        print('Seguidores: $seguidores');
-        // Aquí puedes procesar la lista de seguidos según tus necesidades
-        // Por ejemplo, puedes asignar la lista a una variable de estado para usarla en tu interfaz de usuario
+        print("Correo: $_correoS");
 
-        setState(() {
-          _listaSeguidores = seguidores.cast<Map<String, dynamic>>();
-        });
+        if (_correoS != null) {
+          final response = await http.post(
+            Uri.parse('${Env.URL_PREFIX}/listarSeguidores/'),
+            body: jsonEncode({'correo': _correoS}),
+            headers: {'Content-Type': 'application/json'},
+          );
+          print('Response: ${response.body}');
+          if (response.statusCode == 200) {
+            final Map<String, dynamic> responseData = jsonDecode(response.body);
+            final List<dynamic> seguidores = responseData['seguidores'];
+            print('Seguidores: $seguidores');
+
+            setState(() {
+              _listaSeguidores = seguidores.cast<Map<String, dynamic>>();
+            });
+          } else {
+            print('Error al obtener los usuarios seguidores: ${response.statusCode}');
+          }
+        } else {
+          print('El correo es nulo');
+        }
       } else {
-        print('Error al obtener los usuarios seguidores: ${response.statusCode}');
+        print('Token es nulo');
       }
     } catch (e) {
       print('Error en la solicitud HTTP: $e');
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -77,21 +78,30 @@ class _ListaSeguidoresState extends State<ListaSeguidores> {
           ? Center(
         child: CircularProgressIndicator(),
       )
-          : _listaSeguidores != null
-          ? ListView.builder(
+          : ListView.builder(
         itemCount: _listaSeguidores.length,
         itemBuilder: (context, index) {
           final seguidor = _listaSeguidores[index];
+          final String nombreSeguidor = seguidor['seguidor'] ?? 'Sin nombre'; // Maneja el caso de valor nulo
           return ListTile(
-            title: Text(seguidor['seguidor'], style: TextStyle(color: Colors.white)),
-            // Agrega más contenido según sea necesario
+            title: GestureDetector(
+              onTap: () {
+                print('Navegando a PerfilAjeno con datos: $seguidor');
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PerfilAjenoSeguidor(usuario: seguidor),
+                  ),
+                );
+              },
+              child: Text(
+                nombreSeguidor,
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
           );
         },
-      )
-          : Center(
-        child: Text('La lista de seguidores está vacía o es nula'),
       ),
     );
   }
-
 }
