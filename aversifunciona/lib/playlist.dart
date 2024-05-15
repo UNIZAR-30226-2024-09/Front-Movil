@@ -104,23 +104,36 @@ class _PlaylistState extends State<Playlist> {
       );
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
-        final songsData = responseData['canciones'];
+        if (responseData.containsKey('canciones')) {
+          final songsData = responseData['canciones'];
+          if (songsData.isNotEmpty) {
+            for (var i = 0; i < songsData.length; i++) {
+              CancionSin cancion = CancionSin.fromJson(songsData[i]);
+              canciones_.add(cancion);
+              ids.add(canciones_[i].id!);
+            }
 
-        for (var i = 0; i < songsData.length; i++) {
-          CancionSin cancion = CancionSin.fromJson(songsData[i]);
-          canciones_.add(cancion);
-          ids.add(canciones_[i].id!);
-        }
-
-        // Actualizar la lista de canciones con los datos recibidos de la API
-        setState(() {
-          songs = List<Map<String, dynamic>>.from(songsData);
-          canciones = canciones_;
-          cargado = true;
-        });
-        // Iterar sobre la lista de canciones y obtener los artistas de cada una
-        for (var song in songs) {
-          await _fetchSongArtists(song['id']);
+            // Actualizar la lista de canciones con los datos recibidos de la API
+            setState(() {
+              songs = List<Map<String, dynamic>>.from(songsData);
+              canciones = canciones_;
+              cargado = true;
+            });
+            // Iterar sobre la lista de canciones y obtener los artistas de cada una
+            for (var song in songs) {
+              await _fetchSongArtists(song['id']);
+            }
+          }
+        } else if(responseData.containsKey('message')) {
+          setState(() {
+            canciones = []; // Limpiar la lista de canciones
+            cargado = true; // Marcar como cargado para evitar el indicador de carga
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('La playlist no tiene canciones'),
+            ),
+          );
         }
       } else {
         throw Exception('Error al obtener las canciones de la playlist');
@@ -134,6 +147,7 @@ class _PlaylistState extends State<Playlist> {
       );
     }
   }
+
 
   // Método para cargar una imagen desde una URL
   Future<Uint8List> _fetchImageFromUrl(String imageUrl) async {
