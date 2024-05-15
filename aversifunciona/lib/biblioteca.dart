@@ -153,8 +153,8 @@ class _pantalla_bibliotecaState extends State<pantalla_biblioteca> {
               child: ListView(
                 children: [
                 const SizedBox(height: 20),
-                  Expanded(
-                    child: ListView.builder(
+
+                    ListView.builder(
                       shrinkWrap: true,
                       itemCount: _playlists.length,
                       itemBuilder: (context, index) {
@@ -188,7 +188,7 @@ class _pantalla_bibliotecaState extends State<pantalla_biblioteca> {
                         );
                       },
                     ),
-                  ),
+
               ]
               ),
 

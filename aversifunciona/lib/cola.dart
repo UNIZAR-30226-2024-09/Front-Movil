@@ -97,6 +97,7 @@ class _ColaState extends State<Cola> {
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'correo': _correoS,
+          'cancionId': songId,
         }),
       );
       if (response.statusCode == 200) {
