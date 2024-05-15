@@ -8,6 +8,7 @@ import 'package:aversifunciona/pantallaArtista.dart';
 import 'package:aversifunciona/pantallaPresentador.dart';
 import 'package:aversifunciona/pantalla_principal.dart';
 import 'package:aversifunciona/perfilAjeno.dart';
+import 'package:aversifunciona/playlist.dart';
 import 'package:aversifunciona/pop.dart';
 import 'package:aversifunciona/reggaeton.dart';
 import 'package:aversifunciona/rock.dart';
@@ -377,18 +378,20 @@ class _pantalla_buscarState extends State<pantalla_buscar> {
           } else if (item.containsKey('presentador')) {
             nombre = item['presentador']['nombre'];
             pantallaCorrespondiente = PantallaPresentador(presentadorId:item['presentador']['id'], presentadorName:item['presentador']['nombre'],);
-          } /*else if (item.containsKey('playlist')) {
+          } else if (item.containsKey('playlist')) {
             nombre = item['playlist']['nombre'];
             pantallaCorrespondiente = Playlist(playlistId:item['playlist']['id'], playlistName: item['playlist']['nombre']);
-          } else if (item.containsKey('usuario')) {
+          } else if (item.containsKey('usuario') && item['usuario'] != null) {
             nombre = item['usuario']['nombre'];
-            pantallaCorrespondiente = PerfilAjeno(usuario:item);
-          } */else {
+            Map<String, dynamic> usuario = item;
+            pantallaCorrespondiente = PerfilAjeno(usuario: usuario);
+        } else {
             // Si no es una canción, podrías asignarle un valor predeterminado,
             // como una pantalla de error o una pantalla de detalles genérica.
             nombre = "Elemento no reconocido";
             pantallaCorrespondiente = pantalla_categorias();
           }
+
 
           return GestureDetector(
             onTap: () {

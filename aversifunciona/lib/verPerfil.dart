@@ -145,10 +145,13 @@ class _verPerfilState extends State<verPerfil> {
               children: [
                 Row(
                   children: [
-                    CircleAvatar(
-                      backgroundColor: Colors.white,
-                      // Aquí colocas la imagen de la foto de perfil
-                      radius: 50,
+                    ClipOval(
+                      child: Image.asset(
+                        'lib/panda.jpg',
+                        width: 100,
+                        height: 100,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                     SizedBox(width: 20),
                     Column(

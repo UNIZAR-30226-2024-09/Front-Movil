@@ -92,6 +92,8 @@ flutter:
     - lib/letras/51.js
     - lib/letras/52.js
     - lib/letras/53.js
+    - lib/panda.jpg
+    - lib/panda2.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
