@@ -31,6 +31,7 @@ class _historialAjenoState extends State<historialAjeno> {
     super.initState();
     _getListarHistorial();
     //_devolverUsuario(widget.correoSeguidoS);
+    _correoSeguidoS = widget.correoSeguidoS;
   }
 
   Future<void> _devolverUsuario(String correo) async {
@@ -65,7 +66,7 @@ class _historialAjenoState extends State<historialAjeno> {
     try {
         final response = await http.post(
           Uri.parse('${Env.URL_PREFIX}/listarHistorial/'), // Reemplaza 'tu_url_de_la_api' por la URL correcta
-          body: json.encode({'correo': _correoSeguidoS}),
+          body: json.encode({'correo': widget.correoSeguidoS}),
           headers: {'Content-Type': 'application/json'},
         );
 
@@ -106,8 +107,8 @@ class _historialAjenoState extends State<historialAjeno> {
             Navigator.pop(context);
           },
         ),
-        title: const Text(
-          'Historial de ',
+        title: Text(
+          'Historial de $_correoSeguidoS',
           style: TextStyle(color: Colors.white),
         ),
       ),

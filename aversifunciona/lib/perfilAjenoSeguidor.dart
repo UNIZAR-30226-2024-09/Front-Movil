@@ -6,16 +6,16 @@ import 'package:aversifunciona/getUserSession.dart';
 
 import 'historialAjeno.dart';
 
-class PerfilAjeno extends StatefulWidget {
+class PerfilAjenoSeguidor extends StatefulWidget {
   final Map<String, dynamic> usuario;
 
-  PerfilAjeno({required this.usuario});
+  PerfilAjenoSeguidor({required this.usuario});
 
   @override
-  _PerfilAjenoState createState() => _PerfilAjenoState();
+  _PerfilAjenoSeguidorState createState() => _PerfilAjenoSeguidorState();
 }
 
-class _PerfilAjenoState extends State<PerfilAjeno> {
+class _PerfilAjenoSeguidorState extends State<PerfilAjenoSeguidor> {
   String _nombreS = '';
   String _correoSeguidoS = '';
   List<String> _playlists = [];
@@ -27,18 +27,8 @@ class _PerfilAjenoState extends State<PerfilAjeno> {
   @override
   void initState() {
     super.initState();
-    if (widget.usuario.containsKey('seguido')) {
-      _devolverUsuario(widget.usuario['seguido']);
-    } else if(widget.usuario != null) {
-      print('el nombre del ususario es ${widget.usuario['nombre']}');
-      _devolverUsuario(widget.usuario['correo']);
-    } else {
-      print('El usuario pasado al perfil es nulo o no contiene la clave "seguido".');
-      // Aquí puedes manejar el caso en el que el usuario es nulo o no contiene la clave esperada.
-    }
+    _devolverUsuario(widget.usuario['seguidor']);
   }
-
-
 
   void toggleFollow() {
     setState(() {
@@ -53,17 +43,11 @@ class _PerfilAjenoState extends State<PerfilAjeno> {
 
   void _seguirUsuario() async {
     try {
-      String correoAux;
-      if (widget.usuario.containsKey('seguido')) {
-        correoAux = widget.usuario['seguido'];
-      } else {
-        correoAux = widget.usuario['correo'];
-      }
       final response = await http.post(
         Uri.parse('${Env.URL_PREFIX}/seguir/'),
         body: jsonEncode({
           'correo': _correoS, // Correo del usuario actual
-          'seguido': correoAux, // Correo del usuario del perfil
+          'seguido': widget.usuario['seguidor'], // Correo del usuario del perfil
         }),
         headers: {'Content-Type': 'application/json'},
       );
@@ -84,7 +68,7 @@ class _PerfilAjenoState extends State<PerfilAjeno> {
         Uri.parse('${Env.URL_PREFIX}/dejarDeSeguir/'),
         body: jsonEncode({
           'correo': _correoS, // Correo del usuario actual
-          'seguido': widget.usuario['seguido'], // Correo del usuario del perfil
+          'seguido': widget.usuario['seguidor'], // Correo del usuario del perfil
         }),
         headers: {'Content-Type': 'application/json'},
       );
@@ -102,8 +86,7 @@ class _PerfilAjenoState extends State<PerfilAjeno> {
 
   Future<void> _getUserInfo() async {
     try {
-      String? token = await getUserSession
-          .getToken(); // Espera a que el token se resuelva
+      String? token = await getUserSession.getToken(); // Espera a que el token se resuelva
       print("Token: $token");
       if (token != null) {
         // Llama al método AuthService para obtener la información del usuario
@@ -164,23 +147,15 @@ class _PerfilAjenoState extends State<PerfilAjeno> {
         headers: {'Content-Type': 'application/json'},
       );
 
-      if (responseSeguidos.statusCode == 200 &&
-          responseSeguidores.statusCode == 200) {
-        final Map<String, dynamic> dataSeguidos = jsonDecode(
-            responseSeguidos.body);
-        final Map<String, dynamic> dataSeguidores = jsonDecode(
-            responseSeguidores.body);
+      if (responseSeguidos.statusCode == 200 && responseSeguidores.statusCode == 200) {
+        final Map<String, dynamic> dataSeguidos = jsonDecode(responseSeguidos.body);
+        final Map<String, dynamic> dataSeguidores = jsonDecode(responseSeguidores.body);
         setState(() {
-          _numSeguidos =
-          dataSeguidos['numSeguidos'] != null ? dataSeguidos['numSeguidos']
-              .toString() : '0';
-          _numSeguidores = dataSeguidores['numSeguidores'] != null
-              ? (dataSeguidores['numSeguidores']).toString()
-              : '0';
+          _numSeguidos = dataSeguidos['numSeguidos'] != null ? dataSeguidos['numSeguidos'].toString() : '0';
+          _numSeguidores = dataSeguidores['numSeguidores'] != null ? (dataSeguidores['numSeguidores']).toString() : '0';
         });
       } else {
-        throw Exception(
-            'Error al obtener los números de seguidos y seguidores');
+        throw Exception('Error al obtener los números de seguidos y seguidores');
       }
     } catch (e) {
       print('Catch: $e');
@@ -199,11 +174,9 @@ class _PerfilAjenoState extends State<PerfilAjeno> {
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
         print('Response: $responseData');
-        if (responseData.containsKey('playlists') &&
-            responseData['playlists'] != null) {
+        if (responseData.containsKey('playlists') && responseData['playlists'] != null) {
           final List<dynamic> playlistData = responseData['playlists'];
-          final List<String> playlists = playlistData.map((data) =>
-              data['nombre'].toString()).toList();
+          final List<String> playlists = playlistData.map((data) => data['nombre'].toString()).toList();
 
           setState(() {
             _playlists = playlists;
@@ -260,7 +233,7 @@ class _PerfilAjenoState extends State<PerfilAjeno> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
-            Navigator.pop(context, true);
+            Navigator.pop(context);
           },
         ),
         title: const Text('Perfil', style: TextStyle(color: Colors.white)),
@@ -276,16 +249,8 @@ class _PerfilAjenoState extends State<PerfilAjeno> {
                 children: [
                   CircleAvatar(
                     radius: 50,
-                    child: ClipOval(
-                      child: Image.asset(
-                        'lib/panda2.jpg',
-                        width: 100,
-                        height: 100,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
+                    backgroundImage: NetworkImage('URL_DE_LA_IMAGEN_DEL_PERFIL'),
                   ),
-
                   SizedBox(width: 20),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
