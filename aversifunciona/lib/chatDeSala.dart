@@ -33,6 +33,7 @@ class ChatDeSala extends StatefulWidget {
 
 class _ChatDeSalaState extends State<ChatDeSala> {
   TextEditingController _messageController = TextEditingController();
+  ScrollController _scrollController = ScrollController();
   List<Map<String, dynamic>> _messages = [];
   Sala _sala = Sala(id: -1, nombre: "");
   String userEmail = '';
@@ -48,7 +49,10 @@ class _ChatDeSalaState extends State<ChatDeSala> {
     setState(() {
       _isLoading = true;
     });
-    _loadMessages(); // Cargar mensajes al iniciar la pantalla del chat
+    _loadMessages().then((_) {
+      // Desplazar la lista al final
+      _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+    });
     setState(() {
       _isLoading = false;
     });
@@ -128,6 +132,7 @@ class _ChatDeSalaState extends State<ChatDeSala> {
     String messageToSend = jsonEncode(messageData);
     _channel.sink.add(messageToSend); // Guardar el mensaje enviado por el usuario en el canal para que les llegue al resto de usuarios en el momento actual
     _saveMessage(message); // Guardar el mensaje enviado por el usuario en la base de datos
+    _loadMessages();
   }
 
   @override
@@ -148,10 +153,8 @@ class _ChatDeSalaState extends State<ChatDeSala> {
       );
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> data = jsonDecode(response.body);
-        final List<dynamic> mensajesData = data['mensajes'];
-
-        List<Map<String, dynamic>> mensajes = mensajesData.map((message) {
+        final List<dynamic> data = jsonDecode(response.body);
+        final List<Map<String, dynamic>> mensajesData = data.map((message) {
           return {
             "texto": message['texto'],
             "miUsuario": message['miUsuario'],
@@ -159,9 +162,15 @@ class _ChatDeSalaState extends State<ChatDeSala> {
         }).toList();
 
         setState(() {
-          _messages = mensajes.reversed.toList();
+          _messages = mensajesData.toList();
           _isLoading = false;
         });
+
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
       } else if (response.statusCode == 404) {
         debugPrint('La sala no existe');
       } else {
@@ -191,6 +200,7 @@ class _ChatDeSalaState extends State<ChatDeSala> {
 
       if (response.statusCode == 200) {
         debugPrint('Mensaje registrado con éxito');
+        await _loadMessages();
       }else if (response.statusCode == 404) {
         debugPrint('El emisor o la sala no existen.');
       } else {
@@ -239,9 +249,11 @@ class _ChatDeSalaState extends State<ChatDeSala> {
             Expanded(
               child: Container(
                 child: ListView.builder(
+                  controller: _scrollController,
                   itemCount: _messages.length,
                   itemBuilder: (context, index) {
-                    final message = _messages.reversed.toList()[index];
+
+                    final message = _messages[index];
                     final isCurrentUser = message['miUsuario'] == userEmail; // comparamos el propietario del mensaje que estamos tratando con el usuario actual
                     return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -271,7 +283,7 @@ class _ChatDeSalaState extends State<ChatDeSala> {
                                 ? Alignment.centerRight
                                 : Alignment.centerLeft,
                             child: Container(
-                              padding: EdgeInsets.all(8),
+                              padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
                                 color: isCurrentUser ? Colors.blue : Colors.green,
                                 borderRadius: BorderRadius.circular(10),
