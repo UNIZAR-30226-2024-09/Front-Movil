@@ -78,7 +78,7 @@ class MyHomePage extends StatelessWidget {
                     );
                   },
                 ),
-                GoogleButton(
+                /*GoogleButton(
                   text: 'Continuar con Google',
                   backgroundColor: Colors.black,
                   textColor: Colors.red,
@@ -89,7 +89,7 @@ class MyHomePage extends StatelessWidget {
                       MaterialPageRoute(builder: (context) => Google()),
                     );
                   },
-                ),
+                ),*/
                 TransparentButton(
                   text: 'Registrarse',
                   textColor: Colors.white,
