@@ -119,6 +119,7 @@ class _pantalla_bibliotecaState extends State<pantalla_biblioteca> {
           leading: TextButton(
               child: const CircleAvatar(
                 child: Icon(Icons.person_rounded, color: Colors.white,),
+                backgroundImage: AssetImage('lib/panda.jpg'),
               ),
               onPressed: () {
                 Navigator.of(context).push(_createRoute());
@@ -327,6 +328,7 @@ class _pantalla_bibliotecaState extends State<pantalla_biblioteca> {
       mainAxisSize: MainAxisSize.min,
       children: [
         // Aquí puedes agregar tu propio widget de imagen si es necesario
+
         Text(
           title,
           style: const TextStyle(color: Colors.white, fontSize: 18),

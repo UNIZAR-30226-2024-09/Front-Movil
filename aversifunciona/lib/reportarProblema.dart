@@ -68,7 +68,7 @@ class _reportarProblema extends State<reportarProblema> {
     debugPrint("El usuario está identificado ");
     final url = '${Env.URL_PREFIX}/reporteAPI/';
     final body = jsonEncode({
-      'correo': correo,
+      'correo': "musify2024@gmail.com",
       'mensaje': 'Tipo de problema: $_tipoProblema, Descripción: $_descripcion',
     });
     debugPrint('Tipo de problema: $_tipoProblema');

@@ -397,6 +397,8 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
         leading: TextButton(
             child: const CircleAvatar(
               child: Icon(Icons.person_rounded, color: Colors.white,),
+              backgroundImage: AssetImage('lib/panda.jpg'),
+
             ),
             onPressed: () {
               Navigator.of(context).push(_createRoute());
