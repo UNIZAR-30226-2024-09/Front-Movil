@@ -39,18 +39,49 @@ class _EditarPerfilState extends State<EditarPerfil> {
       if (token != null) {
         Map<String, dynamic> userInfo = await getUserSession.getUserInfo(token);
         setState(() {
-          _nombreS = userInfo['nombre'];
+          //_nombreS = userInfo['nombre'];
           _correoS = userInfo['correo'];
-          _nacimientoS = userInfo['nacimiento'];
-          _sexoS = userInfo['sexo'];
-          _paisS = userInfo['pais'];
-          _contrasegnaS = userInfo['contrasegna'] ?? ''; // Verifica si la contraseña es nula
+          //_sexoS = userInfo['sexo'];
+          //_nacimientoS = userInfo['nacimiento'];
+          //_contrasegnaS = userInfo['contrasegna'];
+          //_paisS = userInfo['pais'];
         });
+        //print('correo es ${_correoS}');+
+        _devolverUsuario(_correoS);
       } else {
         print('Token is null');
       }
     } catch (e) {
       print('Error fetching user info: $e');
+    }
+  }
+
+  Future<void> _devolverUsuario(String correo) async {
+    try {
+      print('Correo: $correo');
+      final response = await http.post(
+        Uri.parse('${Env.URL_PREFIX}/devolverUsuario/'),
+        body: jsonEncode({'correo': correo}),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        final Map<String, dynamic>? usuario = responseData['usuario'];
+        setState(() {
+          _nombreS = usuario!['nombre'];
+          _sexoS = usuario!['sexo'];
+          _nacimientoS = usuario!['nacimiento'];
+          _contrasegnaS = usuario!['contrasegna'];
+          _paisS = usuario!['pais'];
+        });
+      } else if (response.statusCode == 404) {
+        print('Else if: El usuario no existe');
+      } else {
+        print('Error al obtener el usuario: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error en la solicitud HTTP: $e');
     }
   }
 
@@ -90,8 +121,10 @@ class _EditarPerfilState extends State<EditarPerfil> {
   Widget build(BuildContext context) {
     TextEditingController _nombre = TextEditingController(text: _nombreS);
     TextEditingController _sexo = TextEditingController(text: _sexoS);
-    TextEditingController _nacimiento = TextEditingController(text: _nacimientoS);
-    TextEditingController _contrasegna = TextEditingController(text: _contrasegnaS);
+    TextEditingController _nacimiento = TextEditingController(
+        text: _nacimientoS);
+    TextEditingController _contrasegna = TextEditingController(
+        text: '');
     TextEditingController _pais = TextEditingController(text: _paisS);
     TextEditingController _correo = TextEditingController(text: _correoS);
 
@@ -105,7 +138,8 @@ class _EditarPerfilState extends State<EditarPerfil> {
             Navigator.pop(context);
           },
         ),
-        title: const Text('Editar Perfil', style: TextStyle(color: Colors.white)),
+        title: const Text(
+            'Editar Perfil', style: TextStyle(color: Colors.white)),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -167,7 +201,8 @@ class _EditarPerfilState extends State<EditarPerfil> {
                 onTap: () {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('No se puede cambiar el correo electrónico'),
+                      content: Text(
+                          'No se puede cambiar el correo electrónico'),
                       backgroundColor: Colors.red,
                     ),
                   );
@@ -218,7 +253,8 @@ class _EditarPerfilState extends State<EditarPerfil> {
                 ),
                 ElevatedButton(
                   onPressed: () async {
-                    bool cambiosGuardados = await actualizarUsuario(_nombre, _sexo, _nacimiento, _contrasegna, _pais);
+                    bool cambiosGuardados = await actualizarUsuario(
+                        _nombre, _sexo, _nacimiento, _contrasegna, _pais);
                     if (cambiosGuardados) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
@@ -243,5 +279,4 @@ class _EditarPerfilState extends State<EditarPerfil> {
         ),
       ),
     );
-  }
-}
+  }}
