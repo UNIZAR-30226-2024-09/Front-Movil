@@ -44,8 +44,7 @@ class _PantallaAlbumState extends State<PantallaAlbum> {
   @override
   void initState() {
     super.initState();
-    // Obtener los datos de la playlist al inicializar el widget
-    _fetchAlbumData();
+    _fetchAlbumData(); // Llamada para obtener los datos del álbum
   }
   Future<Uint8List> _fetchImageFromUrl(String imageUrl) async {
     final response = await http.get(Uri.parse(imageUrl));
@@ -82,23 +81,23 @@ class _PantallaAlbumState extends State<PantallaAlbum> {
         final responseData = jsonDecode(response.body);
         final albumData = responseData['album'];
 
-        _fetchAlbumSongs();
+        _fetchAlbumSongs(); // Llamada para obtener las canciones del álbum
       } else {
-        throw Exception('Error al obtener los datos del album');
+        throw Exception('Error al obtener los datos del álbum');
       }
     } catch (e) {
       print('Error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Error al obtener los datos del album'),
+          content: Text('Error al obtener los datos del álbum'),
         ),
       );
     }
   }
 
-
   Future<void> _fetchAlbumSongs() async {
     List<CancionSin> canciones_ = [];
+    List<Map<String, dynamic>> cancionesData = []; // Definir la variable cancionesData
     try {
       final response = await http.post(
         Uri.parse('${Env.URL_PREFIX}/listarCancionesAlbum/'),
@@ -106,17 +105,18 @@ class _PantallaAlbumState extends State<PantallaAlbum> {
         body: jsonEncode({
           'nombreAlbum': widget.albumName,
         }),
-
       );
 
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
-        final cancionesData = responseData['canciones'];
+        if (responseData.containsKey('canciones')) {
+          cancionesData = responseData['canciones']; // Asignar valor a cancionesData
 
-        for (var i = 0; i < cancionesData.length; i++) {
-          CancionSin cancion = CancionSin.fromJson(cancionesData[i]);
-          canciones_.add(cancion);
-          ids.add(canciones_[i].id!);
+          for (var i = 0; i < cancionesData.length; i++) {
+            CancionSin cancion = CancionSin.fromJson(cancionesData[i]);
+            canciones_.add(cancion);
+            ids.add(canciones_[i].id!);
+          }
         }
 
         // Actualizar la lista de canciones con los datos recibidos de la API
@@ -125,16 +125,14 @@ class _PantallaAlbumState extends State<PantallaAlbum> {
           canciones2 = canciones_;
           cargado = true;
         });
-        // Iterar sobre la lista de canciones y obtener los artistas de cada una
-
       } else {
-        throw Exception('Error al obtener las canciones del album');
+        throw Exception('Error al obtener las canciones del álbum');
       }
     } catch (e) {
       print('Error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Error al obtener las canciones del album'),
+          content: Text('Error al obtener las canciones del álbum'),
         ),
       );
     }
@@ -202,20 +200,18 @@ class _PantallaAlbumState extends State<PantallaAlbum> {
                       ),
                     ),
                     const SizedBox(height: 5),
-                    Text(
+                    /*Text(
                       'Duración: $duration',
                       style: const TextStyle(
                         fontSize: 16,
                         color: Colors.grey,
                       ),
-                    ),
+                    ),*/
                   ],
                 ),
                 Row(
                   children: [
                     ElevatedButton(
-
-                      //style: ButtonStyle(backgroundColor: MaterialStateProperty.all<Color>(Colors.white), ),
                       onPressed: () async{
                         // Lógica para reproducir la playlist
                         ids.shuffle();
@@ -232,16 +228,13 @@ class _PantallaAlbumState extends State<PantallaAlbum> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(builder: (context) => Reproductor(cancion: song, ids: ids, playlist: 'Reproduciendo desde: $albumName',)), // cancion: cancion dentro de reproductor cuando esto funcione
-
                         );
                       },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.transparent,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                      ),
-                      child: const Column(
+                      child: const Icon(Icons.shuffle, color: Colors.green),
+                    ),
+
+                    const SizedBox(width: 10,),
+                      /*child: const Column(
                         children: [
                           SizedBox(height: 8),
                           Icon(Icons.question_mark_outlined, color: Colors.grey, size: 37.0),
@@ -251,14 +244,38 @@ class _PantallaAlbumState extends State<PantallaAlbum> {
                           ),
                         ],
                       ),
+                    ),*/
+                    ElevatedButton(
+                      onPressed: () async {
+                        // Lógica para reproducir la playlist
+                        canciones2.shuffle(); // Me imagino que quieres mezclar las canciones
+                        CancionSin? selectedSong = canciones2.isNotEmpty ? canciones2[0] : null; // Obtener la primera canción, o null si no hay canciones
+                        if (selectedSong != null) {
+                          Uint8List image = await _fetchImageFromUrl('${Env.URL_PREFIX}/imagenCancion/${selectedSong.id}/');
+                          Uint8List audio = await _fetchAudioFromUrl('${Env.URL_PREFIX}/audioCancion/${selectedSong.id}/');
+                          Cancion song = Cancion(id: selectedSong.id, nombre: selectedSong.nombre, miAlbum: selectedSong.miAlbum, puntuacion: selectedSong.puntuacion, archivomp3: audio, foto: image);
+
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => Reproductor(cancion: song, ids: ids, playlist: 'Reproduciendo desde: $albumName',)),
+                          );
+                        } else {
+                          // Manejar el caso en el que no hay canciones disponibles
+                        }
+                      },
+                      child: const Icon(Icons.shuffle, color: Colors.green),
                     ),
+
 
                   ],
                 )
 
               ],
             ),
-          ),
+
+              //],
+            ),
+          //),
           const SizedBox(height: 20),
           !cargado ? const CircularProgressIndicator(): Expanded(
             child: ListView.builder(

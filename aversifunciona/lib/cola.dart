@@ -173,6 +173,7 @@ class _ColaState extends State<Cola> {
                 icon: Icon(Icons.play_arrow, color: Colors.white),
                 onPressed: () {
                   // Acción al presionar el botón de reproducción
+
                 },
               ),
             ],
