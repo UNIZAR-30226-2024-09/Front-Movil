@@ -188,13 +188,15 @@ class _verPerfilState extends State<verPerfil> {
             mainAxisAlignment: MainAxisAlignment.start, // Alinea los botones horizontalmente
             children: [
               TextButton(
-                onPressed: () {
+                onPressed: () async {
                   // Lógica para navegar a la pantalla de seguidos
                   // Aquí debes añadir la navegación
-                  Navigator.push(
+                  await Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => ListaSeguidos()),
                   );
+                  // Actualizar números de seguidos y seguidores al regresar
+                  _fetchSeguidosSeguidores();
                 },
                 style: ButtonStyle(
                   backgroundColor: MaterialStateProperty.all(Colors.black),
@@ -205,13 +207,15 @@ class _verPerfilState extends State<verPerfil> {
                 ),
               ),
               TextButton(
-                onPressed: () {
+                onPressed: () async {
                   // Lógica para navegar a la pantalla de seguidores
                   // Aquí debes añadir la navegación
-                  Navigator.push(
+                  await Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => ListaSeguidores()),
                   );
+                  // Actualizar números de seguidos y seguidores al regresar
+                  _fetchSeguidosSeguidores();
                 },
                 style: ButtonStyle(
                   backgroundColor: MaterialStateProperty.all(Colors.black),

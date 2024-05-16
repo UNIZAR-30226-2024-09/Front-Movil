@@ -22,42 +22,56 @@ class _ListaSeguidosState extends State<ListaSeguidos> {
   }
 
   Future<void> _fetchSeguidos() async {
-
     try {
-      String? token = await getUserSession.getToken(); // Espera a que el token se resuelva
+      String? token = await getUserSession.getToken();
       print("Token: $token");
       if (token != null) {
-        // Llama al método AuthService para obtener la información del usuario
         Map<String, dynamic> userInfo = await getUserSession.getUserInfo(token);
         setState(() {
           _correoS = userInfo['correo'];
         });
-      } else {
-        print('Token is null');
-      }
-      final response = await http.post(
-        Uri.parse('${Env.URL_PREFIX}/listarSeguidos/'),
-        body: jsonEncode({'correo': _correoS}),
-        headers: {'Content-Type': 'application/json'},
-      );
-      print('Response: ${response.body}');
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> responseData = jsonDecode(response.body);
-        final List<dynamic> seguidos = responseData['seguidos']; // Acceder a la lista de seguidos
-        print('Seguidos: $seguidos');
-        // Aquí puedes procesar la lista de seguidos según tus necesidades
-        // Por ejemplo, puedes asignar la lista a una variable de estado para usarla en tu interfaz de usuario
+        print("Correo: $_correoS");
 
-        setState(() {
-          _listaSeguidos = seguidos.cast<Map<String, dynamic>>();
-        });
+        if (_correoS != null) {
+          final response = await http.post(
+            Uri.parse('${Env.URL_PREFIX}/listarSeguidos/'),
+            body: jsonEncode({'correo': _correoS}),
+            headers: {'Content-Type': 'application/json'},
+          );
+          print('Response: ${response.body}');
+          if (response.statusCode == 200) {
+            final Map<String, dynamic> responseData = jsonDecode(response.body);
+            if (responseData.containsKey('seguidos')) {
+              final List<dynamic> seguidos = responseData['seguidos'];
+              print('Seguidos: $seguidos');
+
+              setState(() {
+                _listaSeguidos = seguidos.cast<Map<String, dynamic>>();
+              });
+            } else if (responseData.containsKey('message')) {
+              setState(() {
+                _listaSeguidos = []; // Marcar como cargado para evitar el indicador de carga
+              });
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('No tienes seguidos'),
+                ),
+              );
+            }
+          } else {
+            print('Error al obtener los usuarios seguidos: ${response.statusCode}');
+          }
+        } else {
+          print('El correo es nulo');
+        }
       } else {
-        print('Error al obtener los usuarios seguidos: ${response.statusCode}');
+        print('Token es nulo');
       }
     } catch (e) {
       print('Error en la solicitud HTTP: $e');
     }
   }
+
 
   void _handleNavigatorResult() async {
     // Recargar la lista de seguidos
@@ -91,13 +105,14 @@ class _ListaSeguidosState extends State<ListaSeguidos> {
           final usuario = _listaSeguidos[index];
           return ListTile(
             title: GestureDetector(
-              onTap: () {
+              onTap: () async {
                 print('Navegando a PerfilAjeno con datos: $usuario');
                 // Navegar a la pantalla del perfil del usuario y pasar los datos del usuario
-                Navigator.push(
+                await Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => PerfilAjeno(usuario: usuario)),
                 );
+                _fetchSeguidos();
               },
               child: Text(
                 usuario['seguido'],

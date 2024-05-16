@@ -40,12 +40,23 @@ class _ListaSeguidoresState extends State<ListaSeguidores> {
           print('Response: ${response.body}');
           if (response.statusCode == 200) {
             final Map<String, dynamic> responseData = jsonDecode(response.body);
-            final List<dynamic> seguidores = responseData['seguidores'];
-            print('Seguidores: $seguidores');
+            if (responseData.containsKey('seguidores')) {
+              final List<dynamic> seguidores = responseData['seguidores'];
+              print('Seguidores: $seguidores');
 
-            setState(() {
-              _listaSeguidores = seguidores.cast<Map<String, dynamic>>();
-            });
+              setState(() {
+                _listaSeguidores = seguidores.cast<Map<String, dynamic>>();
+              });
+            } else if (responseData.containsKey('message')) {
+              setState(() {
+                _listaSeguidores = []; // Marcar como cargado para evitar el indicador de carga
+              });
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('No tienes seguidores'),
+                ),
+              );
+            }
           } else {
             print('Error al obtener los usuarios seguidores: ${response.statusCode}');
           }
@@ -60,6 +71,12 @@ class _ListaSeguidoresState extends State<ListaSeguidores> {
     }
   }
 
+
+  void _handleNavigatorResult() async {
+    // Recargar la lista de seguidos
+    await _fetchSeguidores();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -70,6 +87,7 @@ class _ListaSeguidoresState extends State<ListaSeguidores> {
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Navigator.pop(context);
+            _handleNavigatorResult();
           },
         ),
         title: Text('Lista de Seguidores', style: TextStyle(color: Colors.white)),
@@ -85,14 +103,15 @@ class _ListaSeguidoresState extends State<ListaSeguidores> {
           final String nombreSeguidor = seguidor['seguidor'] ?? 'Sin nombre'; // Maneja el caso de valor nulo
           return ListTile(
             title: GestureDetector(
-              onTap: () {
+              onTap: () async {
                 print('Navegando a PerfilAjeno con datos: $seguidor');
-                Navigator.push(
+                await Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => PerfilAjenoSeguidor(usuario: seguidor),
                   ),
                 );
+                _fetchSeguidores();
               },
               child: Text(
                 nombreSeguidor,
