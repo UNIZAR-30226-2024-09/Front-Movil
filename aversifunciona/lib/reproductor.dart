@@ -268,7 +268,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
         );
         // Actualizar la lista de canciones después de eliminar la canción
         setState(() {
-          _cola.removeRange(0, 0);
+          _cola = _cola.removeAt(0);
         });
       } else {
         throw Exception('Error al eliminar la canción de la playlist');
@@ -609,8 +609,6 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
     await mp3player.stop();
     debugPrint(index.toString());
 
-    if (!enCola) { // Si no estamos reproduciendo canciones de la cola entramos
-      if(!hayCola){ // Si ni siquiera hay canciones en la cola, entramos
         if (!podcast) {
           if (index >= ids.length - 1) {
             index = 0;
@@ -631,34 +629,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
           }
           await sig_capitulo(index);
         }
-      }
-      else{ // Sí que hay cola, pero NO estamos en ella
-        enCola = true;
-        List<int> ids_cola = [];
-        _getListarCola();
-        for (var song in _cola){
-          ids_cola.add(song['id']);
-        }
-        await sig_cancion(ids_cola, index);
-        _deleteSongFromQueue(ids_cola[0]);
-      }
-    }
-    else{ // Hay más canciones en la cola, y estamos ahora mismo reproduciendo la cola
-      if (index >= ids.length - 1) {
-        index = 0;
-        comienzo = true;
-      }
-      else{
-        List<int> ids_cola = [];
-        _getListarCola();
-        for (var song in _cola){
-          ids_cola.add(song['id']);
-        }
-        await sig_cancion(ids_cola, index);
-        _deleteSongFromQueue(ids_cola[0]);
-      }
 
-    }
 
     setState(() {
       progress = 0.0;
@@ -679,7 +650,6 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
   void previousSong() async{
     // Aquí iría la lógica para volver a la canción anterior
     timer?.cancel();
-    if (!enCola){
       if (index <= 0){
         index = 0;
         await mp3player.stop();
@@ -695,12 +665,8 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
           await sig_capitulo(index);
         }
       }
-    }
-    else{
-      enCola = false;
-      await mp3player.stop();
-      await sig_cancion(ids, index);
-    }
+
+
 
     setState(() {
       progress = 0.0;
