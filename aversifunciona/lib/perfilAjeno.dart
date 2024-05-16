@@ -70,6 +70,7 @@ class _PerfilAjenoState extends State<PerfilAjeno> {
 
       if (response.statusCode == 200) {
         print('Usuario seguido con éxito');
+          _devolverUsuario(correoAux);
       } else {
         print('Error al seguir al usuario: ${response.statusCode}');
       }
@@ -80,17 +81,24 @@ class _PerfilAjenoState extends State<PerfilAjeno> {
 
   void _dejarDeSeguirUsuario() async {
     try {
+      String correoAux;
+      if (widget.usuario.containsKey('seguido')) {
+        correoAux = widget.usuario['seguido'];
+      } else {
+        correoAux = widget.usuario['correo'];
+      }
       final response = await http.post(
         Uri.parse('${Env.URL_PREFIX}/dejarDeSeguir/'),
         body: jsonEncode({
           'correo': _correoS, // Correo del usuario actual
-          'seguido': widget.usuario['seguido'], // Correo del usuario del perfil
+          'seguido': correoAux, // Correo del usuario del perfil
         }),
         headers: {'Content-Type': 'application/json'},
       );
 
       if (response.statusCode == 200) {
         print('Usuario dejado de seguir con éxito');
+        _devolverUsuario(correoAux);
       } else {
         print('Error al dejar de seguir al usuario: ${response.statusCode}');
       }
@@ -120,6 +128,8 @@ class _PerfilAjenoState extends State<PerfilAjeno> {
       print('Error fetching user info: $e');
     }
   }
+
+
 
   Future<void> _devolverUsuario(String correo) async {
     try {
@@ -341,6 +351,7 @@ class _PerfilAjenoState extends State<PerfilAjeno> {
               child: isFollowing
                   ? OutlinedButton(
                 onPressed: toggleFollow,
+
                 style: OutlinedButton.styleFrom(
                   side: BorderSide(color: Colors.white),
                 ),
