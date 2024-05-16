@@ -1,10 +1,14 @@
+import 'dart:typed_data';
+
 import 'package:aversifunciona/biblioteca.dart';
 import 'package:aversifunciona/buscar.dart';
 import 'package:aversifunciona/pantalla_principal.dart';
+import 'package:aversifunciona/reproductor.dart';
 import 'package:aversifunciona/salas.dart';
 import 'package:flutter/material.dart';
 
 import 'cancion.dart';
+import 'cancionSin.dart';
 
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -31,7 +35,7 @@ class _PantallaAlbumState extends State<PantallaAlbum> {
   final TextEditingController _emailController = TextEditingController();
   bool cargado = false;
   List<int> ids = [];
-  List<Cancion> canciones2= [];
+  List<CancionSin> canciones2= [];
 
   _PantallaAlbumState(String name){
     albumName = name;
@@ -43,7 +47,27 @@ class _PantallaAlbumState extends State<PantallaAlbum> {
     // Obtener los datos de la playlist al inicializar el widget
     _fetchAlbumData();
   }
+  Future<Uint8List> _fetchImageFromUrl(String imageUrl) async {
+    final response = await http.get(Uri.parse(imageUrl));
+    if (response.statusCode == 200) {
+      // Devuelve los bytes de la imagen
+      return response.bodyBytes;
+    } else {
+      // Si la solicitud falla, lanza un error
+      throw Exception('Failed to load image from $imageUrl');
+    }
+  }
 
+  Future<Uint8List> _fetchAudioFromUrl(String audioUrl) async {
+    final response = await http.get(Uri.parse(audioUrl));
+    if (response.statusCode == 200) {
+      // Devuelve los bytes de la imagen
+      return response.bodyBytes;
+    } else {
+      // Si la solicitud falla, lanza un error
+      throw Exception('Failed to load audio from $audioUrl');
+    }
+  }
   Future<void> _fetchAlbumData() async {
     try {
       final response = await http.post(
@@ -74,7 +98,7 @@ class _PantallaAlbumState extends State<PantallaAlbum> {
 
 
   Future<void> _fetchAlbumSongs() async {
-    List<Cancion> canciones_ = [];
+    List<CancionSin> canciones_ = [];
     try {
       final response = await http.post(
         Uri.parse('${Env.URL_PREFIX}/listarCancionesAlbum/'),
@@ -90,7 +114,7 @@ class _PantallaAlbumState extends State<PantallaAlbum> {
         final cancionesData = responseData['canciones'];
 
         for (var i = 0; i < cancionesData.length; i++) {
-          Cancion cancion = Cancion.fromJson(cancionesData[i]);
+          CancionSin cancion = CancionSin.fromJson(cancionesData[i]);
           canciones_.add(cancion);
           ids.add(canciones_[i].id!);
         }
@@ -189,18 +213,46 @@ class _PantallaAlbumState extends State<PantallaAlbum> {
                 ),
                 Row(
                   children: [
-                    const SizedBox(width: 10,),
-                    ElevatedButton.icon(
-                      onPressed: () {
+                    ElevatedButton(
+
+                      //style: ButtonStyle(backgroundColor: MaterialStateProperty.all<Color>(Colors.white), ),
+                      onPressed: () async{
                         // Lógica para reproducir la playlist
-                        /*Navigator.push(
+                        ids.shuffle();
+                        Cancion? song;
+                        for (var cancion in canciones2){
+                          if(ids[0] == cancion.id){
+                            Uint8List image = await _fetchImageFromUrl('${Env.URL_PREFIX}/imagenCancion/${cancion.id}/');
+                            Uint8List audio = await _fetchAudioFromUrl('${Env.URL_PREFIX}/audioCancion/${cancion.id}/');
+                            Cancion cancion2 = Cancion(id: cancion.id, nombre: cancion.nombre, miAlbum: cancion.miAlbum, puntuacion: cancion.puntuacion, archivomp3: audio, foto: image);
+                            song = cancion2;
+                          }
+                        }
+
+                        Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => reproductor(cancion: canciones[0], ids: ids)), // cancion: cancion dentro de reproductor cuando esto funcione
-                        );*/
+                          MaterialPageRoute(builder: (context) => Reproductor(cancion: song, ids: ids, playlist: 'Reproduciendo desde: $albumName',)), // cancion: cancion dentro de reproductor cuando esto funcione
+
+                        );
                       },
-                      icon: const Icon(Icons.play_arrow),
-                      label: const Text('Play'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.transparent,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      child: const Column(
+                        children: [
+                          SizedBox(height: 8),
+                          Icon(Icons.question_mark_outlined, color: Colors.grey, size: 37.0),
+                          Text(
+                            'Buscar',
+                            style: TextStyle(color: Colors.white, fontSize: 12),
+                          ),
+                        ],
+                      ),
                     ),
+
                   ],
                 )
 
