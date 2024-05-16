@@ -64,7 +64,7 @@ class _PantallaCancionState extends State<PantallaCancion> {
         imagen = await _fetchImageFromUrl('${Env.URL_PREFIX}/imagenCancion/${c_id}/');
         print('${Env.URL_PREFIX}/imagenCancion/${c_id}/');
         await _fetchAlbumName(album);
-        await _fetchArtistName(album);
+        await _fetchArtistName(songData['id']);
       } else {
         throw Exception('Error al obtener los datos de la canción');
       }
@@ -125,23 +125,30 @@ class _PantallaCancionState extends State<PantallaCancion> {
     }
   }
 
-  Future<void> _fetchArtistName(int albumId) async {
+  Future<void> _fetchArtistName(int cancionId) async {
     try {
       final response = await http.post(
-        Uri.parse('${Env.URL_PREFIX}/listarArtistasCancion/'), // Reemplaza con la URL de tu API
+        Uri.parse('${Env.URL_PREFIX}/listarArtistasCancion/'), // Cambia la URL según la ruta correcta de tu API
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
-          'albumId': albumId,
+          'cancionId': cancionId,
         }),
       );
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
-        final artistData = responseData['artistas'];
-        final artistName = artistData['nombre']; // Suponiendo que 'nombre' es el campo que contiene el nombre del álbum
+        final List<dynamic> artistData = responseData['artistas'];
+
+        // Si hay múltiples artistas, necesitas iterar sobre ellos para obtener todos los nombres
+        List<String> artistNames = [];
+        for (var artist in artistData) {
+          artistNames.add(artist['nombre']);
+        }
+
         setState(() {
-          // Actualizar el estado con el nombre del álbum
-          // Aquí puedes asignar el nombre del álbum a una variable en el estado si es necesario
-          this.artistName = artistName;
+          // Actualizar el estado con el nombre o nombres de los artistas
+          // Si solo hay un artista, puedes asignar directamente el nombre
+          // Si hay múltiples artistas, puedes concatenarlos o manejarlos como sea necesario
+          this.artistName = artistNames.join(', '); // Uniendo los nombres de los artistas separados por coma
         });
       } else {
         throw Exception('Error al obtener el nombre del artista');
@@ -151,6 +158,7 @@ class _PantallaCancionState extends State<PantallaCancion> {
       // Manejar el error aquí
     }
   }
+
 
   Future<void> _getUserInfo() async {
     try {
@@ -390,10 +398,10 @@ class _PantallaCancionState extends State<PantallaCancion> {
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Text(
+                /*Text(
                   'Duración: $duracion',
                   style: const TextStyle(fontSize: 16, color: Colors.grey),
-                ),
+                ),*/
               ],
             ),
           ],
