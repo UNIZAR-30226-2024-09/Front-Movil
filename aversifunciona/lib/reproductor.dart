@@ -145,6 +145,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
   double progress = 0.0; // Representa la posición de reproducción de la canción
   double volume = 1.0;
   Timer? timer;
+  int id_podcast = 0;
   String duracion = '';
   String progreso = '0:00';
   int segundos = 0;
@@ -154,26 +155,29 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
   String _correoS = '';
   bool podcast = false;
   bool capitulo = false;
+  String nombrePodcast = '';
   List<dynamic> capitulos = [];
   int index = 0;
   AudioPlayer mp3player = AudioPlayer();
   List<int> ids = [];
   List<dynamic> _cola = [];
+  var imagen_cancion;
 
   _MusicPlayerScreenState(var song, AudioPlayer player, List<int> index_, String playlist_){
     playlist = playlist_;
     posible_podcast = song;
     cancion = song;
     mp3player = player;
-    if (index_.isNotEmpty){
+
+    if (index_.isNotEmpty) {
       ids = index_;
-    }
-    else{
-      if(index_[0] == -33){
-        ids = [];
+
+      if (index_[0] == -33) {
+        debugPrint("Marianela");
+        id_podcast = index_[1];
         podcast = true;
       }
-      else if (index_[0] == -32){
+      else if (index_[0] == -32) {
         ids = [];
         capitulo = true;
       }
@@ -288,7 +292,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
       try {
         // Decodificar el audio base64 a bytes
 
-        Uint8List song = capitulos[index].archivomp3!;
+        Uint8List audio = await _fetchAudioFromUrl('${Env.URL_PREFIX}/audioPodcast/${ids[index]}/');
         //song.replaceAll(RegExp('^data:audio\\/mp3;base64,'), '').replaceAll(RegExp('^data:[^;]+;base64,'), '')
         /*String song2 = ('data:audio/mp3;base64,${(utf8.decode(base64Decode(
             song.replaceAll(RegExp(r'^data:audio\/mp3;base64,'), '')
@@ -301,7 +305,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
         await mp3player.setAudioSource(
             ConcatenatingAudioSource(children: [
               AudioSource.uri(Uri.dataFromBytes(
-                song,
+                audio,
                 mimeType: 'audio/mp3',
               ))]));
 
@@ -318,33 +322,49 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
 
   }
 
-  Future<void> cargar_capitulos() async{
+  Future<void> cargar_capitulos(int index) async{
     try {
       // Decodificar el audio base64 a bytes
+      imagen_cancion = await _fetchImageFromUrl('${Env.URL_PREFIX}/imagenPodcast/$id_podcast/');
+
+      final response2 = await http.post(
+        Uri.parse('${Env.URL_PREFIX}/devolverPodcast/'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode({'podcastId': id_podcast}),
+      );
+
+      if (response2.statusCode == 200){
+        Map<String, dynamic> data = jsonDecode(response2.body);
+        dynamic name = data['podcast'];
+        nombrePodcast = name['nombre'];
+      }
+
 
       final response = await http.post(
         Uri.parse('${Env.URL_PREFIX}/listarCapitulosPodcast/'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
-        body: jsonEncode({'nombrePodcast': cancion.nombre}),
+        body: jsonEncode({'nombrePodcast': nombrePodcast}),
       );
 
       if (response.statusCode == 200) {
         Map<String, dynamic> data = jsonDecode(response.body);
         dynamic capitulosData = data['capitulos'];
 
-        List<dynamic> nuevosCapitulos = [];
+        List<int> nuevosCapitulos = [];
 
         for (var i = 0; i < capitulosData.length; i++) {
           Capitulo capitulo = Capitulo.fromJson(capitulosData[i]);
-          nuevosCapitulos.add(capitulo);
-          debugPrint(capitulo.toString());
+
+          nuevosCapitulos.add(capitulo.id!);
         }
 
+        debugPrint(nuevosCapitulos.toString());
         setState(() {
-          capitulos = nuevosCapitulos;
-          duracion = '${mp3player.duration!.inMinutes}:${mp3player.duration!.inSeconds % 60 >= 10 ? mp3player.duration!.inSeconds %60: '0${mp3player.duration!.inSeconds % 60}'}';
+          ids = nuevosCapitulos;
         });
 
       } else {
@@ -367,14 +387,20 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
       MyCustomSource audioSource = MyCustomSource(capitulos[index].archivomp3!);
 
       */
+      debugPrint("Pedro");
+      Uint8List audio = await _fetchAudioFromUrl('${Env.URL_PREFIX}/audioPodcast/${ids[0]}/');
+
 
       await mp3player.setAudioSource(
           ConcatenatingAudioSource(children: [
             AudioSource.uri(Uri.dataFromBytes(
-              capitulos[0].archivomp3!,
+              audio,
               mimeType: 'audio/mp3',
             ))]));
 
+      setState(() {
+        duracion = '${mp3player.duration!.inMinutes}:${mp3player.duration!.inSeconds % 60 >= 10 ? mp3player.duration!.inSeconds %60: '0${mp3player.duration!.inSeconds % 60}'}';
+      });
       // Cargar el AudioSource en el reproductor de audio
     }
 
@@ -398,7 +424,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
         headers: {'Content-Type': 'application/json'},
       );
       if (response.statusCode == 200) {
-        debugPrint("Pedro");
+
       }
       else {
         throw Exception('Error al obtener la cola: ${response.statusCode}');
@@ -425,6 +451,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
         Cancion song2 = Cancion(id: song_.id, nombre: song_.nombre, miAlbum: song_.miAlbum, puntuacion: song_.puntuacion, archivomp3: audio, foto: imagen);
 
         setState(() {
+          imagen_cancion = imagen;
           cancion = song2;
         });
 
@@ -488,6 +515,10 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
       }
     }
 
+    Uint8List imagen = await _fetchImageFromUrl('${Env.URL_PREFIX}/imagenCancion/${cancion.id}/');
+    setState(() {
+      imagen_cancion = imagen;
+    });
 
     try {
 
@@ -518,6 +549,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
                 mimeType: 'audio/mp3',
         ))]));
 
+
         setState(() {
           duracion = '${mp3player.duration!.inMinutes}:${mp3player.duration!.inSeconds % 60 >= 10 ? mp3player.duration!.inSeconds %60: '0${mp3player.duration!.inSeconds % 60}'}';
         });
@@ -535,8 +567,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
   void initState(){
     _getListarCola();
     if(podcast){
-      ids = [];
-      cargar_capitulos();
+      cargar_capitulos(0);
     }
     else if (capitulo){
 
@@ -609,7 +640,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
     await mp3player.stop();
     debugPrint(index.toString());
 
-        if (!podcast) {
+        if (!podcast) { // No es un podcast
           if (index >= ids.length - 1) {
             index = 0;
             comienzo = true;
@@ -619,8 +650,9 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
           }
           await sig_cancion(ids, index);
         }
-        else {
-          if (index >= capitulos.length - 1) {
+        else { // Es un podcast
+          debugPrint(ids.length.toString());
+          if (index >= ids.length - 1) {
             index = 0;
             comienzo = true;
           }
@@ -665,8 +697,6 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
           await sig_capitulo(index);
         }
       }
-
-
 
     setState(() {
       progress = 0.0;
@@ -719,7 +749,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Image.memory(cancion.foto, height: 200, width: 200,),
+                imagen_cancion !=null ? Image.memory(imagen_cancion, height: 200, width: 200,) : const CircularProgressIndicator(),
                 const SizedBox(height: 20.0),
                 // Agregar aquí la imagen de la canción
                 const SizedBox(height: 20.0),

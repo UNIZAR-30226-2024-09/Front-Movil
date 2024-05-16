@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:aversifunciona/biblioteca.dart';
 import 'package:aversifunciona/buscar.dart';
 import 'package:aversifunciona/pantalla_principal.dart';
+import 'package:aversifunciona/reproductor.dart';
 import 'package:aversifunciona/salas.dart';
 import 'package:flutter/material.dart';
 
@@ -33,6 +34,7 @@ class _PantallaPodcastState extends State<PantallaPodcast> {
   late List<Map<String, dynamic>> capitulos1 = [];
   final TextEditingController _emailController = TextEditingController();
   bool cargado = false;
+  int id_podcast = 0;
   List<int> ids = [];
   List<Capitulo> capitulos2= [];
   Uint8List imagen=Uint8List(0);
@@ -64,6 +66,9 @@ class _PantallaPodcastState extends State<PantallaPodcast> {
         print('Podcast: $podcastName');
         imagen = await _fetchImageFromUrl('${Env.URL_PREFIX}/imagenPodcast/${widget.podcastId}/');
         _fetchPodcastEpisodes();
+        setState(() {
+          id_podcast = widget.podcastId;
+        });
       } else {
         throw Exception('Error al obtener los datos del podcast');
       }
@@ -91,6 +96,7 @@ class _PantallaPodcastState extends State<PantallaPodcast> {
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
         final episodesData = responseData['capitulos'];
+
 
         for (var i = 0; i < episodesData.length; i++) {
           Capitulo capitulo = Capitulo.fromJson(episodesData[i]);
@@ -205,11 +211,16 @@ class _PantallaPodcastState extends State<PantallaPodcast> {
                       const SizedBox(width: 10,),
                       ElevatedButton.icon(
                         onPressed: () {
+
                           // Lógica para reproducir la playlist
-                          /*Navigator.push(
+                          ids = [-33];
+                          ids.add(id_podcast);
+                          Capitulo capitulo = Capitulo(id: capitulos1[0]['id'], nombre: capitulos1[0]['nombre'], descripcion: capitulos1[0]['descripcion'], miPodcast: capitulos1[0]['miPodcast'], archivomp3: null);
+                          Navigator.push(
+
                             context,
-                            MaterialPageRoute(builder: (context) => reproductor(cancion: canciones[0], ids: ids)), // cancion: cancion dentro de reproductor cuando esto funcione
-                          );*/
+                            MaterialPageRoute(builder: (context) => Reproductor(cancion: capitulo, ids: ids, playlist: 'Reproduciendo podcast: $podcastName',)), // cancion: cancion dentro de reproductor cuando esto funcione
+                          );
                         },
                         icon: const Icon(Icons.play_arrow),
                         label: const Text('Play'),
