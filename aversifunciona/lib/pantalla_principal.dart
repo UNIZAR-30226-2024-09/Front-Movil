@@ -261,51 +261,55 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
   }
 
   Future<void> _recomendar() async {
-    final Map<String, dynamic> data = {
-      'correo': _correoS,
-    };
-    final response = await http.post(
-      Uri.parse('${Env.URL_PREFIX}/recomendar/'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(data),
-    );
-    if (response.statusCode == 200) {
-      // Recomendacion exitosa
-      final data = jsonDecode(response.body) as Map<String, dynamic>;
-      final Map<String, dynamic> recomendaciones = data['recomendaciones'];
+    try {
+      final Map<String, dynamic> data = {
+        'correo': _correoS,
+      };
+      final response = await http.post(
+        Uri.parse('${Env.URL_PREFIX}/recomendar/'),
+        headers: {'Content-Type': 'application/json; charset=UTF-8'},
+        body: jsonEncode(data),
+      );
+      if (response.statusCode == 200) {
+        // Recomendacion exitosa
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
+        final Map<String, dynamic> recomendaciones = data['recomendaciones'];
 
-      // Obtener lista de canciones recomendadas
-      final List<dynamic> cancionesData = recomendaciones['canciones'];
-      final List<Map<String, dynamic>> cancionesRecomendadasAux = cancionesData.map((cancionRecomendada) {
-        return {
-          'id': cancionRecomendada['id'] as int,
-          'nombre': cancionRecomendada['nombre'] as String,
-          'miAlbum': cancionRecomendada['miAlbum'] as int,
-          'puntuacion': cancionRecomendada['puntuacion'] as int,
-          //archivoMp3: cancionRecomendada['archivoMp3'] as String?,
-          //'foto': cancionRecomendada['foto'] as String,
-        };
-      }).toList();
+        // Obtener lista de canciones recomendadas
+        final List<dynamic>? cancionesData = recomendaciones['canciones'];
+        final List<Map<String, dynamic>> cancionesRecomendadasAux = cancionesData?.map<Map<String, dynamic>>((cancionRecomendada) {
+          return {
+            'id': cancionRecomendada['id'] as int,
+            'nombre': cancionRecomendada['nombre'] as String,
+            'miAlbum': cancionRecomendada['miAlbum'] != null ? cancionRecomendada['miAlbum'] as int : null, // Verificar si miAlbum no es null
+            'puntuacion': cancionRecomendada['puntuacion'] as int,
+            //archivoMp3: cancionRecomendada['archivoMp3'] as String?,
+            //'foto': cancionRecomendada['foto'] as String,
+          };
+        }).toList() ?? [];
 
-      // Obtener lista de podcasts recomendados
-      final List<dynamic> podcastsData = recomendaciones['podcasts'];
-      final List<Map<String, dynamic>> podcastsRecomendadosAux = podcastsData.map((podcastRecomendado) {
-        return {
-          'id': podcastRecomendado['id'] as int,
-          'nombre': podcastRecomendado['nombre'] as String,
-          //'foto': podcastRecomendado['foto'] as String,
-        };
-      }).toList();
+// Obtener lista de podcasts recomendados
+        final List<dynamic>? podcastsData = recomendaciones['podcasts'];
+        final List<Map<String, dynamic>> podcastsRecomendadosAux = podcastsData?.map<Map<String, dynamic>>((podcastRecomendado) {
+          return {
+            'id': podcastRecomendado['id'] as int,
+            'nombre': podcastRecomendado['nombre'] as String,
+            //'foto': podcastRecomendado['foto'] as String,
+          };
+        }).toList() ?? [];
 
-      // Actualizar el estado del widget con las recomendaciones
-      setState(() {
-        cancionesRecomendadas = cancionesRecomendadasAux;
-        podcastsRecomendados = podcastsRecomendadosAux;
-      });
-    } else {
-      throw Exception('Failed to get recommendation');
+
+        // Actualizar el estado del widget con las recomendaciones
+        setState(() {
+          cancionesRecomendadas = cancionesRecomendadasAux;
+          podcastsRecomendados = podcastsRecomendadosAux;
+        });
+      } else {
+        throw Exception('Failed to get recommendation');
+      }
+    } catch (e) {
+      print('Error en la función _recomendar: $e');
+      // Manejar el error aquí
     }
   }
 
@@ -388,6 +392,7 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
     }
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -453,7 +458,7 @@ class _PantallaPrincipalState extends State<pantalla_principal> {
                               children: [
                                 Expanded(
                                   child: FutureBuilder<Uint8List>(
-                                    future: _fetchImageFromUrl('${Env.URL_PREFIX}/imagenCancion/${cancionRecomendada['id']}/'),
+                                    future: _fetchImageFromUrl('${Env.URL_PREFIX}/imagenCancion/${cancionRecomendada['id']}'),
                                     builder: (context, snapshot) {
                                       if (snapshot.connectionState == ConnectionState.waiting) {
                                         // Muestra un indicador de carga mientras se decodifica la imagen
