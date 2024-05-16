@@ -15,17 +15,17 @@ import 'env.dart';
 import 'cola.dart';
 import 'salas.dart';
 
-class Album extends StatefulWidget {
+class PantallaAlbum extends StatefulWidget {
   final int albumId;
   final String albumName;
 
-  const Album({Key? key, required this.albumId, required this.albumName}) : super(key: key);
+  const PantallaAlbum({Key? key, required this.albumId, required this.albumName}) : super(key: key);
 
   @override
   _AlbumState createState() => _AlbumState(albumName);
 }
 
-class _AlbumState extends State<Album> {
+class _AlbumState extends State<PantallaAlbum> {
   //bool isPublic = true; // Estado de la playlist (pública o privada)
   String albumName = '';
   late String userName = '';
@@ -306,12 +306,12 @@ class _AlbumState extends State<Album> {
                         onPressed: () async{
                           // Lógica para reproducir la playlist
                           ids.shuffle();
-                          CancionSin? song;
+                          Cancion? song;
                           for (var cancion in canciones){
                             if(ids[0] == cancion.id){
                               Uint8List image = await _fetchImageFromUrl('${Env.URL_PREFIX}/imagenCancion/${cancion.id}/');
                               Uint8List audio = await _fetchAudioFromUrl('${Env.URL_PREFIX}/audioCancion/${cancion.id}/');
-                              CancionSin cancion2 = CancionSin(id: cancion.id, nombre: cancion.nombre, miAlbum: cancion.miAlbum, puntuacion: cancion.puntuacion);
+                              Cancion cancion2 = Cancion(id: cancion.id, nombre: cancion.nombre, miAlbum: cancion.miAlbum, puntuacion: cancion.puntuacion, foto: image, archivomp3: audio);
                               song = cancion2;
                             }
                           }
@@ -328,12 +328,12 @@ class _AlbumState extends State<Album> {
                       ElevatedButton.icon(
                         onPressed: () async {
                           // Lógica para reproducir la playlist
-                          CancionSin? song;
+                          Cancion? song;
                           for (var cancion in canciones){
                             if(ids[0] == cancion.id){
                               Uint8List image = await _fetchImageFromUrl('${Env.URL_PREFIX}/imagenCancion/${cancion.id}/');
                               Uint8List audio = await _fetchAudioFromUrl('${Env.URL_PREFIX}/audioCancion/${cancion.id}/');
-                              CancionSin cancion2 = CancionSin(id: cancion.id, nombre: cancion.nombre, miAlbum: cancion.miAlbum, puntuacion: cancion.puntuacion);
+                              Cancion cancion2 = Cancion(id: cancion.id, nombre: cancion.nombre, miAlbum: cancion.miAlbum, puntuacion: cancion.puntuacion, foto: image, archivomp3: audio);
                               song = cancion2;
                             }
                           }

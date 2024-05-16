@@ -374,7 +374,7 @@ class _pantalla_buscarState extends State<pantalla_buscar> {
             pantallaCorrespondiente = PantallaArtista(artistaId:item['artista']['id'], artistaName:item['artista']['nombre']);
           } else if (item.containsKey('album')) {
             nombre = item['album']['nombre'];
-            pantallaCorrespondiente = Album(albumId:item['album']['id'], albumName:item['album']['nombre']);
+            pantallaCorrespondiente = PantallaAlbum(albumId:item['album']['id'], albumName:item['album']['nombre']);
           } else if (item.containsKey('presentador')) {
             nombre = item['presentador']['nombre'];
             pantallaCorrespondiente = PantallaPresentador(presentadorId:item['presentador']['id'], presentadorName:item['presentador']['nombre'],);
