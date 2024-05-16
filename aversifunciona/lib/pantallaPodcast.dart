@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:aversifunciona/biblioteca.dart';
 import 'package:aversifunciona/buscar.dart';
 import 'package:aversifunciona/pantalla_principal.dart';
@@ -17,6 +19,7 @@ class PantallaPodcast extends StatefulWidget {
   final int podcastId;
   final String podcastName;
 
+
   const PantallaPodcast({Key? key, required this.podcastId, required this.podcastName}) : super(key: key);
 
   @override
@@ -32,6 +35,7 @@ class _PantallaPodcastState extends State<PantallaPodcast> {
   bool cargado = false;
   List<int> ids = [];
   List<Capitulo> capitulos2= [];
+  Uint8List imagen=Uint8List(0);
 
   _PantallaPodcastState(String name){
     podcastName = name;
@@ -58,6 +62,7 @@ class _PantallaPodcastState extends State<PantallaPodcast> {
         final podcastData = responseData['podcast'];
 
         print('Podcast: $podcastName');
+        imagen = await _fetchImageFromUrl('${Env.URL_PREFIX}/imagenPodcast/${widget.podcastId}/');
         _fetchPodcastEpisodes();
       } else {
         throw Exception('Error al obtener los datos del podcast');
@@ -114,6 +119,17 @@ class _PantallaPodcastState extends State<PantallaPodcast> {
     }
   }
 
+  Future<Uint8List> _fetchImageFromUrl(String imageUrl) async {
+    final response = await http.get(Uri.parse(imageUrl));
+    if (response.statusCode == 200) {
+      // Devuelve los bytes de la imagen
+      return response.bodyBytes;
+    } else {
+      // Si la solicitud falla, lanza un error
+      throw Exception('Failed to load image from $imageUrl');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -133,21 +149,19 @@ class _PantallaPodcastState extends State<PantallaPodcast> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const SizedBox(height: 20),
-            // Aquí iría la foto de la playlist (cuadrada, en el centro, dentro de un contenedor gris)
             Container(
-              color: Colors.black,
-              padding: const EdgeInsets.all(20),
+              width: 200,
+              height: 200,
+              color: Colors.grey.withOpacity(0.5),
               child: Center(
-                child: SizedBox(
-                  width: 200,
+                child: imagen.isNotEmpty // Verifica si la lista de bytes de la imagen no está vacía
+                    ? Image.memory(
+                  imagen,
                   height: 200,
-                  child: Container(
-                    color: Colors.grey.withOpacity(0.5),
-                    child: Center(
-                      child: Image.asset('lib/playlist.jpg'),
-                    ),
-                  ),
-                ),
+                  width: 200,
+                  fit: BoxFit.cover, // Ajusta la imagen para que cubra el contenedor
+                )
+                    : CircularProgressIndicator(), // Muestra un indicador de carga si la lista de bytes está vacía
               ),
             ),
 
@@ -242,7 +256,23 @@ class _PantallaPodcastState extends State<PantallaPodcast> {
                         }
                       },
                       child: ListTile(
-                        leading: const Icon(Icons.music_note),
+                        leading: FutureBuilder<Uint8List>(
+                          future: _fetchImageFromUrl('${Env.URL_PREFIX}/imagenPodcast/${widget.podcastId}/'),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return const SizedBox(); // Devuelve un widget vacío mientras espera
+                            } else if (snapshot.hasError) {
+                              return const Icon(Icons.error);
+                            } else {
+                              return Image.memory(
+                                snapshot.data!,
+                                width: 50,
+                                height: 50,
+                                fit: BoxFit.cover,
+                              );
+                            }
+                          },
+                        ),
                         title: Text(capitulo['nombre'] ?? 'Nombre no disponible', style: const TextStyle(color: Colors.white)),
                         //subtitle: Text(artistasString, style: const TextStyle(color: Colors.grey)),
                       ),
